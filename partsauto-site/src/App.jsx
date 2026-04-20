@@ -706,8 +706,11 @@ function MainPage() {
                         transition={{ delay: index * 0.03 }}
                       >
                         <div className="card card-product h-100">
-                          <div 
-                            onClick={() => setSelectedProduct(product)}
+                          <div
+                            onClick={(e) => {
+                              e.stopPropagation()
+                              setSelectedProduct(product)
+                            }}
                             style={{ cursor: 'pointer' }}
                           >
                             <ProductImageSlider images={product.images} title={product.title} />

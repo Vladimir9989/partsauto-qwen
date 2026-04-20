@@ -55,6 +55,14 @@ const ProductModal = ({ product, onClose }) => {
     }
   }
 
+  const handlePrevImage = () => {
+    setCurrentImageIndex((prev) => (prev === 0 ? images.length - 1 : prev - 1))
+  }
+
+  const handleNextImage = () => {
+    setCurrentImageIndex((prev) => (prev === images.length - 1 ? 0 : prev + 1))
+  }
+
   return (
     <AnimatePresence>
       <motion.div
@@ -114,6 +122,21 @@ const ProductModal = ({ product, onClose }) => {
                           ))}
                         </div>
                       )}
+                      {/* Кнопки навигации */}
+                      <button
+                        className="slider-nav slider-prev"
+                        onClick={handlePrevImage}
+                        aria-label="Предыдущее изображение"
+                      >
+                        <i className="bi bi-chevron-left"></i>
+                      </button>
+                      <button
+                        className="slider-nav slider-next"
+                        onClick={handleNextImage}
+                        aria-label="Следующее изображение"
+                      >
+                        <i className="bi bi-chevron-right"></i>
+                      </button>
                     </>
                   ) : (
                     <div className="no-image-placeholder">

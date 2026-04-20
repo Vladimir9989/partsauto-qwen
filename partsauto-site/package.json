@@ -6,6 +6,8 @@
   "scripts": {
     "dev": "vite",
     "build": "vite build",
+    "deploy": "npm run build && scp -r dist/* root@217.198.13.45:/var/www/partsauto/",
+    "deploy:full": "git add . && git commit -m \"Update\" && git push && npm run deploy",
     "preview": "vite preview",
     "server": "node server/index.js",
     "start": "node server/index.js"

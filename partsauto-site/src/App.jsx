@@ -10,6 +10,7 @@ import ComparePage from './components/ComparePage'
 import SearchAutocomplete from './components/SearchAutocomplete'
 import ThemeToggle from './components/ThemeToggle'
 import OldHeader from './components/OldHeader'
+import Header from './components/Header/Header'
 import { useFavoritesStore, useCompareStore, useThemeStore } from './store/useStore'
 
 const API_URL = '/api/products'
@@ -443,6 +444,7 @@ function MainPage() {
 
       <div className="container-fluid p-0">
         {/* <OldHeader /> */}
+        <Header />
 
         <div className="container">
           {/* Компактные фильтры для средних экранов */}

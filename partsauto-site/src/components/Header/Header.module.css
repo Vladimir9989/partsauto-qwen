@@ -8,6 +8,22 @@
   border-bottom: 1px solid #e0e0e0;
 }
 
+.container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 16px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.top-row {
+  display: flex;
+  align-items: center;
+  gap: 24px;
+  width: 100%;
+}
+
 .location-info {
   display: flex;
   align-items: center;
@@ -67,6 +83,7 @@
   align-items: center;
   gap: 4px;
   font-size: 14px;
+  position: relative;
 }
 
 .cart-icon {
@@ -82,6 +99,9 @@
   font-weight: bold;
   min-width: 18px;
   text-align: center;
+  position: absolute;
+  top: -8px;
+  right: -8px;
 }
 
 .headerBottom {

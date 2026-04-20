@@ -32,10 +32,8 @@ const CartPanel = ({ isOpen, onClose }) => {
   }, [updateQuantity])
 
   const handleClearCart = useCallback(() => {
-    if (window.confirm('Очистить корзину?')) {
-      clearCart()
-      toast.success('Корзина очищена')
-    }
+    clearCart()
+    toast.success('Корзина очищена')
   }, [clearCart])
 
   const handleBackdropClick = useCallback((e) => {

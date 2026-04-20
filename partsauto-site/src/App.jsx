@@ -468,6 +468,7 @@ function App() {
             style: {
               background: '#363636',
               color: '#fff',
+              pointerEvents: 'none',
             },
             success: {
               duration: 2000,

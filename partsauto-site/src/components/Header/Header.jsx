@@ -1,19 +1,40 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import HeaderTop from './HeaderTop';
 import HeaderBottom from './HeaderBottom';
 import MobileMenu from './MobileMenu';
 import styles from './Header.module.css';
 
+const navLinks = [
+  { to: '/', label: 'Главная' },
+  { to: '/catalog', label: 'Каталог запчастей' },
+  { to: '/delivery', label: 'Оплата и доставка' },
+  { to: '/contacts', label: 'Контакты' },
+  { to: '/news', label: 'Новости о нас' },
+  { to: '/warranty', label: 'Гарантия и возврат' },
+];
+
 function Header() {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+
+  useEffect(() => {
+    if (isMobileMenuOpen) {
+      document.body.style.overflow = 'hidden';
+    } else {
+      document.body.style.overflow = '';
+    }
+  }, [isMobileMenuOpen]);
 
   return (
     <header className={styles.header}>
       <HeaderTop />
-      <HeaderBottom />
+      <HeaderBottom 
+        isMobileMenuOpen={isMobileMenuOpen}
+        setIsMobileMenuOpen={setIsMobileMenuOpen}
+      />
       <MobileMenu
-        isOpen={isMobileMenuOpen}
+        isMenuOpen={isMobileMenuOpen}
         onClose={() => setIsMobileMenuOpen(false)}
+        links={navLinks}
       />
     </header>
   );

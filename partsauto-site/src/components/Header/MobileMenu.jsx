@@ -1,22 +1,26 @@
 import { Link } from 'react-router-dom';
 import styles from './Header.module.css';
 
-function MobileMenu({ isOpen, onClose }) {
+function MobileMenu({ isMenuOpen, onClose, links }) {
   return (
-    <div className={styles.mobileMenu}>
-      <div className={`mobile-menu-overlay ${isOpen ? 'visible' : ''}`} onClick={onClose} />
-      <div className={`mobile-menu ${isOpen ? 'visible' : ''}`}>
-        <button className="mobile-menu-close" onClick={onClose}>
+    <>
+      <div 
+        className={`${styles.mobileMenuOverlay} ${isMenuOpen ? styles.visible : ''}`} 
+        onClick={onClose} 
+      />
+      <div className={`${styles.mobileMenuPanel} ${isMenuOpen ? styles.visible : ''}`}>
+        <button className={styles.mobileMenuClose} onClick={onClose}>
           ×
         </button>
-        <nav className="mobile-nav">
-          <Link to="/" onClick={onClose}>Главная</Link>
-          <Link to="/catalog" onClick={onClose}>Каталог</Link>
-          <Link to="/favorites" onClick={onClose}>Избранное</Link>
-          <Link to="/compare" onClick={onClose}>Сравнение</Link>
+        <nav className={styles.mobileNav}>
+          {links.map((link) => (
+            <Link key={link.to} to={link.to} onClick={onClose}>
+              {link.label}
+            </Link>
+          ))}
         </nav>
       </div>
-    </div>
+    </>
   );
 }
 

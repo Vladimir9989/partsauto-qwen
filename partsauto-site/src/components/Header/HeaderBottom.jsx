@@ -1,20 +1,65 @@
 import { Link } from 'react-router-dom';
+import { FaBars, FaShoppingCart, FaChevronDown } from 'react-icons/fa';
+import { useState } from 'react';
 import styles from './Header.module.css';
 
-function HeaderBottom() {
+function HeaderBottom({ isMobileMenuOpen, setIsMobileMenuOpen }) {
+  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+
   return (
     <div className={styles.headerBottom}>
-      <div className="container">
-        <div className="header-content">
-          <Link to="/" className="logo">
+      <div className={styles.container}>
+        <div className={styles.headerContent}>
+          <Link to="/" className={styles.logo}>
             PartsAuto
           </Link>
-          <nav className="nav-menu">
-            <Link to="/">Главная</Link>
-            <Link to="/catalog">Каталог</Link>
-            <Link to="/favorites">Избранное</Link>
-            <Link to="/compare">Сравнение</Link>
+          
+          {/* Десктопная навигация */}
+          <nav className={styles.navMenu}>
+            <Link to="/catalog">Каталог запчастей</Link>
+            <Link to="/delivery">Оплата и доставка</Link>
+            <Link to="/contacts">Контакты</Link>
+            <Link to="/news">Новости о нас</Link>
+            <Link to="/warranty">Гарантия и возврат</Link>
+            <Link to="/car-buyback">Выкуп авто</Link>
           </nav>
+
+          {/* Планшетная навигация с дропдауном */}
+          <div className={styles.tabletNav}>
+            <div className={styles.dropdown}>
+              <button 
+                className={styles.dropdownBtn}
+                onClick={() => setIsDropdownOpen(!isDropdownOpen)}
+              >
+                Меню <FaChevronDown className={isDropdownOpen ? styles.chevronRotated : ''} />
+              </button>
+              {isDropdownOpen && (
+                <div className={styles.dropdownMenu}>
+                  <Link to="/catalog">Каталог запчастей</Link>
+                  <Link to="/delivery">Оплата и доставка</Link>
+                  <Link to="/contacts">Контакты</Link>
+                  <Link to="/news">Новости о нас</Link>
+                  <Link to="/warranty">Гарантия и возврат</Link>
+                  <Link to="/car-buyback">Выкуп авто</Link>
+                </div>
+              )}
+            </div>
+          </div>
+
+          {/* Мобильная группа: корзина + бургер */}
+          <div className={styles.mobileRightGroup}>
+            <div className={styles.mobileCartInfo}>
+              <FaShoppingCart className={styles.cartIcon} />
+              <span className={styles.cartBadge}>0</span>
+            </div>
+            <button 
+              className={styles.mobileMenuBtn} 
+              aria-label="Меню"
+              onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+            >
+              <FaBars />
+            </button>
+          </div>
         </div>
       </div>
     </div>

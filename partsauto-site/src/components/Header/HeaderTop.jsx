@@ -1,31 +1,34 @@
-import React from 'react';
-import { FaMapMarkerAlt, FaStar, FaTag, FaVk, FaTelegram, FaShoppingCart, FaCar } from 'react-icons/fa';
+import { FaMapMarkerAlt, FaPhone, FaShoppingCart, FaFacebook, FaInstagram, FaTelegram } from 'react-icons/fa';
 import styles from './Header.module.css';
 
 function HeaderTop() {
   return (
     <div className={styles.headerTop}>
       <div className={styles.container}>
-        <div className={styles['top-row']}>
-          <span className={styles['location-info']}>
-            <FaMapMarkerAlt className={styles['location-icon']} />
-            <span>Реж-Екатеринбург</span>
-          </span>
-          <span className={styles['contact-info']}>
-            <a href="tel:89826048040">89826048040</a>
-          </span>
-          <span className={styles['socials-info']}>
-            <span>мы в соц сетях</span>
-            <FaStar className={styles['social-icon']} />
-            <FaTag className={styles['social-icon']} />
-            <FaVk className={styles['social-icon']} />
-            <FaTelegram className={styles['social-icon']} />
-            <FaCar className={styles['social-icon']} />
-          </span>
-          <span className={styles['cart-info']}>
-            <FaShoppingCart className={styles['cart-icon']} />
-            <span className={styles['cart-badge']}>3</span>
-          </span>
+        <div className={styles.topRow}>
+          <div className={styles.locationInfo}>
+            <FaMapMarkerAlt className={styles.locationIcon} />
+            <span>г. Реж - Екатеринбург</span>
+          </div>
+          <div className={styles.topRowBlock}>
+            <div className={styles.contactInfo}>
+              <FaPhone className={styles.contactIcon} />
+              <a href="tel:+79826048040">8 (982) 604-80-40</a>
+            </div>
+            <div className={styles.socialsInfo}>
+              <span>Мы в соцсетях:</span>
+              <div className={styles.socialsBlock}>
+                <FaFacebook className={styles.socialIcon} />
+                <FaInstagram className={styles.socialIcon} />
+                <FaTelegram className={styles.socialIcon} />
+              </div>
+            </div>
+            {/* Десктопная корзина */}
+            <div className={styles.desktopCartInfo}>
+              <FaShoppingCart className={styles.cartIcon} />
+              <span className={styles.cartBadge}>0</span>
+            </div>
+          </div>
         </div>
       </div>
     </div>

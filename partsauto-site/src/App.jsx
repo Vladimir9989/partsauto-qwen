@@ -19,7 +19,7 @@ const ITEMS_PER_PAGE = 20
 function MainPage() {
   const navigate = useNavigate()
   const location = useLocation()
-  
+
   // Состояние
   const [products, setProducts] = useState([])
   const [allProducts, setAllProducts] = useState([]) // Для автодополнения
@@ -33,7 +33,7 @@ function MainPage() {
   const [selectedProduct, setSelectedProduct] = useState(null)
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
   const [showCompactFilters, setShowCompactFilters] = useState(false)
-  
+
   const [filters, setFilters] = useState({
     search: '',
     brand: '',
@@ -42,7 +42,7 @@ function MainPage() {
     priceMax: '',
     sortBy: 'default', // default, price-asc, price-desc, name-asc, name-desc
   })
-  
+
   const [priceError, setPriceError] = useState('')
   const [debouncedSearch, setDebouncedSearch] = useState('')
   const [debouncedPriceMin, setDebouncedPriceMin] = useState('')
@@ -88,10 +88,10 @@ function MainPage() {
       } else if (activeElement === priceMaxRef.current) {
         activePriceFieldRef.current = 'priceMax'
       }
-      
+
       setLoading(true)
       setLoadingProgress('Загрузка...')
-      
+
       try {
         const params = new URLSearchParams()
         if (debouncedSearch) params.set('search', debouncedSearch)
@@ -104,14 +104,14 @@ function MainPage() {
 
         const response = await fetch(`${API_URL}?${params}`)
         if (!response.ok) throw new Error('Ошибка загрузки')
-        
+
         let data = await response.json()
-        
+
         // Сортировка на клиенте
         if (filters.sortBy !== 'default') {
           data.products = sortProducts(data.products, filters.sortBy)
         }
-        
+
         setProducts(data.products)
         setTotalResults(data.total)
         setTotalPages(data.totalPages)
@@ -122,7 +122,7 @@ function MainPage() {
         toast.error('Ошибка загрузки данных')
       } finally {
         setLoading(false)
-        
+
         setTimeout(() => {
           if (activePriceFieldRef.current === 'priceMin' && priceMinRef.current) {
             priceMinRef.current.focus()
@@ -144,19 +144,19 @@ function MainPage() {
         const response = await fetch(`${API_URL}?page=1&limit=1`)
         if (!response.ok) throw new Error('Ошибка')
         const data = await response.json()
-        
+
         if (brands.length === 0 && data.products.length > 0) {
           const allRes = await fetch(`${API_URL}?page=1&limit=1000`)
           const allData = await allRes.json()
-          
+
           const brandsSet = new Set()
           const categoriesSet = new Set()
           allData.products.forEach(p => {
             if (p.brand) brandsSet.add(p.brand)
             if (p.category) categoriesSet.add(p.category)
           })
-          setBrands(Array.from(brandsSet).sort())
-          setCategories(Array.from(categoriesSet).sort())
+          setBrands([...new Set(Array.from(brandsSet))].sort())
+          setCategories([...new Set(Array.from(categoriesSet))].sort())
         }
       } catch (error) {
         console.error('Ошибка загрузки метаданных:', error)
@@ -190,12 +190,12 @@ function MainPage() {
   const validatePriceRange = useCallback((min, max) => {
     const minVal = min ? parseInt(min) : null
     const maxVal = max ? parseInt(max) : null
-    
+
     if (minVal !== null && maxVal !== null && minVal > maxVal) {
       setPriceError('Цена "до" должна быть больше или равна цене "от"')
       return false
     }
-    
+
     setPriceError('')
     return true
   }, [])
@@ -323,7 +323,7 @@ function MainPage() {
 
   const ProductImageSlider = ({ images, title }) => {
     const [currentIndex, setCurrentIndex] = useState(0)
-    
+
     if (!images || images.length === 0) {
       return (
         <div className="product-image text-muted d-flex align-items-center justify-content-center">
@@ -334,26 +334,26 @@ function MainPage() {
         </div>
       )
     }
-    
+
     const goToPrevious = () => {
       setCurrentIndex((prevIndex) =>
         prevIndex === 0 ? images.length - 1 : prevIndex - 1
       )
     }
-    
+
     const goToNext = () => {
       setCurrentIndex((prevIndex) =>
         prevIndex === images.length - 1 ? 0 : prevIndex + 1
       )
     }
-    
+
     const goToSlide = (index) => {
       setCurrentIndex(index)
     }
-    
+
     const currentImage = images[currentIndex]
     const imageUrl = getImageUrl(currentImage)
-    
+
     return (
       <div className="product-image-slider position-relative">
         {imageUrl ? (
@@ -376,14 +376,14 @@ function MainPage() {
             </div>
           </div>
         )}
-        
+
         <div className="image-fallback product-image text-muted d-none align-items-center justify-content-center">
           <div className="text-center">
             <i className="bi bi-image display-4"></i>
             <div className="mt-2">Ошибка загрузки</div>
           </div>
         </div>
-        
+
         {images.length > 1 && (
           <>
             <button
@@ -400,7 +400,7 @@ function MainPage() {
             >
               <i className="bi bi-chevron-right"></i>
             </button>
-            
+
             <div className="slider-indicators">
               {images.map((_, index) => (
                 <button
@@ -459,7 +459,7 @@ function MainPage() {
                   {showCompactFilters ? 'Скрыть' : 'Показать'} фильтры
                 </button>
               </div>
-              
+
               {showCompactFilters && (
                 <div className="row g-2 mt-2">
                   <div className="col-md-4">
@@ -494,8 +494,8 @@ function MainPage() {
                       onChange={(e) => handleFilterChange('brand', e.target.value)}
                     >
                       <option value="">Все бренды</option>
-                      {brands.map(brand => (
-                        <option key={brand} value={brand}>{brand}</option>
+                      {brands.map((brand, index) => (
+                        <option key={`brand-${brand}-${index}`} value={brand}>{brand}</option>
                       ))}
                     </select>
                   </div>
@@ -563,8 +563,8 @@ function MainPage() {
                     onChange={(e) => handleFilterChange('brand', e.target.value)}
                   >
                     <option value="">Все бренды</option>
-                    {brands.map(brand => (
-                      <option key={brand} value={brand}>{brand}</option>
+                    {brands.map((brand, index) => (
+                      <option key={`compact-brand-${brand}-${index}`} value={brand}>{brand}</option>
                     ))}
                   </select>
                 </div>
@@ -577,8 +577,8 @@ function MainPage() {
                     onChange={(e) => handleFilterChange('category', e.target.value)}
                   >
                     <option value="">Все категории</option>
-                    {categories.map(cat => (
-                      <option key={cat} value={cat}>{cat}</option>
+                    {categories.map((cat, index) => (
+                      <option key={`category-${cat}-${index}`} value={cat}>{cat}</option>
                     ))}
                   </select>
                 </div>
@@ -735,7 +735,7 @@ function MainPage() {
                                   <i className="bi bi-arrow-left-right"></i>
                                 </button>
                               </div>
-                              
+
                               {product.address && (
                                 <div className="small text-muted">
                                   <i className="bi bi-geo-alt"></i> {product.address}
@@ -802,7 +802,7 @@ function App() {
             },
           }}
         />
-        
+
         <Routes>
           <Route path="/" element={<MainPage />} />
           <Route path="/favorites" element={

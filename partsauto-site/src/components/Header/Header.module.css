@@ -128,7 +128,8 @@
 }
 
 .socialIcon {
-  font-size: 26px;
+  width: 26px;
+  height: 26px;
   cursor: pointer;
   transition: transform 0.2s ease, color 0.2s ease;
 }
@@ -142,10 +143,11 @@
 .desktopCartInfo {
   color: var(--header-text);
   display: flex;
-  align-items: center;
+  align-items: flex-end;
   gap: 4px;
   font-size: 26px;
   position: relative;
+  align-self: flex-end;
 }
 
 .cartIcon {

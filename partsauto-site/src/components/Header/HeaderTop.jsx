@@ -1,4 +1,5 @@
-import { FaMapMarkerAlt, FaPhone, FaShoppingCart, FaFacebook, FaInstagram, FaTelegram } from 'react-icons/fa';
+import { FaMapMarkerAlt, FaPhone, FaShoppingCart } from 'react-icons/fa';
+import { IconMax, IconAvito, IconVK, IconTelegram, IconDrom } from '../Icons';
 import styles from './Header.module.css';
 
 function HeaderTop({ onCartClick, cartItemsCount = 0 }) {
@@ -18,9 +19,11 @@ function HeaderTop({ onCartClick, cartItemsCount = 0 }) {
             <div className={styles.socialsInfo}>
               <span>Мы в соцсетях:</span>
               <div className={styles.socialsBlock}>
-                <FaFacebook className={styles.socialIcon} />
-                <FaInstagram className={styles.socialIcon} />
-                <FaTelegram className={styles.socialIcon} />
+                <IconMax className={styles.socialIcon} />
+                <IconAvito className={styles.socialIcon} />
+                <IconVK className={styles.socialIcon} />
+                <IconTelegram className={styles.socialIcon} />
+                <IconDrom className={styles.socialIcon} />
               </div>
             </div>
             {/* Десктопная корзина с обработчиком клика */}

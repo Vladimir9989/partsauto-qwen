@@ -9,6 +9,7 @@ import FavoritesPage from './components/FavoritesPage'
 import ComparePage from './components/ComparePage'
 import SearchAutocomplete from './components/SearchAutocomplete'
 import ThemeToggle from './components/ThemeToggle'
+import OldHeader from './components/OldHeader'
 import { useFavoritesStore, useCompareStore, useThemeStore } from './store/useStore'
 
 const API_URL = '/api/products'
@@ -441,47 +442,7 @@ function MainPage() {
       </Helmet>
 
       <div className="container-fluid p-0">
-        <header className="bg-primary text-white py-3 mb-4">
-          <div className="container">
-            <div className="d-flex justify-content-between align-items-center">
-              <div>
-                <h1 className="mb-1 h3"><i className="bi bi-gear-wide-connected"></i> PartsAuto</h1>
-                <p className="mb-0 small d-none d-md-block">Каталог автозапчастей</p>
-              </div>
-              
-              <div className="d-flex gap-2 align-items-center">
-                <Link to="/favorites" className="btn btn-outline-light position-relative">
-                  <i className="bi bi-heart-fill"></i>
-                  <span className="d-none d-md-inline ms-1">Избранное</span>
-                  {favorites.length > 0 && (
-                    <span className="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
-                      {favorites.length}
-                    </span>
-                  )}
-                </Link>
-                
-                <Link to="/compare" className="btn btn-outline-light position-relative">
-                  <i className="bi bi-arrow-left-right"></i>
-                  <span className="d-none d-md-inline ms-1">Сравнение</span>
-                  {compareList.length > 0 && (
-                    <span className="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-info">
-                      {compareList.length}
-                    </span>
-                  )}
-                </Link>
-                
-                <ThemeToggle />
-                
-                <button
-                  className="btn btn-outline-light d-md-none"
-                  onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-                >
-                  <i className={`bi ${mobileMenuOpen ? 'bi-x-lg' : 'bi-filter'}`}></i>
-                </button>
-              </div>
-            </div>
-          </div>
-        </header>
+        {/* <OldHeader /> */}
 
         <div className="container">
           {/* Компактные фильтры для средних экранов */}
@@ -848,18 +809,7 @@ function App() {
                 <title>Избранное - PartsAuto</title>
                 <meta name="description" content="Избранные автозапчасти" />
               </Helmet>
-              <header className="bg-primary text-white py-3 mb-4">
-                <div className="container">
-                  <div className="d-flex justify-content-between align-items-center">
-                    <h1 className="mb-0 h3">
-                      <Link to="/" className="text-white text-decoration-none">
-                        <i className="bi bi-arrow-left me-2"></i>
-                        <i className="bi bi-gear-wide-connected"></i> PartsAuto
-                      </Link>
-                    </h1>
-                  </div>
-                </div>
-              </header>
+              {/* <OldHeader /> */}
               <FavoritesPage onProductClick={(product) => {
                 // Открыть модальное окно можно добавить позже
               }} />
@@ -871,18 +821,7 @@ function App() {
                 <title>Сравнение товаров - PartsAuto</title>
                 <meta name="description" content="Сравнение автозапчастей" />
               </Helmet>
-              <header className="bg-primary text-white py-3 mb-4">
-                <div className="container">
-                  <div className="d-flex justify-content-between align-items-center">
-                    <h1 className="mb-0 h3">
-                      <Link to="/" className="text-white text-decoration-none">
-                        <i className="bi bi-arrow-left me-2"></i>
-                        <i className="bi bi-gear-wide-connected"></i> PartsAuto
-                      </Link>
-                    </h1>
-                  </div>
-                </div>
-              </header>
+              {/* <OldHeader /> */}
               <ComparePage onProductClick={(product) => {
                 // Открыть модальное окно можно добавить позже
               }} />

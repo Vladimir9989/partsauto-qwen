@@ -39,36 +39,3 @@ const applyTheme = (theme) => {
     document.documentElement.setAttribute('data-theme', theme)
   }
 }
-
-// Store для избранного
-export const useFavoritesStore = create(
-  persist(
-    (set, get) => ({
-      favorites: [],
-      
-      addToFavorites: (product) => {
-        const { favorites } = get()
-        if (!favorites.find(p => p.id === product.id)) {
-          set({ favorites: [...favorites, product] })
-          return true
-        }
-        return false
-      },
-      
-      removeFromFavorites: (productId) => {
-        set({ favorites: get().favorites.filter(p => p.id !== productId) })
-      },
-      
-      isFavorite: (productId) => {
-        return get().favorites.some(p => p.id === productId)
-      },
-      
-      clearFavorites: () => {
-        set({ favorites: [] })
-      }
-    }),
-    {
-      name: 'partsauto-favorites',
-    }
-  )
-)

@@ -17,11 +17,11 @@ function HeaderBottom({ isMobileMenuOpen, setIsMobileMenuOpen, onCartClick, cart
           {/* Десктопная навигация */}
           <nav className={styles.navMenu}>
             <Link to="/catalog">Каталог запчастей</Link>
+            <Link to="/car-buyback">Выкуп авто</Link>
             <Link to="/delivery">Оплата и доставка</Link>
             <Link to="/contacts">Контакты</Link>
             <Link to="/news">Новости о нас</Link>
             <Link to="/warranty">Гарантия и возврат</Link>
-            <Link to="/car-buyback">Выкуп авто</Link>
           </nav>
 
           {/* Планшетная навигация с дропдауном */}

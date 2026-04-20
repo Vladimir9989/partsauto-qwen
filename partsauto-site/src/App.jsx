@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef, useCallback, useMemo, lazy, Suspense } from 'react'
+import { useState, useEffect, useRef, useCallback, useMemo } from 'react'
 import { BrowserRouter as Router, Routes, Route, useNavigate, useLocation, useSearchParams } from 'react-router-dom'
 import { Toaster } from 'react-hot-toast'
 import toast from 'react-hot-toast'
@@ -11,12 +11,8 @@ import Pagination from './components/Pagination'
 import SkeletonCard from './components/SkeletonCard'
 import CartPanel from './components/CartPanel'
 import Header from './components/Header/Header'
-import { useFavoritesStore } from './store/useStore'
 import { useCartStore } from './store/useCartStore'
 import { API_URL, ITEMS_PER_PAGE, SEARCH_DEBOUNCE_DELAY, PRICE_DEBOUNCE_DELAY } from './config'
-
-// Ленивая загрузка страницы избранного
-const FavoritesPage = lazy(() => import('./components/FavoritesPage'))
 
 function MainPage() {
   const navigate = useNavigate()
@@ -489,22 +485,6 @@ function App() {
 
         <Routes>
           <Route path="/" element={<MainPage />} />
-          <Route path="/favorites" element={
-            <Suspense fallback={
-              <div className="container mt-5 text-center">
-                <span className="loading-spinner text-primary"></span>
-                <p className="mt-2">Загрузка...</p>
-              </div>
-            }>
-              <Helmet>
-                <title>Избранное - PartsAuto</title>
-                <meta name="description" content="Избранные автозапчасти" />
-              </Helmet>
-              <FavoritesPage onProductClick={(product) => {
-                // Можно добавить открытие модального окна
-              }} />
-            </Suspense>
-          } />
         </Routes>
       </Router>
     </HelmetProvider>

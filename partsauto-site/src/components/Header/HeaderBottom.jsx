@@ -3,7 +3,7 @@ import { FaBars, FaShoppingCart, FaChevronDown } from 'react-icons/fa';
 import { useState } from 'react';
 import styles from './Header.module.css';
 
-function HeaderBottom({ isMobileMenuOpen, setIsMobileMenuOpen }) {
+function HeaderBottom({ isMobileMenuOpen, setIsMobileMenuOpen, onCartClick, cartItemsCount = 0 }) {
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
 
   return (
@@ -48,9 +48,16 @@ function HeaderBottom({ isMobileMenuOpen, setIsMobileMenuOpen }) {
 
           {/* Мобильная группа: корзина + бургер */}
           <div className={styles.mobileRightGroup}>
-            <div className={styles.mobileCartInfo}>
+            <div 
+              className={styles.mobileCartInfo}
+              onClick={onCartClick}
+              style={{ cursor: 'pointer' }}
+              title="Открыть корзину"
+            >
               <FaShoppingCart className={styles.cartIcon} />
-              <span className={styles.cartBadge}>0</span>
+              {cartItemsCount > 0 && (
+                <span className={styles.cartBadge}>{cartItemsCount}</span>
+              )}
             </div>
             <button 
               className={styles.mobileMenuBtn} 

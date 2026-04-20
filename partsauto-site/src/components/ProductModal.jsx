@@ -1,12 +1,11 @@
-import { useState } from 'react'
+import { useState, useCallback } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
-import { useFavoritesStore, useCompareStore } from '../store/useStore'
+import { useCartStore } from '../store/useCartStore'
 import toast from 'react-hot-toast'
 
 const ProductModal = ({ product, onClose }) => {
   const [currentImageIndex, setCurrentImageIndex] = useState(0)
-  const { addToFavorites, removeFromFavorites, isFavorite } = useFavoritesStore()
-  const { addToCompare, removeFromCompare, isInCompare } = useCompareStore()
+  const { addToCart, isInCart } = useCartStore()
   
   if (!product) return null
 
@@ -25,29 +24,17 @@ const ProductModal = ({ product, onClose }) => {
     return `${parseInt(price).toLocaleString('ru-RU')} ₽`
   }
 
-  const handleFavoriteToggle = () => {
-    if (isFavorite(product.id)) {
-      removeFromFavorites(product.id)
-      toast.success('Удалено из избранного', { icon: '💔' })
+  // Обработчик добавления в корзину (заменяет избранное)
+  const handleAddToCart = useCallback(() => {
+    if (isInCart(product.id)) {
+      toast.error('Товар уже в корзине', { icon: '🛒' })
     } else {
-      addToFavorites(product)
-      toast.success('Добавлено в избранное', { icon: '❤️' })
-    }
-  }
-
-  const handleCompareToggle = () => {
-    if (isInCompare(product.id)) {
-      removeFromCompare(product.id)
-      toast.success('Удалено из сравнения')
-    } else {
-      const result = addToCompare(product)
+      const result = addToCart(product)
       if (result.success) {
-        toast.success(result.message)
-      } else {
-        toast.error(result.message)
+        toast.success('Товар добавлен в корзину', { icon: '🛒' })
       }
     }
-  }
+  }, [product, addToCart, isInCart])
 
   const handleBackdropClick = (e) => {
     if (e.target === e.currentTarget) {
@@ -98,6 +85,7 @@ const ProductModal = ({ product, onClose }) => {
                           src={getImageUrl(images[currentImageIndex])}
                           alt={`${product.title} - фото ${currentImageIndex + 1}`}
                           className="img-fluid"
+                          loading="lazy"
                           onError={(e) => {
                             e.target.src = 'data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" width="400" height="400"%3E%3Crect fill="%23e9ecef" width="400" height="400"/%3E%3Ctext fill="%236c757d" x="50%25" y="50%25" dominant-baseline="middle" text-anchor="middle" font-size="20"%3EНет изображения%3C/text%3E%3C/svg%3E'
                           }}
@@ -114,6 +102,7 @@ const ProductModal = ({ product, onClose }) => {
                               <img
                                 src={getImageUrl(img)}
                                 alt={`Миниатюра ${index + 1}`}
+                                loading="lazy"
                                 onError={(e) => {
                                   e.target.src = 'data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" width="80" height="80"%3E%3Crect fill="%23e9ecef" width="80" height="80"/%3E%3C/svg%3E'
                                 }}
@@ -123,20 +112,24 @@ const ProductModal = ({ product, onClose }) => {
                         </div>
                       )}
                       {/* Кнопки навигации */}
-                      <button
-                        className="slider-nav slider-prev"
-                        onClick={handlePrevImage}
-                        aria-label="Предыдущее изображение"
-                      >
-                        <i className="bi bi-chevron-left"></i>
-                      </button>
-                      <button
-                        className="slider-nav slider-next"
-                        onClick={handleNextImage}
-                        aria-label="Следующее изображение"
-                      >
-                        <i className="bi bi-chevron-right"></i>
-                      </button>
+                      {images.length > 1 && (
+                        <>
+                          <button
+                            className="slider-nav slider-prev"
+                            onClick={handlePrevImage}
+                            aria-label="Предыдущее изображение"
+                          >
+                            <i className="bi bi-chevron-left"></i>
+                          </button>
+                          <button
+                            className="slider-nav slider-next"
+                            onClick={handleNextImage}
+                            aria-label="Следующее изображение"
+                          >
+                            <i className="bi bi-chevron-right"></i>
+                          </button>
+                        </>
+                      )}
                     </>
                   ) : (
                     <div className="no-image-placeholder">
@@ -228,21 +221,14 @@ const ProductModal = ({ product, onClose }) => {
                     </div>
                   )}
 
-                  {/* Кнопки действий */}
-                  <div className="action-buttons">
+                  {/* Кнопки действий - только корзина */}
+                  <div className="action-buttons mb-4">
                     <button
-                      className={`btn ${isFavorite(product.id) ? 'btn-danger' : 'btn-outline-danger'} me-2`}
-                      onClick={handleFavoriteToggle}
+                      className={`btn ${isInCart(product.id) ? 'btn-success' : 'btn-outline-success'} w-100`}
+                      onClick={handleAddToCart}
                     >
-                      <i className={`bi ${isFavorite(product.id) ? 'bi-heart-fill' : 'bi-heart'}`}></i>
-                      {isFavorite(product.id) ? ' В избранном' : ' В избранное'}
-                    </button>
-                    <button
-                      className={`btn ${isInCompare(product.id) ? 'btn-info' : 'btn-outline-info'}`}
-                      onClick={handleCompareToggle}
-                    >
-                      <i className="bi bi-arrow-left-right"></i>
-                      {isInCompare(product.id) ? ' В сравнении' : ' Сравнить'}
+                      <i className={`bi ${isInCart(product.id) ? 'bi-cart-check-fill' : 'bi-cart-plus'}`}></i>
+                      {isInCart(product.id) ? ' Товар в корзине' : ' Добавить в корзину'}
                     </button>
                   </div>
 
@@ -250,10 +236,10 @@ const ProductModal = ({ product, onClose }) => {
                   <div className="contact-section mt-4 p-3 bg-light rounded">
                     <h6 className="mb-3">Связаться с продавцом</h6>
                     <div className="d-grid gap-2">
-                      <a href="tel:+79000000000" className="btn btn-success">
+                      <a href="tel:+79826048040" className="btn btn-success">
                         <i className="bi bi-telephone-fill"></i> Позвонить
                       </a>
-                      <a href="https://wa.me/79000000000" target="_blank" rel="noopener noreferrer" className="btn btn-outline-success">
+                      <a href="https://wa.me/79826048040" target="_blank" rel="noopener noreferrer" className="btn btn-outline-success">
                         <i className="bi bi-whatsapp"></i> WhatsApp
                       </a>
                     </div>

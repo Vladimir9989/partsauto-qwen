@@ -1,28 +1,30 @@
-import { useState, useEffect, useRef, useCallback } from 'react'
-import { BrowserRouter as Router, Routes, Route, Link, useNavigate, useLocation } from 'react-router-dom'
+import { useState, useEffect, useRef, useCallback, useMemo, lazy, Suspense } from 'react'
+import { BrowserRouter as Router, Routes, Route, useNavigate, useLocation, useSearchParams } from 'react-router-dom'
 import { Toaster } from 'react-hot-toast'
 import toast from 'react-hot-toast'
 import { HelmetProvider, Helmet } from 'react-helmet-async'
-import { motion, AnimatePresence } from 'framer-motion'
+import { AnimatePresence } from 'framer-motion'
 import ProductModal from './components/ProductModal'
-import FavoritesPage from './components/FavoritesPage'
-import ComparePage from './components/ComparePage'
-import SearchAutocomplete from './components/SearchAutocomplete'
-import ThemeToggle from './components/ThemeToggle'
-import OldHeader from './components/OldHeader'
+import ProductCard from './components/ProductCard'
+import FiltersPanel from './components/FiltersPanel'
+import Pagination from './components/Pagination'
+import SkeletonCard from './components/SkeletonCard'
+import CartPanel from './components/CartPanel'
 import Header from './components/Header/Header'
-import { useFavoritesStore, useCompareStore, useThemeStore } from './store/useStore'
+import { useFavoritesStore } from './store/useStore'
+import { useCartStore } from './store/useCartStore'
+import { API_URL, ITEMS_PER_PAGE, SEARCH_DEBOUNCE_DELAY, PRICE_DEBOUNCE_DELAY } from './config'
 
-const API_URL = '/api/products'
-const ITEMS_PER_PAGE = 20
+// Ленивая загрузка страницы избранного
+const FavoritesPage = lazy(() => import('./components/FavoritesPage'))
 
 function MainPage() {
   const navigate = useNavigate()
   const location = useLocation()
+  const [searchParams, setSearchParams] = useSearchParams()
 
   // Состояние
   const [products, setProducts] = useState([])
-  const [allProducts, setAllProducts] = useState([]) // Для автодополнения
   const [loading, setLoading] = useState(true)
   const [loadingProgress, setLoadingProgress] = useState('Загрузка...')
   const [brands, setBrands] = useState([])
@@ -33,6 +35,7 @@ function MainPage() {
   const [selectedProduct, setSelectedProduct] = useState(null)
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
   const [showCompactFilters, setShowCompactFilters] = useState(false)
+  const [cartPanelOpen, setCartPanelOpen] = useState(false)
 
   const [filters, setFilters] = useState({
     search: '',
@@ -40,7 +43,7 @@ function MainPage() {
     category: '',
     priceMin: '',
     priceMax: '',
-    sortBy: 'default', // default, price-asc, price-desc, name-asc, name-desc
+    sortBy: 'default',
   })
 
   const [priceError, setPriceError] = useState('')
@@ -48,19 +51,19 @@ function MainPage() {
   const [debouncedPriceMin, setDebouncedPriceMin] = useState('')
   const [debouncedPriceMax, setDebouncedPriceMax] = useState('')
 
-  const { favorites, addToFavorites, removeFromFavorites, isFavorite } = useFavoritesStore()
-  const { compareList, addToCompare, removeFromCompare, isInCompare } = useCompareStore()
+  const { totalItems } = useCartStore()
 
-  // Ref для сохранения фокуса на полях ввода
+  // Refs для фокуса на полях ввода
   const priceMinRef = useRef(null)
   const priceMaxRef = useRef(null)
   const activePriceFieldRef = useRef(null)
+  const abortControllerRef = useRef(null)
 
   // Debounce для поиска
   useEffect(() => {
     const timer = setTimeout(() => {
       setDebouncedSearch(filters.search)
-    }, 300)
+    }, SEARCH_DEBOUNCE_DELAY)
     return () => clearTimeout(timer)
   }, [filters.search])
 
@@ -68,20 +71,27 @@ function MainPage() {
   useEffect(() => {
     const timer = setTimeout(() => {
       setDebouncedPriceMin(filters.priceMin)
-    }, 500)
+    }, PRICE_DEBOUNCE_DELAY)
     return () => clearTimeout(timer)
   }, [filters.priceMin])
 
   useEffect(() => {
     const timer = setTimeout(() => {
       setDebouncedPriceMax(filters.priceMax)
-    }, 500)
+    }, PRICE_DEBOUNCE_DELAY)
     return () => clearTimeout(timer)
   }, [filters.priceMax])
 
-  // Загрузка данных с сервера
+  // Загрузка данных с сервера с использованием AbortController
   useEffect(() => {
     const loadData = async () => {
+      // Отмена предыдущего запроса
+      if (abortControllerRef.current) {
+        abortControllerRef.current.abort()
+      }
+
+      abortControllerRef.current = new AbortController()
+
       const activeElement = document.activeElement
       if (activeElement === priceMinRef.current) {
         activePriceFieldRef.current = 'priceMin'
@@ -102,7 +112,10 @@ function MainPage() {
         params.set('page', currentPage)
         params.set('limit', ITEMS_PER_PAGE)
 
-        const response = await fetch(`${API_URL}?${params}`)
+        const response = await fetch(`${API_URL}?${params}`, {
+          signal: abortControllerRef.current.signal
+        })
+        
         if (!response.ok) throw new Error('Ошибка загрузки')
 
         let data = await response.json()
@@ -117,12 +130,17 @@ function MainPage() {
         setTotalPages(data.totalPages)
         setLoadingProgress('')
       } catch (error) {
+        if (error.name === 'AbortError') {
+          console.log('Запрос отменен')
+          return
+        }
         console.error('Ошибка:', error)
         setLoadingProgress('Ошибка загрузки')
         toast.error('Ошибка загрузки данных')
       } finally {
         setLoading(false)
 
+        // Восстановление фокуса
         setTimeout(() => {
           if (activePriceFieldRef.current === 'priceMin' && priceMinRef.current) {
             priceMinRef.current.focus()
@@ -135,6 +153,13 @@ function MainPage() {
     }
 
     loadData()
+
+    // Cleanup: отмена запроса при размонтировании
+    return () => {
+      if (abortControllerRef.current) {
+        abortControllerRef.current.abort()
+      }
+    }
   }, [debouncedSearch, debouncedPriceMin, debouncedPriceMax, filters.brand, filters.category, filters.sortBy, currentPage])
 
   // Загрузка списка брендов и категорий
@@ -155,8 +180,8 @@ function MainPage() {
             if (p.brand) brandsSet.add(p.brand)
             if (p.category) categoriesSet.add(p.category)
           })
-          setBrands([...new Set(Array.from(brandsSet))].sort())
-          setCategories([...new Set(Array.from(categoriesSet))].sort())
+          setBrands([...brandsSet].sort())
+          setCategories([...categoriesSet].sort())
         }
       } catch (error) {
         console.error('Ошибка загрузки метаданных:', error)
@@ -164,14 +189,15 @@ function MainPage() {
     }
 
     if (brands.length === 0) loadMeta()
-  }, [])
+  }, [brands.length])
 
   // Сброс страницы при изменении фильтров
   useEffect(() => {
     setCurrentPage(1)
-  }, [filters.brand, filters.category, filters.search, filters.sortBy])
+  }, [filters.brand, filters.category, debouncedSearch, filters.sortBy])
 
-  const sortProducts = (products, sortBy) => {
+  // Мемоизированная функция сортировки
+  const sortProducts = useCallback((products, sortBy) => {
     const sorted = [...products]
     switch (sortBy) {
       case 'price-asc':
@@ -185,7 +211,7 @@ function MainPage() {
       default:
         return sorted
     }
-  }
+  }, [])
 
   const validatePriceRange = useCallback((min, max) => {
     const minVal = min ? parseInt(min) : null
@@ -212,7 +238,7 @@ function MainPage() {
     setFilters(prev => ({ ...prev, [key]: value }))
   }, [])
 
-  const clearFilters = () => {
+  const clearFilters = useCallback(() => {
     setFilters({
       search: '',
       brand: '',
@@ -222,200 +248,33 @@ function MainPage() {
       sortBy: 'default',
     })
     toast.success('Фильтры сброшены')
-  }
+  }, [])
 
-  const formatPrice = (price) => {
-    if (!price) return 'Цена не указана'
-    return `${parseInt(price).toLocaleString('ru-RU')} ₽`
-  }
+  const handleProductClick = useCallback((product) => {
+    setSelectedProduct(product)
+  }, [])
 
-  const handleFavoriteToggle = (product, e) => {
-    e.stopPropagation()
-    if (isFavorite(product.id)) {
-      removeFromFavorites(product.id)
-      toast.success('Удалено из избранного', { icon: '💔' })
-    } else {
-      addToFavorites(product)
-      toast.success('Добавлено в избранное', { icon: '❤️' })
-    }
-  }
+  const handlePageChange = useCallback((page) => {
+    setCurrentPage(page)
+    window.scrollTo({ top: 0, behavior: 'smooth' })
+  }, [])
 
-  const handleCompareToggle = (product, e) => {
-    e.stopPropagation()
-    if (isInCompare(product.id)) {
-      removeFromCompare(product.id)
-      toast.success('Удалено из сравнения')
-    } else {
-      const result = addToCompare(product)
-      if (result.success) {
-        toast.success(result.message)
-      } else {
-        toast.error(result.message)
-      }
-    }
-  }
+  const handleCloseMobileMenu = useCallback(() => {
+    setMobileMenuOpen(false)
+  }, [])
 
-  const renderPagination = () => {
-    if (totalPages <= 1) return null
+  const handleToggleCartPanel = useCallback(() => {
+    setCartPanelOpen(prev => !prev)
+  }, [])
 
-    const pages = []
-    const maxVisible = 5
-    let startPage = Math.max(1, currentPage - Math.floor(maxVisible / 2))
-    let endPage = Math.min(totalPages, startPage + maxVisible - 1)
-
-    if (endPage - startPage < maxVisible - 1) {
-      startPage = Math.max(1, endPage - maxVisible + 1)
-    }
-
-    for (let i = startPage; i <= endPage; i++) {
-      pages.push(i)
-    }
-
-    return (
-      <nav className="mt-4">
-        <ul className="pagination justify-content-center flex-wrap">
-          <li className={`page-item ${currentPage === 1 ? 'disabled' : ''}`}>
-            <button className="page-link" onClick={() => setCurrentPage(p => Math.max(1, p - 1))} disabled={currentPage === 1}>
-              <i className="bi bi-chevron-left"></i> Назад
-            </button>
-          </li>
-
-          {startPage > 1 && (
-            <>
-              <li className="page-item">
-                <button className="page-link" onClick={() => setCurrentPage(1)}>1</button>
-              </li>
-              {startPage > 2 && <li className="page-item disabled"><span className="page-link">...</span></li>}
-            </>
-          )}
-
-          {pages.map(page => (
-            <li key={page} className={`page-item ${currentPage === page ? 'active' : ''}`}>
-              <button className="page-link" onClick={() => setCurrentPage(page)}>{page}</button>
-            </li>
-          ))}
-
-          {endPage < totalPages && (
-            <>
-              {endPage < totalPages - 1 && <li className="page-item disabled"><span className="page-link">...</span></li>}
-              <li className="page-item">
-                <button className="page-link" onClick={() => setCurrentPage(totalPages)}>{totalPages}</button>
-              </li>
-            </>
-          )}
-
-          <li className={`page-item ${currentPage === totalPages ? 'disabled' : ''}`}>
-            <button className="page-link" onClick={() => setCurrentPage(p => Math.min(totalPages, p + 1))} disabled={currentPage === totalPages}>
-              Вперёд <i className="bi bi-chevron-right"></i>
-            </button>
-          </li>
-        </ul>
-      </nav>
-    )
-  }
-
-  const getImageUrl = (img) => {
-    if (typeof img === 'object') {
-      return img['@_url'] || img.url || ''
-    }
-    return img || ''
-  }
-
-  const ProductImageSlider = ({ images, title }) => {
-    const [currentIndex, setCurrentIndex] = useState(0)
-
-    if (!images || images.length === 0) {
-      return (
-        <div className="product-image text-muted d-flex align-items-center justify-content-center">
-          <div className="text-center">
-            <i className="bi bi-image display-4"></i>
-            <div className="mt-2">Нет фото</div>
-          </div>
-        </div>
-      )
-    }
-
-    const goToPrevious = () => {
-      setCurrentIndex((prevIndex) =>
-        prevIndex === 0 ? images.length - 1 : prevIndex - 1
-      )
-    }
-
-    const goToNext = () => {
-      setCurrentIndex((prevIndex) =>
-        prevIndex === images.length - 1 ? 0 : prevIndex + 1
-      )
-    }
-
-    const goToSlide = (index) => {
-      setCurrentIndex(index)
-    }
-
-    const currentImage = images[currentIndex]
-    const imageUrl = getImageUrl(currentImage)
-
-    return (
-      <div className="product-image-slider position-relative">
-        {imageUrl ? (
-          <img
-            src={imageUrl}
-            alt={`${title} - фото ${currentIndex + 1}`}
-            className="card-img-top product-image"
-            loading="lazy"
-            onError={(e) => {
-              e.target.style.display = 'none'
-              const fallback = e.target.parentElement.querySelector('.image-fallback')
-              if (fallback) fallback.style.display = 'flex'
-            }}
-          />
-        ) : (
-          <div className="product-image text-muted d-flex align-items-center justify-content-center">
-            <div className="text-center">
-              <i className="bi bi-image display-4"></i>
-              <div className="mt-2">Нет фото</div>
-            </div>
-          </div>
-        )}
-
-        <div className="image-fallback product-image text-muted d-none align-items-center justify-content-center">
-          <div className="text-center">
-            <i className="bi bi-image display-4"></i>
-            <div className="mt-2">Ошибка загрузки</div>
-          </div>
-        </div>
-
-        {images.length > 1 && (
-          <>
-            <button
-              className="slider-nav slider-prev btn btn-sm btn-light rounded-circle"
-              onClick={(e) => { e.stopPropagation(); goToPrevious(); }}
-              aria-label="Предыдущее фото"
-            >
-              <i className="bi bi-chevron-left"></i>
-            </button>
-            <button
-              className="slider-nav slider-next btn btn-sm btn-light rounded-circle"
-              onClick={(e) => { e.stopPropagation(); goToNext(); }}
-              aria-label="Следующее фото"
-            >
-              <i className="bi bi-chevron-right"></i>
-            </button>
-
-            <div className="slider-indicators">
-              {images.map((_, index) => (
-                <button
-                  key={index}
-                  className={`indicator ${index === currentIndex ? 'active' : ''}`}
-                  onClick={(e) => { e.stopPropagation(); goToSlide(index); }}
-                  aria-label={`Перейти к фото ${index + 1}`}
-                />
-              ))}
-            </div>
-          </>
-        )}
+  // Скелетоны для загрузки
+  const skeletonCards = useMemo(() => {
+    return Array.from({ length: 6 }, (_, i) => (
+      <div key={`skeleton-${i}`} className="col-md-6 col-xl-4">
+        <SkeletonCard />
       </div>
-    )
-  }
+    ))
+  }, [])
 
   if (loading && products.length === 0) {
     return (
@@ -443,8 +302,7 @@ function MainPage() {
       </Helmet>
 
       <div className="container-fluid p-0">
-        {/* <OldHeader /> */}
-        <Header />
+        <Header onCartClick={handleToggleCartPanel} cartItemsCount={totalItems} />
 
         <div className="container">
           {/* Компактные фильтры для средних экранов */}
@@ -526,130 +384,27 @@ function MainPage() {
           <div className="row">
             {/* Filters - боковая панель для больших экранов */}
             <div className={`col-lg-3 mb-4 ${mobileMenuOpen ? '' : 'd-none d-lg-block'}`}>
-              <div className="filter-section p-3">
-                <h5 className="mb-3"><i className="bi bi-funnel"></i> Фильтры</h5>
-
-                <div className="mb-3">
-                  <label className="form-label">Поиск</label>
-                  <input
-                    type="text"
-                    className="form-control"
-                    placeholder="Название или модель..."
-                    value={filters.search}
-                    onChange={(e) => handleFilterChange('search', e.target.value)}
-                  />
-                </div>
-
-                <div className="mb-3">
-                  <label className="form-label">Сортировка</label>
-                  <select
-                    className="form-select"
-                    value={filters.sortBy}
-                    onChange={(e) => handleFilterChange('sortBy', e.target.value)}
-                  >
-                    <option value="default">По умолчанию</option>
-                    <option value="price-asc">Цена: по возрастанию</option>
-                    <option value="price-desc">Цена: по убыванию</option>
-                    <option value="name-asc">Название: А-Я</option>
-                    <option value="name-desc">Название: Я-А</option>
-                  </select>
-                </div>
-
-                <div className="mb-3">
-                  <label className="form-label">Бренд</label>
-                  <select
-                    className="form-select"
-                    value={filters.brand}
-                    onChange={(e) => handleFilterChange('brand', e.target.value)}
-                  >
-                    <option value="">Все бренды</option>
-                    {brands.map((brand, index) => (
-                      <option key={`compact-brand-${brand}-${index}`} value={brand}>{brand}</option>
-                    ))}
-                  </select>
-                </div>
-
-                <div className="mb-3">
-                  <label className="form-label">Категория</label>
-                  <select
-                    className="form-select"
-                    value={filters.category}
-                    onChange={(e) => handleFilterChange('category', e.target.value)}
-                  >
-                    <option value="">Все категории</option>
-                    {categories.map((cat, index) => (
-                      <option key={`category-${cat}-${index}`} value={cat}>{cat}</option>
-                    ))}
-                  </select>
-                </div>
-
-                <div className="mb-3">
-                  <label className="form-label">Цена от</label>
-                  <input
-                    ref={priceMinRef}
-                    type="number"
-                    className="form-control"
-                    placeholder="Мин."
-                    value={filters.priceMin}
-                    onChange={(e) => handlePriceChange('priceMin', e.target.value)}
-                  />
-                </div>
-
-                <div className="mb-3">
-                  <label className="form-label">Цена до</label>
-                  <input
-                    ref={priceMaxRef}
-                    type="number"
-                    className="form-control"
-                    placeholder="Макс."
-                    value={filters.priceMax}
-                    onChange={(e) => handlePriceChange('priceMax', e.target.value)}
-                  />
-                </div>
-
-                {priceError && (
-                  <div className="alert alert-danger" role="alert">
-                    <i className="bi bi-exclamation-triangle"></i> {priceError}
-                  </div>
-                )}
-
-                <button
-                  className="btn btn-outline-secondary w-100"
-                  onClick={clearFilters}
-                >
-                  <i className="bi bi-x-circle"></i> Сбросить фильтры
-                </button>
-
-                <div className="mt-3 text-muted small">
-                  Найдено: {totalResults}
-                </div>
-
-                {/* Кнопки для мобильного меню */}
-                <div className="d-lg-none mt-3">
-                  <div className="d-grid gap-2">
-                    <button
-                      className="btn btn-primary"
-                      onClick={() => setMobileMenuOpen(false)}
-                    >
-                      <i className="bi bi-check-lg me-2"></i> Применить фильтры
-                    </button>
-                    <button
-                      className="btn btn-outline-secondary"
-                      onClick={() => setMobileMenuOpen(false)}
-                    >
-                      <i className="bi bi-x-lg me-2"></i> Закрыть
-                    </button>
-                  </div>
-                </div>
-              </div>
+              <FiltersPanel
+                filters={filters}
+                brands={brands}
+                categories={categories}
+                totalResults={totalResults}
+                priceError={priceError}
+                priceMinRef={priceMinRef}
+                priceMaxRef={priceMaxRef}
+                onFilterChange={handleFilterChange}
+                onPriceChange={handlePriceChange}
+                onClearFilters={clearFilters}
+                mobileMenuOpen={mobileMenuOpen}
+                onCloseMobileMenu={handleCloseMobileMenu}
+              />
             </div>
 
             {/* Products */}
             <div className="col-lg-9">
               {loading ? (
-                <div className="text-center py-5">
-                  <span className="loading-spinner text-primary"></span>
-                  <p className="mt-2 text-muted">Загрузка...</p>
+                <div className="row g-3">
+                  {skeletonCards}
                 </div>
               ) : products.length === 0 ? (
                 <div className="text-center py-5">
@@ -661,94 +416,20 @@ function MainPage() {
                 <>
                   <div className="row g-3">
                     {products.map((product, index) => (
-                      <motion.div
+                      <ProductCard
                         key={product.id}
-                        className="col-md-6 col-xl-4"
-                        initial={{ opacity: 0, y: 20 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        transition={{ delay: index * 0.03 }}
-                      >
-                        <div className="card card-product h-100">
-                          <div
-                            onClick={(e) => {
-                              e.stopPropagation()
-                              setSelectedProduct(product)
-                            }}
-                            style={{ cursor: 'pointer' }}
-                          >
-                            <ProductImageSlider images={product.images} title={product.title} />
-                          </div>
-
-                          <div className="card-body d-flex flex-column">
-                            <h6 className="card-title" onClick={() => setSelectedProduct(product)} style={{ cursor: 'pointer' }}>
-                              {product.title}
-                            </h6>
-
-                            <div className="mb-2">
-                              {product.price ? (
-                                <span className="price-badge text-primary">{formatPrice(product.price)}</span>
-                              ) : (
-                                <span className="badge bg-secondary">Цена по запросу</span>
-                              )}
-                            </div>
-
-                            <div className="small mb-2">
-                              {product.brand && (
-                                <div><i className="bi bi-tag"></i> {product.brand}</div>
-                              )}
-                              {(product.carMake || product.carModel) && (
-                                <div><i className="bi bi-car-front"></i> {product.carMake} {product.carModel}</div>
-                              )}
-                              {product.generation && (
-                                <div><i className="bi bi-info-circle"></i> {product.generation}</div>
-                              )}
-                              {product.condition && (
-                                <div>
-                                  <i className="bi bi-box"></i>{' '}
-                                  <span className={product.condition.includes('Нов') ? 'text-success' : 'text-info'}>
-                                    {product.condition}
-                                  </span>
-                                </div>
-                              )}
-                            </div>
-
-                            {product.category && (
-                              <span className="badge bg-light text-dark category-badge mb-2">
-                                {product.category}
-                              </span>
-                            )}
-
-                            <div className="mt-auto">
-                              <div className="d-flex gap-2 mb-2">
-                                <button
-                                  className={`btn btn-sm ${isFavorite(product.id) ? 'btn-danger' : 'btn-outline-danger'} flex-fill`}
-                                  onClick={(e) => handleFavoriteToggle(product, e)}
-                                  title={isFavorite(product.id) ? 'Удалить из избранного' : 'Добавить в избранное'}
-                                >
-                                  <i className={`bi ${isFavorite(product.id) ? 'bi-heart-fill' : 'bi-heart'}`}></i>
-                                </button>
-                                <button
-                                  className={`btn btn-sm ${isInCompare(product.id) ? 'btn-info' : 'btn-outline-info'} flex-fill`}
-                                  onClick={(e) => handleCompareToggle(product, e)}
-                                  title={isInCompare(product.id) ? 'Удалить из сравнения' : 'Добавить к сравнению'}
-                                >
-                                  <i className="bi bi-arrow-left-right"></i>
-                                </button>
-                              </div>
-
-                              {product.address && (
-                                <div className="small text-muted">
-                                  <i className="bi bi-geo-alt"></i> {product.address}
-                                </div>
-                              )}
-                            </div>
-                          </div>
-                        </div>
-                      </motion.div>
+                        product={product}
+                        index={index}
+                        onProductClick={handleProductClick}
+                      />
                     ))}
                   </div>
 
-                  {renderPagination()}
+                  <Pagination
+                    currentPage={currentPage}
+                    totalPages={totalPages}
+                    onPageChange={handlePageChange}
+                  />
                 </>
               )}
             </div>
@@ -770,6 +451,8 @@ function MainPage() {
           />
         )}
       </AnimatePresence>
+
+      <CartPanel isOpen={cartPanelOpen} onClose={() => setCartPanelOpen(false)} />
     </>
   )
 }
@@ -806,28 +489,20 @@ function App() {
         <Routes>
           <Route path="/" element={<MainPage />} />
           <Route path="/favorites" element={
-            <>
+            <Suspense fallback={
+              <div className="container mt-5 text-center">
+                <span className="loading-spinner text-primary"></span>
+                <p className="mt-2">Загрузка...</p>
+              </div>
+            }>
               <Helmet>
                 <title>Избранное - PartsAuto</title>
                 <meta name="description" content="Избранные автозапчасти" />
               </Helmet>
-              {/* <OldHeader /> */}
               <FavoritesPage onProductClick={(product) => {
-                // Открыть модальное окно можно добавить позже
+                // Можно добавить открытие модального окна
               }} />
-            </>
-          } />
-          <Route path="/compare" element={
-            <>
-              <Helmet>
-                <title>Сравнение товаров - PartsAuto</title>
-                <meta name="description" content="Сравнение автозапчастей" />
-              </Helmet>
-              {/* <OldHeader /> */}
-              <ComparePage onProductClick={(product) => {
-                // Открыть модальное окно можно добавить позже
-              }} />
-            </>
+            </Suspense>
           } />
         </Routes>
       </Router>

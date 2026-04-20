@@ -1,7 +1,7 @@
 import { FaMapMarkerAlt, FaPhone, FaShoppingCart, FaFacebook, FaInstagram, FaTelegram } from 'react-icons/fa';
 import styles from './Header.module.css';
 
-function HeaderTop() {
+function HeaderTop({ onCartClick, cartItemsCount = 0 }) {
   return (
     <div className={styles.headerTop}>
       <div className={styles.container}>
@@ -23,10 +23,17 @@ function HeaderTop() {
                 <FaTelegram className={styles.socialIcon} />
               </div>
             </div>
-            {/* Десктопная корзина */}
-            <div className={styles.desktopCartInfo}>
+            {/* Десктопная корзина с обработчиком клика */}
+            <div 
+              className={styles.desktopCartInfo}
+              onClick={onCartClick}
+              style={{ cursor: 'pointer' }}
+              title="Открыть корзину"
+            >
               <FaShoppingCart className={styles.cartIcon} />
-              <span className={styles.cartBadge}>0</span>
+              {cartItemsCount > 0 && (
+                <span className={styles.cartBadge}>{cartItemsCount}</span>
+              )}
             </div>
           </div>
         </div>

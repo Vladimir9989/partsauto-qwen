@@ -1,11 +1,65 @@
 [
   {
-    "id": 1776779639000,
-    "title": "Супер новость",
+    "id": 1776784678036,
+    "title": "Newsssssss",
     "date": "21.04.2026",
-    "content": "<p><img src=\"/uploads/news/1776779272320-291741411.jpg\"></p><p><em>ArtRazbor<br>Продажа запчастей<br>Авторазбор<br>Выкуп автомобилей</em></p><h2>Заголовок 2</h2><ul><li><p>фыв</p></li><li><p>фыв</p></li></ul><p><img src=\"/uploads/news/1776779434651-917980496.jpg\"></p><p></p>",
+    "content": "<p><img src=\"/uploads/news/1776784507943-394946899.png\"></p><p>asdasdasdasdasd</p><h2>asdasdasd</h2><h3>aasdasdasd</h3><ul><li><p>1</p></li><li><p>2</p></li><li><p>3</p></li></ul><ol><li><p>A</p></li><li><p>B</p></li><li><p>C</p></li></ol><p><img src=\"/uploads/news/1776784669703-450617037.jpg\"></p><p></p>",
     "imageUrl": null,
-    "link": "/news/1776779639000",
-    "createdAt": "2026-04-21T13:53:59.000Z"
+    "link": "/news/1776784678036",
+    "createdAt": "2026-04-21T15:17:58.036Z"
+  },
+  {
+    "id": 1776783669537,
+    "title": "Newwwss",
+    "date": "21.04.2026",
+    "content": "<p><img src=\"/uploads/news/1776783667101-724158768.jpg\"></p>",
+    "imageUrl": null,
+    "link": "/news/1776783669537",
+    "createdAt": "2026-04-21T15:01:09.537Z"
+  },
+  {
+    "id": 1776783596201,
+    "title": "Newssss",
+    "date": "21.04.2026",
+    "content": "<p><img src=\"/uploads/news/1776783568464-957808616.jpg\"></p><p><img src=\"/uploads/news/1776783576221-858844144.jpg\"></p><p><img src=\"/uploads/news/1776783582643-420804056.jpg\"></p>",
+    "imageUrl": null,
+    "link": "/news/1776783596201",
+    "createdAt": "2026-04-21T14:59:56.201Z"
+  },
+  {
+    "id": 1776783569162,
+    "title": "News4",
+    "date": "21.04.2026",
+    "content": "<p><img src=\"/uploads/news/1776783568464-957808616.jpg\"></p>",
+    "imageUrl": null,
+    "link": "/news/1776783569162",
+    "createdAt": "2026-04-21T14:59:29.162Z"
+  },
+  {
+    "id": 1776783532084,
+    "title": "New3",
+    "date": "21.04.2026",
+    "content": "<p><img src=\"/uploads/news/1776783531000-948188634.jpg\"></p>",
+    "imageUrl": null,
+    "link": "/news/1776783532084",
+    "createdAt": "2026-04-21T14:58:52.084Z"
+  },
+  {
+    "id": 1776783459606,
+    "title": "News-2",
+    "date": "21.04.2026",
+    "content": "<p><img src=\"/uploads/news/1776783444569-7996814.jpg\"></p><p>Text</p>",
+    "imageUrl": null,
+    "link": "/news/1776783459618",
+    "createdAt": "2026-04-21T14:57:39.618Z"
+  },
+  {
+    "id": 1776783323954,
+    "title": "Новость",
+    "date": "21.04.2026",
+    "content": "<p><img src=\"/uploads/news/1776783200408-38575847.jpg\"></p><h2></h2><h2>Заголовок</h2><ul><li><p>1</p></li><li><p>2</p></li><li><p>3</p></li></ul><ol><li><p>А</p></li><li><p>Б</p></li></ol><p>Какой то <strong>текст</strong></p><p></p>",
+    "imageUrl": null,
+    "link": "/news/1776783323954",
+    "createdAt": "2026-04-21T14:55:23.954Z"
   }
 ]

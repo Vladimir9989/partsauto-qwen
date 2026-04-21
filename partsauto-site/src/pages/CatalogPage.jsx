@@ -9,6 +9,7 @@ import FiltersPanel from '../components/FiltersPanel'
 import Pagination from '../components/Pagination'
 import SkeletonCard from '../components/SkeletonCard'
 import { API_URL, ITEMS_PER_PAGE, SEARCH_DEBOUNCE_DELAY, PRICE_DEBOUNCE_DELAY } from '../config'
+import styles from './CatalogPage.module.css'
 
 function CatalogPage() {
   const navigate = useNavigate()
@@ -263,15 +264,9 @@ function CatalogPage() {
 
   if (loading && products.length === 0) {
     return (
-      <div className="container mt-5">
-        <div className="row justify-content-center">
-          <div className="col-md-6 text-center">
-            <div className="mb-3">
-              <span className="loading-spinner text-primary"></span>
-            </div>
-            <h4 className="text-primary">{loadingProgress}</h4>
-          </div>
-        </div>
+      <div className={styles.loadingContainer}>
+        <div className={styles.spinner}></div>
+        <p className={styles.loadingText}>{loadingProgress}</p>
       </div>
     )
   }

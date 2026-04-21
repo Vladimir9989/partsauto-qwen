@@ -6,6 +6,7 @@ import CatalogPage from './pages/CatalogPage'
 import MainPage from './pages/MainPage'
 import AdminPage from './pages/AdminPage'
 import NewsPage from './pages/NewsPage'
+import NewsDetailPage from './pages/NewsDetailPage'
 import Header from './components/Header/Header'
 import { useCartStore } from './store/useCartStore'
 import CartPanel from './components/CartPanel'
@@ -27,6 +28,7 @@ function App() {
           <Route path="/catalog" element={<CatalogPage />} />
           <Route path="/admin" element={<AdminPage />} />
           <Route path="/news" element={<NewsPage />} />
+          <Route path="/news/:id" element={<NewsDetailPage />} />
         </Routes>
         <Toaster
           position="top-right"

@@ -275,6 +275,18 @@ app.get('/api/news', (req, res) => {
   res.json({ success: true, data: getNewsList() });
 });
 
+app.get('/api/news/:id', (req, res) => {
+  const id = parseInt(req.params.id)
+  const news = getNewsList()
+  const item = news.find(n => n.id === id)
+  
+  if (!item) {
+    return res.status(404).json({ success: false, error: 'Новость не найдена' })
+  }
+  
+  res.json({ success: true, data: item })
+})
+
 app.post('/api/news', express.json(), (req, res) => {
   const { title, date, content, imageUrl, link } = req.body;
   if (!title) return res.status(400).json({ success: false, error: 'Не указан заголовок' });

@@ -1,5 +1,8 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import toast from 'react-hot-toast'
+import { useEditor, EditorContent } from '@tiptap/react'
+import StarterKit from '@tiptap/starter-kit'
+import Image from '@tiptap/extension-image'
 import styles from './AdminPage.module.css'
 
 const ADMIN_PASSWORD = 'admin123'
@@ -21,6 +24,52 @@ function AdminPage() {
   const [newNewsTitle, setNewNewsTitle] = useState('')
   const [newNewsContent, setNewNewsContent] = useState('')
   const [newsLoading, setNewsLoading] = useState(false)
+
+  const editor = useEditor({
+    extensions: [
+      StarterKit.configure({
+        heading: {
+          levels: [1, 2, 3],
+        },
+      }),
+      Image.configure({
+        inline: true,
+        allowBase64: false,
+      }),
+    ],
+    content: newNewsContent,
+    onUpdate: ({ editor }) => {
+      setNewNewsContent(editor.getHTML())
+    },
+    editorProps: {
+      attributes: {
+        class: styles.tiptapEditor,
+      },
+    },
+  })
+
+  // Функция для загрузки изображений (использует uploadNewsImageToServer)
+  const addImage = () => {
+    const input = document.createElement('input')
+    input.setAttribute('type', 'file')
+    input.setAttribute('accept', 'image/*')
+    input.click()
+    
+    input.onchange = async () => {
+      const file = input.files[0]
+      if (!file) return
+      
+      toast.loading('Загрузка изображения...', { id: 'upload-image' })
+      
+      try {
+        const imageUrl = await uploadNewsImageToServer(file)
+        editor?.chain().focus().setImage({ src: imageUrl }).run()
+        toast.success('Изображение добавлено', { id: 'upload-image' })
+      } catch (error) {
+        toast.error('Ошибка загрузки изображения', { id: 'upload-image' })
+      }
+    }
+  }
 
   // Проверка пароля
   const handleLogin = (e) => {
@@ -61,7 +110,7 @@ function AdminPage() {
     }
   }
 
-  // Загрузка изображения на сервер
+  // Загрузка изображения на сервер (машины)
   const uploadCarImage = async (file) => {
     const formData = new FormData()
     formData.append('image', file)
@@ -74,6 +123,21 @@ function AdminPage() {
     if (data.success) return data.imageUrl
     throw new Error(data.error)
   }
+
+  // Загрузка изображений для новостей
+  const uploadNewsImageToServer = async (file) => {
+    const formData = new FormData()
+    formData.append('image', file)
+    
+    const res = await fetch('/api/upload-news-image', {
+      method: 'POST',
+      body: formData
+    })
+    const data = await res.json()
+    if (data.success) return data.imageUrl
+    throw new Error(data.error)
+  }
+
 
   // Добавление машины
   const addCar = async (e) => {
@@ -107,7 +171,6 @@ function AdminPage() {
         toast.success('Машина добавлена')
         setNewCarTitle('')
         setNewCarImage(null)
-        // Сбросить input file
         const fileInput = document.getElementById('carImageInput')
         if (fileInput) fileInput.value = ''
         loadCars()
@@ -301,13 +364,18 @@ function AdminPage() {
                   onChange={(e) => setNewNewsTitle(e.target.value)}
                   className={styles.input}
                 />
-                <textarea
-                  placeholder="Содержание новости (можно использовать переносы строк)"
-                  value={newNewsContent}
-                  onChange={(e) => setNewNewsContent(e.target.value)}
-                  className={styles.textarea}
-                  rows={6}
-                />
+                <div className={styles.editorWrapper}>
+                  <div className={styles.toolbar}>
+                    <button type="button" onClick={() => editor?.chain().focus().toggleBold().run()} className={editor?.isActive('bold') ? styles.activeTool : ''}>B</button>
+                    <button type="button" onClick={() => editor?.chain().focus().toggleItalic().run()} className={editor?.isActive('italic') ? styles.activeTool : ''}>I</button>
+                    <button type="button" onClick={() => editor?.chain().focus().toggleHeading({ level: 2 }).run()} className={editor?.isActive('heading', { level: 2 }) ? styles.activeTool : ''}>H2</button>
+                    <button type="button" onClick={() => editor?.chain().focus().toggleHeading({ level: 3 }).run()} className={editor?.isActive('heading', { level: 3 }) ? styles.activeTool : ''}>H3</button>
+                    <button type="button" onClick={() => editor?.chain().focus().toggleBulletList().run()} className={editor?.isActive('bulletList') ? styles.activeTool : ''}>• Список</button>
+                    <button type="button" onClick={() => editor?.chain().focus().toggleOrderedList().run()} className={editor?.isActive('orderedList') ? styles.activeTool : ''}>1. Список</button>
+                    <button type="button" onClick={addImage}>📷 Изображение</button>
+                  </div>
+                  <EditorContent editor={editor} className={styles.tiptapEditor} />
+                </div>
                 <button type="submit" className={styles.submitBtn}>Добавить</button>
               </form>
             </div>

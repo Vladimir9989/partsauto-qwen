@@ -258,3 +258,77 @@
   border-radius: 8px;
   margin-right: 12px;
 }
+
+.editorWrapper {
+  margin-bottom: 12px;
+  border: 1px solid var(--header-border);
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  padding: 8px;
+  background-color: var(--header-bg-secondary);
+  border-bottom: 1px solid var(--header-border);
+}
+
+.toolbar button {
+  background: none;
+  border: 1px solid var(--header-border);
+  border-radius: 4px;
+  padding: 4px 8px;
+  font-size: 14px;
+  cursor: pointer;
+  color: var(--header-text);
+  transition: all 0.2s ease;
+}
+
+.toolbar button:hover {
+  border-color: var(--header-accent);
+  color: var(--header-accent);
+}
+
+.activeTool {
+  border-color: var(--header-accent) !important;
+  color: var(--header-accent) !important;
+  background-color: rgba(249, 115, 22, 0.1) !important;
+}
+
+.tiptapEditor {
+  min-height: 250px;
+  padding: 12px;
+  background-color: var(--header-bg-secondary);
+  color: var(--header-text);
+  outline: none;
+}
+
+.tiptapEditor:focus {
+  outline: none;
+}
+
+.tiptapEditor ul,
+.tiptapEditor ol {
+  padding-left: 24px;
+}
+
+.tiptapEditor h2 {
+  font-size: 1.5rem;
+  font-weight: bold;
+  margin: 0.5rem 0;
+}
+
+.tiptapEditor h3 {
+  font-size: 1.25rem;
+  font-weight: bold;
+  margin: 0.5rem 0;
+}
+
+.tiptapEditor img {
+  max-width: 100%;
+  height: auto;
+  margin: 10px 0;
+  border-radius: 8px;
+}

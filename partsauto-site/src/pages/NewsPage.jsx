@@ -51,11 +51,10 @@ function NewsPage() {
                     <time className={styles.newsDate}>{item.date}</time>
                   </div>
                   {item.content && (
-                    <div className={styles.newsContent}>
-                      {item.content.split('\n').map((paragraph, idx) => (
-                        <p key={idx}>{paragraph}</p>
-                      ))}
-                    </div>
+                    <div
+                      className={styles.newsContent}
+                      dangerouslySetInnerHTML={{ __html: item.content }}
+                    />
                   )}
                 </article>
               ))}

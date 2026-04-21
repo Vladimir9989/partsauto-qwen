@@ -328,9 +328,67 @@ app.post('/api/upload-car-image', upload.single('image'), (req, res) => {
   }
 });
 
-// SPA fallback
-app.get('/{*path}', (req, res) => {
+// Настройка хранилища для изображений новостей
+const newsStorage = multer.diskStorage({
+  destination: (req, file, cb) => {
+    const uploadDir = path.join(__dirname, '../public/uploads/news');
+    if (!fs.existsSync(uploadDir)) {
+      fs.mkdirSync(uploadDir, { recursive: true });
+    }
+    cb(null, uploadDir);
+  },
+  filename: (req, file, cb) => {
+    const uniqueName = `${Date.now()}-${Math.round(Math.random() * 1E9)}${path.extname(file.originalname)}`;
+    cb(null, uniqueName);
+  }
+});
+
+const uploadNewsImage = multer({
+  storage: newsStorage,
+  limits: { fileSize: 10 * 1024 * 1024 }, // 10MB
+  fileFilter: (req, file, cb) => {
+    const allowedTypes = /jpeg|jpg|png|gif|webp/;
+    const extname = allowedTypes.test(path.extname(file.originalname).toLowerCase());
+    const mimetype = allowedTypes.test(file.mimetype);
+    if (extname && mimetype) {
+      return cb(null, true);
+    }
+    cb(new Error('Только изображения!'));
+  }
+});
+
+// Загрузка изображения для новости
+app.post('/api/upload-news-image', uploadNewsImage.single('image'), (req, res) => {
+  try {
+    if (!req.file) {
+      return res.status(400).json({ success: false, error: 'Файл не загружен' });
+    }
+    const imageUrl = `/uploads/news/${req.file.filename}`;
+    res.json({ success: true, imageUrl });
+  } catch (error) {
+    console.error('Ошибка загрузки:', error);
+    res.status(500).json({ success: false, error: 'Ошибка загрузки файла' });
+  }
+});
+
+// Раздача статических файлов из папки dist (для продакшена)
+app.use(express.static(path.join(__dirname, '../dist')));
+
+// SPA fallback - для всех не-API запросов отдаём index.html
+app.use((req, res, next) => {
+  // Пропускаем API запросы и статические файлы
+  if (req.path.startsWith('/api') || req.path.startsWith('/uploads')) {
+    return next();
+  }
+  // Отдаём index.html для всех остальных маршрутов (React Router)
   res.sendFile(path.join(__dirname, '../dist/index.html'));
+});
+
+// Обработка ошибок (404 для API)
+app.use((req, res) => {
+  if (req.path.startsWith('/api')) {
+    res.status(404).json({ error: 'API endpoint not found' });
+  }
 });
 
 app.listen(PORT, '0.0.0.0', () => {

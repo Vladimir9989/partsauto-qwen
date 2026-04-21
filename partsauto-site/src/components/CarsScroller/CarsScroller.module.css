@@ -84,10 +84,21 @@
 :global(.swiper-button-next),
 :global(.swiper-button-prev) {
   color: var(--header-accent) !important;
-  background-color: rgba(0, 0, 0, 0.5);
   width: 40px;
   height: 40px;
-  border-radius: 50%;
+  top: 50% !important;
+  /* margin-top: 0 !important; */
+  transform: translateY(-150%) !important;
+  transition: all 0.3s ease;
+  
+}
+
+:global(.swiper-button-next) {
+  right: -5px !important;
+}
+
+:global(.swiper-button-prev) {
+  left: -5px !important;
 }
 
 :global(.swiper-button-next:after),

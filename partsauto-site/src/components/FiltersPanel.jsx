@@ -5,12 +5,10 @@ const FiltersPanel = ({
   filters,
   brands,
   categories,
+  models,
+  generations,
   totalResults,
-  priceError,
-  priceMinRef,
-  priceMaxRef,
   onFilterChange,
-  onPriceChange,
   onClearFilters,
   mobileMenuOpen,
   onCloseMobileMenu
@@ -20,9 +18,16 @@ const FiltersPanel = ({
     onFilterChange(key, value)
   }, [onFilterChange])
 
-  const handlePriceChange = useCallback((key, value) => {
-    onPriceChange(key, value)
-  }, [onPriceChange])
+  const handleBrandChange = useCallback((value) => {
+    onFilterChange('brand', value)
+    onFilterChange('carModel', '')
+    onFilterChange('generation', '')
+  }, [onFilterChange])
+
+  const handleModelChange = useCallback((value) => {
+    onFilterChange('carModel', value)
+    onFilterChange('generation', '')
+  }, [onFilterChange])
 
   return (
     <div className="filter-section p-3">
@@ -40,30 +45,45 @@ const FiltersPanel = ({
       </div>
 
       <div className="mb-3">
-        <label className="form-label">Сортировка</label>
-        <select
-          className="form-select"
-          value={filters.sortBy}
-          onChange={(e) => handleFilterChange('sortBy', e.target.value)}
-        >
-          <option value="default">По умолчанию</option>
-          <option value="price-asc">Цена: по возрастанию</option>
-          <option value="price-desc">Цена: по убыванию</option>
-          <option value="name-asc">Название: А-Я</option>
-          <option value="name-desc">Название: Я-А</option>
-        </select>
-      </div>
-
-      <div className="mb-3">
         <label className="form-label">Бренд</label>
         <select
           className="form-select"
           value={filters.brand}
-          onChange={(e) => handleFilterChange('brand', e.target.value)}
+          onChange={(e) => handleBrandChange(e.target.value)}
         >
           <option value="">Все бренды</option>
           {brands.map((brand, index) => (
             <option key={`brand-${brand}-${index}`} value={brand}>{brand}</option>
+          ))}
+        </select>
+      </div>
+
+      <div className="mb-3">
+        <label className="form-label">Модель</label>
+        <select
+          className="form-select"
+          value={filters.carModel}
+          onChange={(e) => handleModelChange(e.target.value)}
+          disabled={!filters.brand}
+        >
+          <option value="">Все модели</option>
+          {models.map((model, index) => (
+            <option key={`model-${model}-${index}`} value={model}>{model}</option>
+          ))}
+        </select>
+      </div>
+
+      <div className="mb-3">
+        <label className="form-label">Поколение</label>
+        <select
+          className="form-select"
+          value={filters.generation}
+          onChange={(e) => handleFilterChange('generation', e.target.value)}
+          disabled={!filters.carModel}
+        >
+          <option value="">Все поколения</option>
+          {generations.map((gen, index) => (
+            <option key={`gen-${gen}-${index}`} value={gen}>{gen}</option>
           ))}
         </select>
       </div>
@@ -81,36 +101,6 @@ const FiltersPanel = ({
           ))}
         </select>
       </div>
-
-      <div className="mb-3">
-        <label className="form-label">Цена от</label>
-        <input
-          ref={priceMinRef}
-          type="number"
-          className="form-control"
-          placeholder="Мин."
-          value={filters.priceMin}
-          onChange={(e) => handlePriceChange('priceMin', e.target.value)}
-        />
-      </div>
-
-      <div className="mb-3">
-        <label className="form-label">Цена до</label>
-        <input
-          ref={priceMaxRef}
-          type="number"
-          className="form-control"
-          placeholder="Макс."
-          value={filters.priceMax}
-          onChange={(e) => handlePriceChange('priceMax', e.target.value)}
-        />
-      </div>
-
-      {priceError && (
-        <div className="alert alert-danger" role="alert">
-          <i className="bi bi-exclamation-triangle"></i> {priceError}
-        </div>
-      )}
 
       <button
         className="btn btn-outline-secondary w-100"

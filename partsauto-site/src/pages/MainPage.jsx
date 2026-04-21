@@ -1,6 +1,7 @@
 import { Helmet } from 'react-helmet-async'
 import styles from './MainPage.module.css'
 import CarsScroller from '../components/CarsScroller/CarsScroller'
+import CarSearch from '../components/CarSearch/CarSearch'
 
 function MainPage() {
   const normalText = 'Выкуп авто в любом состоянии '
@@ -28,6 +29,7 @@ function MainPage() {
       </div>
 
       <CarsScroller />
+      <CarSearch />
     </>
   )
 }

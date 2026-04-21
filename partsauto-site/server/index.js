@@ -187,7 +187,7 @@ app.get('/api/products', async (req, res) => {
 
     // Фильтрация на сервере
     let results = cachedProducts;
-    const { search, brand, category, priceMin, priceMax, page, limit } = req.query;
+    const { search, brand, category, carModel, generation, priceMin, priceMax, page, limit } = req.query;
 
     if (search) {
       const s = search.toLowerCase();
@@ -201,6 +201,8 @@ app.get('/api/products', async (req, res) => {
     }
     if (brand) results = results.filter(p => p.brand === brand);
     if (category) results = results.filter(p => p.category === category);
+    if (carModel) results = results.filter(p => p.carModel === carModel);
+    if (generation) results = results.filter(p => p.generation === generation);
 
     const minPrice = priceMin ? parseFloat(priceMin) : null;
     const maxPrice = priceMax ? parseFloat(priceMax) : null;

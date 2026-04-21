@@ -19,6 +19,7 @@ function CatalogPage() {
   // Состояние
   const [products, setProducts] = useState([])
   const [loading, setLoading] = useState(true)
+  const [initialLoad, setInitialLoad] = useState(true)
   const [loadingProgress, setLoadingProgress] = useState('Загрузка...')
   const [brands, setBrands] = useState([])
   const [categories, setCategories] = useState([])
@@ -33,20 +34,14 @@ function CatalogPage() {
     search: '',
     brand: '',
     category: '',
-    priceMin: '',
-    priceMax: '',
-    sortBy: 'default',
+    carModel: '',
+    generation: '',
   })
 
-  const [priceError, setPriceError] = useState('')
+  const [models, setModels] = useState([])
+  const [generations, setGenerations] = useState([])
   const [debouncedSearch, setDebouncedSearch] = useState('')
-  const [debouncedPriceMin, setDebouncedPriceMin] = useState('')
-  const [debouncedPriceMax, setDebouncedPriceMax] = useState('')
 
-  // Refs для фокуса на полях ввода
-  const priceMinRef = useRef(null)
-  const priceMaxRef = useRef(null)
-  const activePriceFieldRef = useRef(null)
   const abortControllerRef = useRef(null)
 
   // Debounce для поиска
@@ -56,21 +51,6 @@ function CatalogPage() {
     }, SEARCH_DEBOUNCE_DELAY)
     return () => clearTimeout(timer)
   }, [filters.search])
-
-  // Debounce для полей цены
-  useEffect(() => {
-    const timer = setTimeout(() => {
-      setDebouncedPriceMin(filters.priceMin)
-    }, PRICE_DEBOUNCE_DELAY)
-    return () => clearTimeout(timer)
-  }, [filters.priceMin])
-
-  useEffect(() => {
-    const timer = setTimeout(() => {
-      setDebouncedPriceMax(filters.priceMax)
-    }, PRICE_DEBOUNCE_DELAY)
-    return () => clearTimeout(timer)
-  }, [filters.priceMax])
 
   // Загрузка данных с сервера с использованием AbortController
   useEffect(() => {
@@ -82,13 +62,6 @@ function CatalogPage() {
 
       abortControllerRef.current = new AbortController()
 
-      const activeElement = document.activeElement
-      if (activeElement === priceMinRef.current) {
-        activePriceFieldRef.current = 'priceMin'
-      } else if (activeElement === priceMaxRef.current) {
-        activePriceFieldRef.current = 'priceMax'
-      }
-
       setLoading(true)
       setLoadingProgress('Загрузка...')
 
@@ -97,8 +70,8 @@ function CatalogPage() {
         if (debouncedSearch) params.set('search', debouncedSearch)
         if (filters.brand) params.set('brand', filters.brand)
         if (filters.category) params.set('category', filters.category)
-        if (debouncedPriceMin) params.set('priceMin', debouncedPriceMin)
-        if (debouncedPriceMax) params.set('priceMax', debouncedPriceMax)
+        if (filters.carModel) params.set('carModel', filters.carModel)
+        if (filters.generation) params.set('generation', filters.generation)
         params.set('page', currentPage)
         params.set('limit', ITEMS_PER_PAGE)
 
@@ -110,15 +83,11 @@ function CatalogPage() {
 
         let data = await response.json()
 
-        // Сортировка на клиенте
-        if (filters.sortBy !== 'default') {
-          data.products = sortProducts(data.products, filters.sortBy)
-        }
-
         setProducts(data.products)
         setTotalResults(data.total)
         setTotalPages(data.totalPages)
         setLoadingProgress('')
+        setInitialLoad(false)
       } catch (error) {
         if (error.name === 'AbortError') {
           console.log('Запрос отменен')
@@ -127,18 +96,9 @@ function CatalogPage() {
         console.error('Ошибка:', error)
         setLoadingProgress('Ошибка загрузки')
         toast.error('Ошибка загрузки данных')
+        setInitialLoad(false)
       } finally {
         setLoading(false)
-
-        // Восстановление фокуса
-        setTimeout(() => {
-          if (activePriceFieldRef.current === 'priceMin' && priceMinRef.current) {
-            priceMinRef.current.focus()
-          } else if (activePriceFieldRef.current === 'priceMax' && priceMaxRef.current) {
-            priceMaxRef.current.focus()
-          }
-          activePriceFieldRef.current = null
-        }, 0)
       }
     }
 
@@ -150,9 +110,9 @@ function CatalogPage() {
         abortControllerRef.current.abort()
       }
     }
-  }, [debouncedSearch, debouncedPriceMin, debouncedPriceMax, filters.brand, filters.category, filters.sortBy, currentPage])
+  }, [debouncedSearch, filters.brand, filters.category, filters.carModel, filters.generation, currentPage])
 
-  // Загрузка списка брендов и категорий
+  // Загрузка списка брендов, категорий, моделей и поколений
   useEffect(() => {
     const loadMeta = async () => {
       try {
@@ -181,48 +141,68 @@ function CatalogPage() {
     if (brands.length === 0) loadMeta()
   }, [brands.length])
 
+  // Загрузка моделей при выборе бренда
+  useEffect(() => {
+    const loadModels = async () => {
+      if (!filters.brand) {
+        setModels([])
+        return
+      }
+
+      try {
+        const res = await fetch(`${API_URL}?brand=${encodeURIComponent(filters.brand)}&limit=1000`)
+        const data = await res.json()
+        const uniqueModels = [...new Set(data.products.map(p => p.carModel).filter(Boolean))]
+        setModels(uniqueModels.sort())
+      } catch (error) {
+        console.error('Ошибка загрузки моделей:', error)
+      }
+    }
+
+    loadModels()
+  }, [filters.brand])
+
+  // Загрузка поколений при выборе модели
+  useEffect(() => {
+    const loadGenerations = async () => {
+      if (!filters.brand || !filters.carModel) {
+        setGenerations([])
+        return
+      }
+
+      try {
+        const res = await fetch(`${API_URL}?brand=${encodeURIComponent(filters.brand)}&carModel=${encodeURIComponent(filters.carModel)}&limit=1000`)
+        const data = await res.json()
+        const uniqueGenerations = [...new Set(data.products.map(p => p.generation).filter(Boolean))]
+        setGenerations(uniqueGenerations.sort())
+      } catch (error) {
+        console.error('Ошибка загрузки поколений:', error)
+      }
+    }
+
+    loadGenerations()
+  }, [filters.brand, filters.carModel])
+
+  // Инициализация фильтров из URL при загрузке страницы
+  useEffect(() => {
+    const brand = searchParams.get('brand')
+    const carModel = searchParams.get('carModel')
+    const generation = searchParams.get('generation')
+
+    if (brand || carModel || generation) {
+      setFilters(prev => ({
+        ...prev,
+        brand: brand || '',
+        carModel: carModel || '',
+        generation: generation || ''
+      }))
+    }
+  }, [])
+
   // Сброс страницы при изменении фильтров
   useEffect(() => {
     setCurrentPage(1)
-  }, [filters.brand, filters.category, debouncedSearch, filters.sortBy])
-
-  // Мемоизированная функция сортировки
-  const sortProducts = useCallback((products, sortBy) => {
-    const sorted = [...products]
-    switch (sortBy) {
-      case 'price-asc':
-        return sorted.sort((a, b) => (parseInt(a.price) || 0) - (parseInt(b.price) || 0))
-      case 'price-desc':
-        return sorted.sort((a, b) => (parseInt(b.price) || 0) - (parseInt(a.price) || 0))
-      case 'name-asc':
-        return sorted.sort((a, b) => a.title.localeCompare(b.title, 'ru'))
-      case 'name-desc':
-        return sorted.sort((a, b) => b.title.localeCompare(a.title, 'ru'))
-      default:
-        return sorted
-    }
-  }, [])
-
-  const validatePriceRange = useCallback((min, max) => {
-    const minVal = min ? parseInt(min) : null
-    const maxVal = max ? parseInt(max) : null
-
-    if (minVal !== null && maxVal !== null && minVal > maxVal) {
-      setPriceError('Цена "до" должна быть больше или равна цене "от"')
-      return false
-    }
-
-    setPriceError('')
-    return true
-  }, [])
-
-  const handlePriceChange = useCallback((key, value) => {
-    setFilters(prev => {
-      const newFilters = { ...prev, [key]: value }
-      validatePriceRange(newFilters.priceMin, newFilters.priceMax)
-      return newFilters
-    })
-  }, [validatePriceRange])
+  }, [filters.brand, filters.category, filters.carModel, filters.generation, debouncedSearch])
 
   const handleFilterChange = useCallback((key, value) => {
     setFilters(prev => ({ ...prev, [key]: value }))
@@ -233,12 +213,12 @@ function CatalogPage() {
       search: '',
       brand: '',
       category: '',
-      priceMin: '',
-      priceMax: '',
-      sortBy: 'default',
+      carModel: '',
+      generation: '',
     })
+    setSearchParams({})
     toast.success('Фильтры сброшены')
-  }, [])
+  }, [setSearchParams])
 
   const handleProductClick = useCallback((product) => {
     setSelectedProduct(product)
@@ -262,15 +242,6 @@ function CatalogPage() {
     ))
   }, [])
 
-  if (loading && products.length === 0) {
-    return (
-      <div className={styles.loadingContainer}>
-        <div className={styles.spinner}></div>
-        <p className={styles.loadingText}>{loadingProgress}</p>
-      </div>
-    )
-  }
-
   return (
     <>
       <Helmet>
@@ -282,8 +253,6 @@ function CatalogPage() {
       </Helmet>
 
       <div className="container-fluid p-0">
-        {/* Header удален, так как он будет в App */}
-
         <div className="container">
           {/* Компактные фильтры для средних экранов */}
           <div className="d-none d-md-block d-lg-none mb-3">
@@ -300,7 +269,7 @@ function CatalogPage() {
 
               {showCompactFilters && (
                 <div className="row g-2 mt-2">
-                  <div className="col-md-4">
+                  <div className="col-md-3">
                     <label className="form-label small mb-1">Поиск</label>
                     <input
                       type="text"
@@ -310,26 +279,16 @@ function CatalogPage() {
                       onChange={(e) => handleFilterChange('search', e.target.value)}
                     />
                   </div>
-                  <div className="col-md-3">
-                    <label className="form-label small mb-1">Сортировка</label>
-                    <select
-                      className="form-select form-select-sm"
-                      value={filters.sortBy}
-                      onChange={(e) => handleFilterChange('sortBy', e.target.value)}
-                    >
-                      <option value="default">По умолчанию</option>
-                      <option value="price-asc">Цена ↑</option>
-                      <option value="price-desc">Цена ↓</option>
-                      <option value="name-asc">Название А-Я</option>
-                      <option value="name-desc">Название Я-А</option>
-                    </select>
-                  </div>
-                  <div className="col-md-3">
+                  <div className="col-md-2">
                     <label className="form-label small mb-1">Бренд</label>
                     <select
                       className="form-select form-select-sm"
                       value={filters.brand}
-                      onChange={(e) => handleFilterChange('brand', e.target.value)}
+                      onChange={(e) => {
+                        handleFilterChange('brand', e.target.value)
+                        handleFilterChange('carModel', '')
+                        handleFilterChange('generation', '')
+                      }}
                     >
                       <option value="">Все бренды</option>
                       {brands.map((brand, index) => (
@@ -338,6 +297,37 @@ function CatalogPage() {
                     </select>
                   </div>
                   <div className="col-md-2">
+                    <label className="form-label small mb-1">Модель</label>
+                    <select
+                      className="form-select form-select-sm"
+                      value={filters.carModel}
+                      onChange={(e) => {
+                        handleFilterChange('carModel', e.target.value)
+                        handleFilterChange('generation', '')
+                      }}
+                      disabled={!filters.brand}
+                    >
+                      <option value="">Все модели</option>
+                      {models.map((model, index) => (
+                        <option key={`model-${model}-${index}`} value={model}>{model}</option>
+                      ))}
+                    </select>
+                  </div>
+                  <div className="col-md-2">
+                    <label className="form-label small mb-1">Поколение</label>
+                    <select
+                      className="form-select form-select-sm"
+                      value={filters.generation}
+                      onChange={(e) => handleFilterChange('generation', e.target.value)}
+                      disabled={!filters.carModel}
+                    >
+                      <option value="">Все поколения</option>
+                      {generations.map((gen, index) => (
+                        <option key={`gen-${gen}-${index}`} value={gen}>{gen}</option>
+                      ))}
+                    </select>
+                  </div>
+                  <div className="col-md-3">
                     <label className="form-label small mb-1">Действия</label>
                     <div className="d-flex gap-1">
                       <button
@@ -368,12 +358,10 @@ function CatalogPage() {
                 filters={filters}
                 brands={brands}
                 categories={categories}
+                models={models}
+                generations={generations}
                 totalResults={totalResults}
-                priceError={priceError}
-                priceMinRef={priceMinRef}
-                priceMaxRef={priceMaxRef}
                 onFilterChange={handleFilterChange}
-                onPriceChange={handlePriceChange}
                 onClearFilters={clearFilters}
                 mobileMenuOpen={mobileMenuOpen}
                 onCloseMobileMenu={handleCloseMobileMenu}
@@ -383,14 +371,20 @@ function CatalogPage() {
             {/* Products */}
             <div className="col-lg-9">
               {loading ? (
-                <div className="row g-3">
-                  {skeletonCards}
+                <div className={styles.loadingContainer}>
+                  <div className={styles.spinner}></div>
+                  <p className={styles.loadingText}>Каталог загружается</p>
                 </div>
-              ) : products.length === 0 ? (
+              ) : products.length === 0 && (filters.search || filters.brand || filters.category || filters.carModel || filters.generation) ? (
                 <div className="text-center py-5">
                   <i className="bi bi-search display-1 text-muted"></i>
                   <h4 className="mt-3 text-muted">Ничего не найдено</h4>
                   <p className="text-muted">Попробуйте изменить параметры поиска</p>
+                </div>
+              ) : products.length === 0 ? (
+                <div className={styles.loadingContainer}>
+                  <div className={styles.spinner}></div>
+                  <p className={styles.loadingText}>Каталог загружается</p>
                 </div>
               ) : (
                 <>

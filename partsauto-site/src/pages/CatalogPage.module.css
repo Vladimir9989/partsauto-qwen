@@ -1,3 +1,30 @@
+/* Jumbotron баннер - стили из MainPage */
+.jumbotron {
+  background-image: url('/main-bg.jpg');
+  background-size: cover;
+  background-position: center;
+  position: relative;
+  z-index: 1;
+  min-height: 330px;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+  padding-bottom: 30px;
+  margin-bottom: 30px;
+}
+
+.content {
+  position: relative;
+  z-index: 2;
+  text-align: center;
+  width: 100%;
+  max-width: 1200px;
+  padding: 0 20px;
+}
+
+
+/* Стили загрузки */
 .loadingContainer {
   display: flex;
   flex-direction: column;

@@ -3,6 +3,7 @@ import { motion } from 'framer-motion'
 import { useCartStore } from '../store/useCartStore'
 import toast from 'react-hot-toast'
 import { CARD_ANIMATION_DELAY } from '../config'
+import styles from './ProductCard.module.css'
 
 // Компонент слайдера изображений для карточки товара
 const ProductImageSlider = React.memo(({ images, title }) => {
@@ -17,11 +18,11 @@ const ProductImageSlider = React.memo(({ images, title }) => {
 
   if (!images || images.length === 0) {
     return (
-      <div className="product-image text-muted d-flex align-items-center justify-content-center">
-        <div className="text-center">
-          <i className="bi bi-image display-4"></i>
-          <div className="mt-2">Нет фото</div>
+      <div className={styles.productImageFallback}>
+        <div className={styles.productImageFallbackIcon}>
+          <i className="bi bi-image"></i>
         </div>
+        <div className={styles.productImageFallbackText}>Нет фото</div>
       </div>
     )
   }
@@ -49,57 +50,57 @@ const ProductImageSlider = React.memo(({ images, title }) => {
   const imageUrl = getImageUrl(currentImage)
 
   return (
-    <div className="product-image-slider position-relative">
+    <div className={styles.productImageSlider}>
       {imageUrl ? (
         <img
           src={imageUrl}
           alt={`${title} - фото ${currentIndex + 1}`}
-          className="card-img-top product-image"
+          className={styles.productImage}
           loading="lazy"
           onError={(e) => {
             e.target.style.display = 'none'
-            const fallback = e.target.parentElement.querySelector('.image-fallback')
+            const fallback = e.target.parentElement.querySelector(`.${styles.imageFallback}`)
             if (fallback) fallback.style.display = 'flex'
           }}
         />
       ) : (
-        <div className="product-image text-muted d-flex align-items-center justify-content-center">
-          <div className="text-center">
-            <i className="bi bi-image display-4"></i>
-            <div className="mt-2">Нет фото</div>
+        <div className={styles.productImageFallback}>
+          <div className={styles.productImageFallbackIcon}>
+            <i className="bi bi-image"></i>
           </div>
+          <div className={styles.productImageFallbackText}>Нет фото</div>
         </div>
       )}
 
-      <div className="image-fallback product-image text-muted d-none align-items-center justify-content-center">
-        <div className="text-center">
-          <i className="bi bi-image display-4"></i>
-          <div className="mt-2">Ошибка загрузки</div>
+      <div className={`${styles.productImageFallback} ${styles.imageFallback}`} style={{ display: 'none' }}>
+        <div className={styles.productImageFallbackIcon}>
+          <i className="bi bi-image"></i>
         </div>
+        <div className={styles.productImageFallbackText}>Ошибка загрузки</div>
       </div>
 
       {images.length > 1 && (
         <>
           <button
-            className="slider-nav slider-prev btn btn-sm btn-light rounded-circle"
+            className={`${styles.sliderNav} ${styles.sliderPrev}`}
             onClick={goToPrevious}
             aria-label="Предыдущее фото"
           >
             <i className="bi bi-chevron-left"></i>
           </button>
           <button
-            className="slider-nav slider-next btn btn-sm btn-light rounded-circle"
+            className={`${styles.sliderNav} ${styles.sliderNext}`}
             onClick={goToNext}
             aria-label="Следующее фото"
           >
             <i className="bi bi-chevron-right"></i>
           </button>
 
-          <div className="slider-indicators">
+          <div className={styles.sliderIndicators}>
             {images.map((_, index) => (
               <button
                 key={index}
-                className={`indicator ${index === currentIndex ? 'active' : ''}`}
+                className={`${styles.indicator} ${index === currentIndex ? styles.activeIndicator : ''}`}
                 onClick={(e) => goToSlide(e, index)}
                 aria-label={`Перейти к фото ${index + 1}`}
               />
@@ -142,12 +143,12 @@ const ProductCard = ({ product, index, onProductClick }) => {
 
   return (
     <motion.div
-      className="col-md-6 col-xl-4"
+      className={styles.productCardWrapper}
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ delay: index * CARD_ANIMATION_DELAY }}
     >
-      <div className="card card-product h-100">
+      <div className={styles.card}>
         <div
           onClick={handleCardClick}
           style={{ cursor: 'pointer' }}
@@ -155,20 +156,20 @@ const ProductCard = ({ product, index, onProductClick }) => {
           <ProductImageSlider images={product.images} title={product.title} />
         </div>
 
-        <div className="card-body d-flex flex-column">
-          <h6 className="card-title" onClick={handleCardClick} style={{ cursor: 'pointer' }}>
+        <div className={styles.cardBody}>
+          <h6 className={styles.cardTitle} onClick={handleCardClick} style={{ cursor: 'pointer' }}>
             {product.title}
           </h6>
 
-          <div className="mb-2">
+          <div className={styles.priceContainer}>
             {product.price ? (
-              <span className="price-badge text-primary">{formatPrice(product.price)}</span>
+              <span className={styles.priceBadge}>{formatPrice(product.price)}</span>
             ) : (
-              <span className="badge bg-secondary">Цена по запросу</span>
+              <span className={styles.priceRequest}>Цена по запросу</span>
             )}
           </div>
 
-          <div className="small mb-2">
+          <div className={styles.productInfo}>
             {product.brand && (
               <div><i className="bi bi-tag"></i> {product.brand}</div>
             )}
@@ -181,7 +182,7 @@ const ProductCard = ({ product, index, onProductClick }) => {
             {product.condition && (
               <div>
                 <i className="bi bi-box"></i>{' '}
-                <span className={product.condition.includes('Нов') ? 'text-success' : 'text-info'}>
+                <span className={product.condition.includes('Нов') ? styles.textSuccess : styles.textInfo}>
                   {product.condition}
                 </span>
               </div>
@@ -189,16 +190,16 @@ const ProductCard = ({ product, index, onProductClick }) => {
           </div>
 
           {product.category && (
-            <span className="badge bg-light text-dark category-badge mb-2">
+            <span className={styles.categoryBadge}>
               {product.category}
             </span>
           )}
 
-          <div className="mt-auto">
-            <div className="d-flex gap-2 mb-2">
+          <div className={styles.cartBtnContainer}>
+            <div className={styles.cartBtnRow}>
               {/* Кнопка добавления в корзину (заменяет избранное) */}
               <button
-                className={`btn btn-sm ${isInCart(product.id) ? 'btn-success' : 'btn-outline-success'} flex-fill`}
+                className={`${styles.cartBtn} ${isInCart(product.id) ? styles.cartBtnFilled : styles.cartBtnOutline}`}
                 onClick={handleAddToCart}
                 title={isInCart(product.id) ? 'Товар в корзине' : 'Добавить в корзину'}
               >
@@ -208,7 +209,7 @@ const ProductCard = ({ product, index, onProductClick }) => {
             </div>
 
             {product.address && (
-              <div className="small text-muted">
+              <div className={styles.address}>
                 <i className="bi bi-geo-alt"></i> {product.address}
               </div>
             )}

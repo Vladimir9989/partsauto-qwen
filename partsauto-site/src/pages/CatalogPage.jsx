@@ -252,15 +252,17 @@ function CatalogPage() {
         <meta property="og:type" content="website" />
       </Helmet>
 
-      <div className="container-fluid p-0">
-        <div className="container">
-          {/* Компактные фильтры для средних экранов */}
-          <div className="d-none d-md-block d-lg-none mb-3">
-            <div className="compact-filters bg-white rounded shadow-sm p-3">
-              <div className="d-flex justify-content-between align-items-center mb-2">
-                <h6 className="mb-0"><i className="bi bi-funnel me-2"></i>Фильтры</h6>
+      <div className={styles.catalogPage}>
+        <div className={styles.catalogContainer}>
+          <h1 className={styles.pageTitle}>Каталог автозапчастей</h1>
+
+          {/* Компактные фильтры для планшетов */}
+          <div className={styles.compactFiltersWrapper}>
+            <div className={styles.compactFilters}>
+              <div className={styles.compactFiltersHeader}>
+                <h6>Фильтры</h6>
                 <button
-                  className="btn btn-sm btn-outline-primary"
+                  className={styles.compactFiltersToggle}
                   onClick={() => setShowCompactFilters(!showCompactFilters)}
                 >
                   {showCompactFilters ? 'Скрыть' : 'Показать'} фильтры
@@ -268,21 +270,19 @@ function CatalogPage() {
               </div>
 
               {showCompactFilters && (
-                <div className="row g-2 mt-2">
-                  <div className="col-md-3">
-                    <label className="form-label small mb-1">Поиск</label>
+                <div className={styles.compactFiltersBody}>
+                  <div className={styles.compactFilterGroup}>
+                    <label>Поиск</label>
                     <input
                       type="text"
-                      className="form-control form-control-sm"
                       placeholder="Название..."
                       value={filters.search}
                       onChange={(e) => handleFilterChange('search', e.target.value)}
                     />
                   </div>
-                  <div className="col-md-2">
-                    <label className="form-label small mb-1">Бренд</label>
+                  <div className={styles.compactFilterGroup}>
+                    <label>Бренд</label>
                     <select
-                      className="form-select form-select-sm"
                       value={filters.brand}
                       onChange={(e) => {
                         handleFilterChange('brand', e.target.value)
@@ -296,10 +296,9 @@ function CatalogPage() {
                       ))}
                     </select>
                   </div>
-                  <div className="col-md-2">
-                    <label className="form-label small mb-1">Модель</label>
+                  <div className={styles.compactFilterGroup}>
+                    <label>Модель</label>
                     <select
-                      className="form-select form-select-sm"
                       value={filters.carModel}
                       onChange={(e) => {
                         handleFilterChange('carModel', e.target.value)
@@ -313,10 +312,9 @@ function CatalogPage() {
                       ))}
                     </select>
                   </div>
-                  <div className="col-md-2">
-                    <label className="form-label small mb-1">Поколение</label>
+                  <div className={styles.compactFilterGroup}>
+                    <label>Поколение</label>
                     <select
-                      className="form-select form-select-sm"
                       value={filters.generation}
                       onChange={(e) => handleFilterChange('generation', e.target.value)}
                       disabled={!filters.carModel}
@@ -327,33 +325,18 @@ function CatalogPage() {
                       ))}
                     </select>
                   </div>
-                  <div className="col-md-3">
-                    <label className="form-label small mb-1">Действия</label>
-                    <div className="d-flex gap-1">
-                      <button
-                        className="btn btn-sm btn-outline-secondary flex-grow-1"
-                        onClick={clearFilters}
-                        title="Сбросить фильтры"
-                      >
-                        <i className="bi bi-x-circle"></i>
-                      </button>
-                      <button
-                        className="btn btn-sm btn-primary flex-grow-1"
-                        onClick={() => setShowCompactFilters(false)}
-                        title="Применить"
-                      >
-                        <i className="bi bi-check"></i>
-                      </button>
-                    </div>
+                  <div className={styles.compactFilterActions}>
+                    <button onClick={clearFilters} className={styles.clearBtn}>Сбросить</button>
+                    <button onClick={() => setShowCompactFilters(false)} className={styles.applyBtn}>Применить</button>
                   </div>
                 </div>
               )}
             </div>
           </div>
 
-          <div className="row">
-            {/* Filters - боковая панель для больших экранов */}
-            <div className={`col-lg-3 mb-4 ${mobileMenuOpen ? '' : 'd-none d-lg-block'}`}>
+          <div className={styles.catalogLayout}>
+            {/* Боковая панель фильтров */}
+            <aside className={`${styles.filtersSidebar} ${mobileMenuOpen ? styles.filtersSidebarOpen : ''}`}>
               <FiltersPanel
                 filters={filters}
                 brands={brands}
@@ -366,29 +349,24 @@ function CatalogPage() {
                 mobileMenuOpen={mobileMenuOpen}
                 onCloseMobileMenu={handleCloseMobileMenu}
               />
-            </div>
+            </aside>
 
-            {/* Products */}
-            <div className="col-lg-9">
-              {loading ? (
+            {/* Основной контент */}
+            <main className={styles.productsMain}>
+              {loading && !initialLoad ? (
                 <div className={styles.loadingContainer}>
                   <div className={styles.spinner}></div>
                   <p className={styles.loadingText}>Каталог загружается</p>
-                </div>
-              ) : products.length === 0 && (filters.search || filters.brand || filters.category || filters.carModel || filters.generation) ? (
-                <div className="text-center py-5">
-                  <i className="bi bi-search display-1 text-muted"></i>
-                  <h4 className="mt-3 text-muted">Ничего не найдено</h4>
-                  <p className="text-muted">Попробуйте изменить параметры поиска</p>
                 </div>
               ) : products.length === 0 ? (
-                <div className={styles.loadingContainer}>
-                  <div className={styles.spinner}></div>
-                  <p className={styles.loadingText}>Каталог загружается</p>
+                <div className={styles.emptyState}>
+                  <div className={styles.emptyIcon}>🔍</div>
+                  <h3 className={styles.emptyTitle}>Ничего не найдено</h3>
+                  <p className={styles.emptyText}>Попробуйте изменить параметры поиска</p>
                 </div>
               ) : (
                 <>
-                  <div className="row g-3">
+                  <div className={styles.productsGrid}>
                     {products.map((product, index) => (
                       <ProductCard
                         key={product.id}
@@ -398,7 +376,6 @@ function CatalogPage() {
                       />
                     ))}
                   </div>
-
                   <Pagination
                     currentPage={currentPage}
                     totalPages={totalPages}
@@ -406,15 +383,9 @@ function CatalogPage() {
                   />
                 </>
               )}
-            </div>
+            </main>
           </div>
         </div>
-
-        <footer className="bg-dark text-white text-center py-3 mt-5">
-          <div className="container">
-            <small>© 2026 PartsAuto - Каталог автозапчастей</small>
-          </div>
-        </footer>
       </div>
 
       <AnimatePresence>

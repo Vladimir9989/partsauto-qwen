@@ -1,28 +1,9 @@
-/* Jumbotron баннер - стили из MainPage */
-.jumbotron {
-  background-image: url('/main-bg.jpg');
-  background-size: cover;
-  background-position: center;
-  position: relative;
-  z-index: 1;
-  min-height: 330px;
-  display: flex;
-  align-items: flex-end;
-  justify-content: center;
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
-  padding-bottom: 30px;
-  margin-bottom: 30px;
-}
+/* CatalogPage.module.css - стили для страницы каталога */
 
-.content {
-  position: relative;
-  z-index: 2;
-  text-align: center;
-  width: 100%;
-  max-width: 1200px;
-  padding: 0 20px;
+.catalogPage {
+  background-color: var(--header-bg-secondary);
+  min-height: 100vh;
 }
-
 
 /* Стили загрузки */
 .loadingContainer {
@@ -53,4 +34,253 @@
   margin-top: 20px;
   font-size: 16px;
   color: var(--header-text-muted);
+}
+
+/* Контейнер каталога */
+.catalogContainer {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 40px 20px;
+}
+
+/* Заголовок страницы */
+.pageTitle {
+  font-size: 28px;
+  font-weight: bold;
+  color: var(--header-text);
+  margin-bottom: 32px;
+  position: relative;
+  display: inline-block;
+}
+
+.pageTitle::after {
+  content: '';
+  position: absolute;
+  bottom: -8px;
+  left: 0;
+  width: 60px;
+  height: 3px;
+  background-color: var(--header-accent);
+}
+
+/* Сетка товаров */
+.productsGrid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 24px;
+}
+
+/* Пустое состояние */
+.emptyState {
+  text-align: center;
+  padding: 60px 20px;
+  background-color: var(--header-bg);
+  border-radius: 16px;
+  border: 1px solid var(--header-border);
+}
+
+.emptyIcon {
+  font-size: 64px;
+  margin-bottom: 20px;
+  opacity: 0.5;
+}
+
+.emptyTitle {
+  font-size: 24px;
+  color: var(--header-text);
+  margin-bottom: 12px;
+}
+
+.emptyText {
+  color: var(--header-text-muted);
+}
+
+/* Компактные фильтры */
+.compactFiltersWrapper {
+  display: none;
+  margin-bottom: 20px;
+}
+
+.compactFilters {
+  background-color: var(--header-bg);
+  border-radius: 12px;
+  padding: 16px;
+  border: 1px solid var(--header-border);
+}
+
+.compactFiltersHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 12px;
+}
+
+.compactFiltersHeader h6 {
+  margin: 0;
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--header-text);
+}
+
+.compactFiltersToggle {
+  background: none;
+  border: 1px solid var(--header-border);
+  border-radius: 6px;
+  padding: 4px 12px;
+  font-size: 13px;
+  cursor: pointer;
+  color: var(--header-text);
+  transition: all 0.2s ease;
+}
+
+.compactFiltersToggle:hover {
+  border-color: var(--header-accent);
+  color: var(--header-accent);
+}
+
+.compactFiltersBody {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-top: 12px;
+}
+
+.compactFilterGroup {
+  flex: 1;
+  min-width: 150px;
+}
+
+.compactFilterGroup label {
+  display: block;
+  font-size: 12px;
+  margin-bottom: 4px;
+  color: var(--header-text-muted);
+}
+
+.compactFilterGroup input,
+.compactFilterGroup select {
+  width: 100%;
+  padding: 8px 10px;
+  background-color: var(--header-bg-secondary);
+  border: 1px solid var(--header-border);
+  border-radius: 6px;
+  color: var(--header-text);
+  font-size: 13px;
+}
+
+.compactFilterGroup input:focus,
+.compactFilterGroup select:focus {
+  outline: none;
+  border-color: var(--header-accent);
+}
+
+.compactFilterGroup select:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.compactFilterActions {
+  display: flex;
+  gap: 8px;
+  align-items: flex-end;
+}
+
+.compactFilterActions .clearBtn,
+.compactFilterActions .applyBtn {
+  padding: 8px 16px;
+  border-radius: 6px;
+  font-size: 13px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.compactFilterActions .clearBtn {
+  background: transparent;
+  border: 1px solid var(--header-border);
+  color: var(--header-text);
+}
+
+.compactFilterActions .clearBtn:hover {
+  border-color: var(--header-accent);
+  color: var(--header-accent);
+}
+
+.compactFilterActions .applyBtn {
+  background-color: var(--header-accent);
+  border: none;
+  color: white;
+}
+
+.compactFilterActions .applyBtn:hover {
+  background-color: var(--header-accent-hover);
+}
+
+/* Лейаут каталога */
+.catalogLayout {
+  display: flex;
+  gap: 30px;
+}
+
+.filtersSidebar {
+  width: 280px;
+  flex-shrink: 0;
+}
+
+.productsMain {
+  flex: 1;
+}
+
+@media (max-width: 768px) {
+  .compactFiltersWrapper {
+    display: block;
+  }
+  
+  .filtersSidebar {
+    position: fixed;
+    top: 0;
+    left: -100%;
+    width: 80%;
+    height: 100%;
+    z-index: 1000;
+    transition: left 0.3s ease;
+  }
+  
+  .filtersSidebarOpen {
+    left: 0;
+  }
+  
+  .catalogLayout {
+    display: block;
+  }
+}
+
+@media (min-width: 769px) and (max-width: 1024px) {
+  .compactFiltersWrapper {
+    display: block;
+  }
+  
+  .filtersSidebar {
+    display: none;
+  }
+}
+
+/* Адаптивность */
+@media (max-width: 1024px) {
+  .productsGrid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 768px) {
+  .catalogContainer {
+    padding: 24px 16px;
+  }
+  
+  .pageTitle {
+    font-size: 22px;
+  }
+  
+  .productsGrid {
+    grid-template-columns: 1fr;
+  }
 }

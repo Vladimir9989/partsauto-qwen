@@ -84,8 +84,17 @@
   color: var(--header-text);
 }
 
+.locationInfo:hover {
+  color: var(--header-accent);
+  cursor: pointer;
+  transition: color 0.2s ease;
+  transform: scale(1.05);
+}
+
 .locationIcon {
   color: var(--header-accent);
+  width: 18px;
+  height: 18px;
 }
 
 .contactInfo {
@@ -97,6 +106,9 @@
 
 .contactIcon {
   color: var(--header-text-muted);
+  width: 18px;
+  height: 18px;
+  transition: color 0.2s ease;
 }
 
 .contactInfo a {
@@ -105,9 +117,9 @@
   transition: color 0.2s ease;
 }
 
+.contactInfo:hover .contactIcon,
 .contactInfo a:hover {
   color: var(--header-accent);
-  text-decoration: underline;
 }
 
 .socialsInfo {
@@ -124,7 +136,7 @@
 
 .socialsBlock {
   display: flex;
-  gap: 6px;
+  gap: 8px;
 }
 
 .socialIcon {
@@ -152,6 +164,8 @@
 
 .cartIcon {
   color: var(--header-text-muted);
+  width: 24px;
+  height: 24px;
 }
 
 .cartBadge {
@@ -342,12 +356,10 @@
 
 /* Десктоп версия (шире 768px) */
 @media (min-width: 769px) {
-  /* Показываем десктопную корзину */
   .desktopCartInfo {
     display: flex;
   }
-  
-  /* Скрываем мобильную группу */
+
   .mobileRightGroup {
     display: none;
   }
@@ -355,13 +367,14 @@
 
 /* Мобильная версия (768px и меньше) */
 @media (max-width: 768px) {
-  /* Скрываем HeaderTop полностью */
   .headerTop {
     display: none;
   }
+
   .container {
     display: block;
   }
+
   .topRow {
     padding-right: 10px;
     justify-content: end;
@@ -382,38 +395,24 @@
     display: block;
   }
 
-  /* Показываем мобильную группу (корзина + бургер) */
   .mobileRightGroup {
     display: flex;
   }
-  
-  /* Показываем корзину в мобильной группе */
+
   .mobileCartInfo {
     display: flex;
   }
-  
-  /* Показываем кнопку бургера */
+
   .mobileMenuBtn {
     display: flex;
   }
-  
-  /* Скрываем десктопную корзину */
+
   .desktopCartInfo {
     display: none;
   }
-}
 
-@media (max-width: 480px) {
-  .socialIcon {
-    font-size: 16px;
-  }
-
-  .mobileMenuClose {
-    font-size: 28px;
-  }
-
-  .mobileNav a {
-    font-size: 16px;
+  .headerContent {
+    gap: 16px;
   }
 }
 
@@ -421,7 +420,6 @@
 .tabletNav {
   display: none;
   flex: 1;
-  display: flex;
   justify-content: center;
 }
 
@@ -478,6 +476,7 @@
     opacity: 0;
     transform: translateX(-50%) translateY(-10px);
   }
+
   to {
     opacity: 1;
     transform: translateX(-50%) translateY(0);
@@ -507,78 +506,75 @@
   padding-right: 24px;
 }
 
-/* Закрытие дропдауна при клике вне */
 .dropdownMenu a:active {
   transform: scale(0.98);
 }
 
-/* Десктоп версия (шире 1045px) */
+/* Десктоп версия (шире 1062px) */
 @media (min-width: 1062px) {
   .desktopCartInfo {
     display: flex;
   }
-  
+
   .mobileRightGroup {
     display: none;
   }
-  
+
   .tabletNav {
     display: none !important;
   }
-  
+
   .navMenu {
     display: flex;
   }
 }
 
-/* Планшетная версия (769px - 1045px) - показываем дропдаун по центру */
-@media (min-width: 769px) and (max-width: 1062px) {
+/* Планшетная версия (769px - 1061px) */
+@media (min-width: 769px) and (max-width: 1061px) {
   .headerTop {
     display: flex;
   }
-  
+
   .navMenu {
     display: none;
   }
-  
+
   .tabletNav {
     display: flex !important;
     justify-content: center;
   }
-  
+
   .mobileRightGroup {
     display: none;
   }
-  
+
   .desktopCartInfo {
     display: flex;
   }
-  
-  /* Перестраиваем headerContent для центрирования */
+
   .headerContent {
     display: flex;
     justify-content: space-between;
     align-items: center;
     width: 100%;
   }
-  
+
   .logo {
     flex-shrink: 0;
   }
-  
+
   .desktopCartInfo {
     flex-shrink: 0;
   }
-  
-  /* Уменьшаем отступы для лучшего вида */
+
   .container {
     padding: 0 16px;
   }
-  
+
   .logo {
     font-size: 22px;
   }
-  
+
   .topRowBlock {
     gap: 20px;
   }
@@ -589,41 +585,38 @@
   .headerTop {
     display: none;
   }
-  
+
   .navMenu {
     display: none;
   }
-  
+
   .tabletNav {
     display: none !important;
   }
-  
+
   .mobileRightGroup {
     display: flex;
   }
-  
+
   .mobileCartInfo {
     display: flex;
   }
-  
+
   .mobileMenuBtn {
     display: flex;
   }
-  
+
   .desktopCartInfo {
     display: none;
   }
-  
+
   .headerContent {
     gap: 16px;
   }
 }
 
+/* Маленькие экраны (до 480px) */
 @media (max-width: 480px) {
-  .socialIcon {
-    font-size: 16px;
-  }
-
   .mobileMenuClose {
     font-size: 28px;
   }

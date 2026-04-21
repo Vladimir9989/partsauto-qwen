@@ -12,6 +12,8 @@ function AdminPage() {
   // Состояния для машин
   const [cars, setCars] = useState([])
   const [newCarTitle, setNewCarTitle] = useState('')
+  const [newCarImage, setNewCarImage] = useState(null)
+  const [uploading, setUploading] = useState(false)
   const [carsLoading, setCarsLoading] = useState(false)
   
   // Состояния для новостей
@@ -59,6 +61,20 @@ function AdminPage() {
     }
   }
 
+  // Загрузка изображения на сервер
+  const uploadCarImage = async (file) => {
+    const formData = new FormData()
+    formData.append('image', file)
+    
+    const res = await fetch('/api/upload-car-image', {
+      method: 'POST',
+      body: formData
+    })
+    const data = await res.json()
+    if (data.success) return data.imageUrl
+    throw new Error(data.error)
+  }
+
   // Добавление машины
   const addCar = async (e) => {
     e.preventDefault()
@@ -66,16 +82,34 @@ function AdminPage() {
       toast.error('Введите заголовок')
       return
     }
+    
+    let imageUrl = null
+    if (newCarImage) {
+      setUploading(true)
+      try {
+        imageUrl = await uploadCarImage(newCarImage)
+      } catch (error) {
+        toast.error('Ошибка загрузки фото: ' + error.message)
+        setUploading(false)
+        return
+      }
+      setUploading(false)
+    }
+    
     try {
       const res = await fetch('/api/cars', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ title: newCarTitle })
+        body: JSON.stringify({ title: newCarTitle, imageUrl })
       })
       const data = await res.json()
       if (data.success) {
         toast.success('Машина добавлена')
         setNewCarTitle('')
+        setNewCarImage(null)
+        // Сбросить input file
+        const fileInput = document.getElementById('carImageInput')
+        if (fileInput) fileInput.value = ''
         loadCars()
       } else {
         toast.error(data.error)
@@ -206,7 +240,17 @@ function AdminPage() {
                   onChange={(e) => setNewCarTitle(e.target.value)}
                   className={styles.input}
                 />
-                <button type="submit" className={styles.submitBtn}>Добавить</button>
+                <input
+                  id="carImageInput"
+                  type="file"
+                  accept="image/*"
+                  onChange={(e) => setNewCarImage(e.target.files[0])}
+                  className={styles.fileInput}
+                />
+                {uploading && <div className={styles.uploading}>Загрузка фото...</div>}
+                <button type="submit" className={styles.submitBtn} disabled={uploading}>
+                  {uploading ? 'Загрузка...' : 'Добавить'}
+                </button>
               </form>
             </div>
 
@@ -224,6 +268,13 @@ function AdminPage() {
                   {cars.map(car => (
                     <li key={car.id} className={styles.listItem}>
                       <div className={styles.itemContent}>
+                        {car.imageUrl && (
+                          <img 
+                            src={car.imageUrl} 
+                            alt={car.title}
+                            className={styles.itemImage}
+                          />
+                        )}
                         <span className={styles.itemTitle}>{car.title}</span>
                         <span className={styles.itemDate}>{car.date}</span>
                       </div>

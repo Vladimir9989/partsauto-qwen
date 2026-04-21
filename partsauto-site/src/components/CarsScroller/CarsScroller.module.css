@@ -127,3 +127,16 @@
     font-size: 12px;
   }
 }
+
+.carImage {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.loader {
+  text-align: center;
+  padding: 40px;
+  color: var(--header-text-muted);
+}

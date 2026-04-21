@@ -1,4 +1,5 @@
 import React, { useCallback } from 'react'
+import styles from './FiltersPanel/FiltersPanel.module.css'
 
 // Компонент панели фильтров
 const FiltersPanel = ({
@@ -30,24 +31,24 @@ const FiltersPanel = ({
   }, [onFilterChange])
 
   return (
-    <div className="filter-section p-3">
-      <h5 className="mb-3"><i className="bi bi-funnel"></i> Фильтры</h5>
+    <div className={styles.filterSection}>
+      <h5 className={styles.title}><i className="bi bi-funnel"></i> Фильтры</h5>
 
-      <div className="mb-3">
-        <label className="form-label">Поиск</label>
+      <div className={styles.formGroup}>
+        <label className={styles.label}>Поиск</label>
         <input
           type="text"
-          className="form-control"
+          className={styles.input}
           placeholder="Название или модель..."
           value={filters.search}
           onChange={(e) => handleFilterChange('search', e.target.value)}
         />
       </div>
 
-      <div className="mb-3">
-        <label className="form-label">Бренд</label>
+      <div className={styles.formGroup}>
+        <label className={styles.label}>Бренд</label>
         <select
-          className="form-select"
+          className={styles.select}
           value={filters.brand}
           onChange={(e) => handleBrandChange(e.target.value)}
         >
@@ -58,10 +59,10 @@ const FiltersPanel = ({
         </select>
       </div>
 
-      <div className="mb-3">
-        <label className="form-label">Модель</label>
+      <div className={styles.formGroup}>
+        <label className={styles.label}>Модель</label>
         <select
-          className="form-select"
+          className={styles.select}
           value={filters.carModel}
           onChange={(e) => handleModelChange(e.target.value)}
           disabled={!filters.brand}
@@ -73,10 +74,10 @@ const FiltersPanel = ({
         </select>
       </div>
 
-      <div className="mb-3">
-        <label className="form-label">Поколение</label>
+      <div className={styles.formGroup}>
+        <label className={styles.label}>Поколение</label>
         <select
-          className="form-select"
+          className={styles.select}
           value={filters.generation}
           onChange={(e) => handleFilterChange('generation', e.target.value)}
           disabled={!filters.carModel}
@@ -88,10 +89,10 @@ const FiltersPanel = ({
         </select>
       </div>
 
-      <div className="mb-3">
-        <label className="form-label">Категория</label>
+      <div className={styles.formGroup}>
+        <label className={styles.label}>Категория</label>
         <select
-          className="form-select"
+          className={styles.select}
           value={filters.category}
           onChange={(e) => handleFilterChange('category', e.target.value)}
         >
@@ -103,13 +104,13 @@ const FiltersPanel = ({
       </div>
 
       <button
-        className="btn btn-outline-secondary w-100"
+        className={styles.clearBtn}
         onClick={onClearFilters}
       >
         <i className="bi bi-x-circle"></i> Сбросить фильтры
       </button>
 
-      <div className="mt-3 text-muted small">
+      <div className={styles.resultsCount}>
         Найдено: {totalResults}
       </div>
 

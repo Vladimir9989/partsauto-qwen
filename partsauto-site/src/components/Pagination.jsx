@@ -1,4 +1,5 @@
 import React, { useMemo, useCallback } from 'react'
+import styles from '../pages/CatalogPage.module.css'
 
 // Компонент пагинации
 const Pagination = ({ currentPage, totalPages, onPageChange }) => {
@@ -43,11 +44,11 @@ const Pagination = ({ currentPage, totalPages, onPageChange }) => {
   const endPage = pages[pages.length - 1]
 
   return (
-    <nav className="mt-4">
-      <ul className="pagination justify-content-center flex-wrap">
-        <li className={`page-item ${currentPage === 1 ? 'disabled' : ''}`}>
+    <nav>
+      <ul className={styles.pagination}>
+        <li className={`${styles.pageItem} ${currentPage === 1 ? styles.disabledPage : ''}`}>
           <button 
-            className="page-link" 
+            className={styles.pageLink} 
             onClick={handlePrevious} 
             disabled={currentPage === 1}
             aria-label="Предыдущая страница"
@@ -58,21 +59,21 @@ const Pagination = ({ currentPage, totalPages, onPageChange }) => {
 
         {startPage > 1 && (
           <>
-            <li className="page-item">
-              <button className="page-link" onClick={() => handlePageClick(1)}>1</button>
+            <li className={styles.pageItem}>
+              <button className={styles.pageLink} onClick={() => handlePageClick(1)}>1</button>
             </li>
             {startPage > 2 && (
-              <li className="page-item disabled">
-                <span className="page-link">...</span>
+              <li className={`${styles.pageItem} ${styles.disabledPage}`}>
+                <span className={styles.ellipsis}>...</span>
               </li>
             )}
           </>
         )}
 
         {pages.map(page => (
-          <li key={page} className={`page-item ${currentPage === page ? 'active' : ''}`}>
+          <li key={page} className={`${styles.pageItem} ${currentPage === page ? styles.activePage : ''}`}>
             <button 
-              className="page-link" 
+              className={styles.pageLink} 
               onClick={() => handlePageClick(page)}
               aria-label={`Страница ${page}`}
               aria-current={currentPage === page ? 'page' : undefined}
@@ -85,21 +86,21 @@ const Pagination = ({ currentPage, totalPages, onPageChange }) => {
         {endPage < totalPages && (
           <>
             {endPage < totalPages - 1 && (
-              <li className="page-item disabled">
-                <span className="page-link">...</span>
+              <li className={`${styles.pageItem} ${styles.disabledPage}`}>
+                <span className={styles.ellipsis}>...</span>
               </li>
             )}
-            <li className="page-item">
-              <button className="page-link" onClick={() => handlePageClick(totalPages)}>
+            <li className={styles.pageItem}>
+              <button className={styles.pageLink} onClick={() => handlePageClick(totalPages)}>
                 {totalPages}
               </button>
             </li>
           </>
         )}
 
-        <li className={`page-item ${currentPage === totalPages ? 'disabled' : ''}`}>
+        <li className={`${styles.pageItem} ${currentPage === totalPages ? styles.disabledPage : ''}`}>
           <button 
-            className="page-link" 
+            className={styles.pageLink} 
             onClick={handleNext} 
             disabled={currentPage === totalPages}
             aria-label="Следующая страница"

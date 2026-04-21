@@ -233,15 +233,6 @@ function CatalogPage() {
     setMobileMenuOpen(false)
   }, [])
 
-  // Скелетоны для загрузки
-  const skeletonCards = useMemo(() => {
-    return Array.from({ length: 6 }, (_, i) => (
-      <div key={`skeleton-${i}`} className="col-md-6 col-xl-4">
-        <SkeletonCard />
-      </div>
-    ))
-  }, [])
-
   return (
     <>
       <Helmet>

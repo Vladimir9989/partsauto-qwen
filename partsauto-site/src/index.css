@@ -68,6 +68,7 @@ body {
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   letter-spacing: -0.01em;
+  margin: 0;
 }
 
 h1, h2, h3, h4, h5, h6 {
@@ -123,83 +124,6 @@ a:hover {
   /* text-decoration: underline; */
 }
 
-.text-muted {
-  color: var(--text-muted) !important;
-}
-
-.text-primary {
-  color: var(--primary-color) !important;
-}
-
-.text-secondary {
-  color: var(--text-secondary) !important;
-}
-
-.small, small {
-  font-size: 0.875rem;
-  line-height: 1.5;
-}
-
-.lead {
-  font-size: 1.125rem;
-  font-weight: 400;
-  line-height: 1.7;
-  color: var(--text-secondary);
-}
-
-.display-1 {
-  font-size: 3.5rem;
-  font-weight: 800;
-  line-height: 1.1;
-  letter-spacing: -0.04em;
-}
-
-.display-2 {
-  font-size: 3rem;
-  font-weight: 800;
-  line-height: 1.1;
-  letter-spacing: -0.04em;
-}
-
-.display-3 {
-  font-size: 2.5rem;
-  font-weight: 800;
-  line-height: 1.2;
-  letter-spacing: -0.03em;
-}
-
-.display-4 {
-  font-size: 2rem;
-  font-weight: 800;
-  line-height: 1.2;
-  letter-spacing: -0.03em;
-}
-
-.font-weight-light {
-  font-weight: 300;
-}
-
-.font-weight-normal {
-  font-weight: 400;
-}
-
-.font-weight-medium {
-  font-weight: 500;
-}
-
-.font-weight-semibold {
-  font-weight: 600;
-}
-
-.font-weight-bold {
-  font-weight: 700;
-}
-
-.font-weight-extrabold {
-  font-weight: 800;
-}
-
-
 .product-image {
   height: 200px;
   object-fit: cover;
@@ -207,63 +131,6 @@ a:hover {
   display: flex;
   align-items: center;
   justify-content: center;
-}
-
-
-/* Формы в темной теме */
-[data-theme="dark"] .form-control,
-[data-theme="dark"] .form-select {
-  background-color: var(--input-bg);
-  border-color: var(--border-color);
-  color: var(--text-primary);
-}
-
-[data-theme="dark"] .form-control:focus,
-[data-theme="dark"] .form-select:focus {
-  background-color: var(--input-bg);
-  border-color: #0d6efd;
-  color: var(--text-primary);
-}
-
-[data-theme="dark"] .form-control::placeholder {
-  color: var(--text-muted);
-}
-
-/* Кнопки в темной теме */
-[data-theme="dark"] .btn-outline-secondary {
-  color: var(--text-secondary);
-  border-color: var(--border-color);
-}
-
-[data-theme="dark"] .btn-outline-secondary:hover {
-  background-color: var(--bg-tertiary);
-  border-color: var(--border-color);
-  color: var(--text-primary);
-}
-
-/* Бейджи в темной теме */
-[data-theme="dark"] .badge.bg-light {
-  background-color: var(--bg-tertiary) !important;
-  color: var(--text-primary) !important;
-}
-
-[data-theme="dark"] .badge.bg-secondary {
-  background-color: var(--bg-tertiary) !important;
-}
-
-/* Таблицы в темной теме */
-[data-theme="dark"] .table {
-  color: var(--text-primary);
-  border-color: var(--border-color);
-}
-
-[data-theme="dark"] .table-bordered {
-  border-color: var(--border-color);
-}
-
-[data-theme="dark"] .table-bordered th,
-[data-theme="dark"] .table-bordered td {
-  border-color: var(--border-color);
 }
 
 .loading-spinner {
@@ -334,11 +201,6 @@ a:hover {
   transform: translateY(-50%) scale(0.95);
 }
 
-/* Убедимся, что стрелочки слайдера имеют правильное позиционирование */
-.slider-nav.btn {
-  position: absolute;
-}
-
 .slider-nav i {
   font-size: 1.3rem;
   color: white;
@@ -376,6 +238,14 @@ a:hover {
   background-color: rgba(255, 255, 255, 0.5);
   cursor: pointer;
   transition: background-color 0.2s;
+}
+
+.slider-indicators .indicator.active {
+  background-color: white;
+}
+
+.slider-indicators .indicator:hover {
+  background-color: rgba(255, 255, 255, 0.8);
 }
 
 /* Модальное окно */
@@ -546,35 +416,21 @@ a:hover {
   border: 1px solid #dee2e6;
 }
 
-
-/* Адаптивный дизайн */
+/* Адаптивный дизайн для модального окна и слайдера */
 @media (max-width: 991px) {
-  .filter-section {
-    position: fixed;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    z-index: 1040;
-    background: white;
-    overflow-y: auto;
-    margin: 0 !important;
-    border-radius: 0;
-  }
-  
   .modal-content-custom {
     max-height: 95vh;
     margin: 10px;
   }
-  
+
   .modal-title-custom {
     font-size: 1.25rem;
   }
-  
+
   .main-image {
     height: 300px;
   }
-  
+
   .price-large {
     font-size: 1.5rem;
   }
@@ -584,165 +440,33 @@ a:hover {
   .modal-backdrop {
     padding: 0;
   }
-  
+
   .modal-content-custom {
     max-height: 100vh;
     border-radius: 0;
     margin: 0;
   }
-  
+
   .modal-header-custom {
     border-radius: 0;
     padding: 16px;
   }
-  
+
   .modal-body-custom {
     padding: 16px;
   }
-  
+
   .main-image {
     height: 250px;
   }
-  
+
   .thumbnail {
     width: 60px;
     height: 60px;
   }
-  
+
   .action-buttons {
     flex-direction: column;
-  }
-  
-  .action-buttons .btn {
-    width: 100%;
-  }
-  
-  .compare-table {
-    font-size: 0.875rem;
-  }
-  
-  .compare-product-header h6 {
-    font-size: 0.875rem;
-  }
-
-  /* Улучшения для мобильных устройств */
-  header.bg-primary {
-    padding-top: 0.75rem;
-    padding-bottom: 0.75rem;
-  }
-  
-  header.bg-primary h1 {
-    font-size: 1.5rem;
-  }
-  
-  header.bg-primary .btn-outline-light {
-    padding: 6px 12px;
-    font-size: 0.875rem;
-  }
-  
-  .filter-section {
-    padding: 20px;
-    border-radius: var(--radius-md);
-  }
-  
-  .filter-section h5 {
-    font-size: 1.125rem;
-  }
-  
-  .card-product .card-body {
-    padding: 16px;
-  }
-  
-  .card-product .price-badge {
-    font-size: 1.25rem;
-  }
-  
-  .card-product .btn {
-    padding: 6px 10px;
-    font-size: 0.8125rem;
-  }
-  
-  .product-image-slider {
-    height: 180px;
-  }
-  
-  .product-image {
-    height: 180px;
-  }
-  
-  h1 {
-    font-size: 2rem;
-  }
-  
-  h2 {
-    font-size: 1.75rem;
-  }
-  
-  h3 {
-    font-size: 1.5rem;
-  }
-  
-  .display-1 {
-    font-size: 2.5rem;
-  }
-  
-  .display-2 {
-    font-size: 2.25rem;
-  }
-  
-  .display-3 {
-    font-size: 2rem;
-  }
-  
-  .display-4 {
-    font-size: 1.75rem;
-  }
-  
-  .pagination {
-    flex-wrap: wrap;
-    justify-content: center;
-  }
-  
-  .page-link {
-    padding: 6px 10px;
-    font-size: 0.875rem;
-  }
-}
-
-/* Медиа-запрос для очень маленьких экранов */
-@media (max-width: 480px) {
-  .container {
-    padding-left: 12px;
-    padding-right: 12px;
-  }
-  
-  .card-product .card-title {
-    font-size: 0.9rem;
-    min-height: 2.6em;
-  }
-  
-  .product-image-slider {
-    height: 160px;
-  }
-  
-  .product-image {
-    height: 160px;
-  }
-  
-  .filter-section {
-    padding: 16px;
-  }
-  
-  header.bg-primary .btn-outline-light span {
-    display: none;
-  }
-  
-  header.bg-primary .btn-outline-light i {
-    margin-right: 0;
-  }
-  
-  .navbar-brand {
-    font-size: 1.25rem;
   }
 }
 
@@ -757,7 +481,6 @@ a:hover {
     transform: translateY(0);
   }
 }
-
 
 /* Скроллбар для галереи */
 .thumbnail-gallery::-webkit-scrollbar {
@@ -776,87 +499,6 @@ a:hover {
 
 .thumbnail-gallery::-webkit-scrollbar-thumb:hover {
   background: #555;
-}
-
-/* Бейджи и метки */
-.badge {
-  font-weight: 500;
-  padding: 4px 8px;
-}
-
-/* Улучшенная типографика */
-body {
-  line-height: 1.6;
-  color: #212529;
-}
-
-h1, h2, h3, h4, h5, h6 {
-  font-weight: 600;
-  line-height: 1.3;
-}
-
-/* Кнопки */
-.btn {
-  font-weight: 500;
-  transition: all 0.2s;
-}
-
-.btn:active {
-  transform: scale(0.98);
-}
-
-/* Пагинация */
-.pagination {
-  gap: 4px;
-}
-
-.page-link {
-  border-radius: 6px;
-  border: 1px solid #dee2e6;
-  color: #0d6efd;
-  font-weight: 500;
-}
-
-.page-item.active .page-link {
-  background-color: #0d6efd;
-  border-color: #0d6efd;
-}
-
-/* Фокус для доступности */
-.btn:focus,
-.form-control:focus,
-.form-select:focus {
-  box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.25);
-}
-
-/* Плавная прокрутка */
-html {
-  scroll-behavior: smooth;
-}
-
-/* Skeleton loading (для будущего использования) */
-.skeleton {
-  background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
-  background-size: 200% 100%;
-  animation: loading 1.5s infinite;
-  border-radius: 4px;
-}
-
-@keyframes loading {
-  0% {
-    background-position: 200% 0;
-  }
-  100% {
-    background-position: -200% 0;
-  }
-}
-
-.slider-indicators .indicator.active {
-  background-color: white;
-}
-
-.slider-indicators .indicator:hover {
-  background-color: rgba(255, 255, 255, 0.8);
 }
 
 .image-fallback {
@@ -1015,81 +657,6 @@ html {
   background-color: var(--bg-tertiary);
 }
 
-/* Адаптивность темной темы */
-[data-theme="dark"] .filter-section {
-  background: var(--card-bg);
-}
-
-@media (max-width: 991px) {
-  [data-theme="dark"] .filter-section {
-    background: var(--bg-primary);
-  }
-}
-
-/* Переключатель темы */
-.theme-toggle-container {
-  display: flex;
-  align-items: center;
-}
-
-.theme-toggle-container .btn-group .btn {
-  border-color: rgba(255, 255, 255, 0.5);
-  color: white;
-}
-
-.theme-toggle-container .btn-group .btn:hover {
-  background-color: rgba(255, 255, 255, 0.1);
-  border-color: white;
-}
-
-.theme-toggle-container .btn-group .btn-primary {
-  background-color: rgba(255, 255, 255, 0.2);
-  border-color: white;
-}
-
-.theme-toggle-container .btn-group .btn-outline-primary {
-  background-color: transparent;
-}
-
-/* Пагинация в темной теме */
-[data-theme="dark"] .page-link {
-  background-color: var(--card-bg);
-  border-color: var(--border-color);
-  color: #0d6efd;
-}
-
-[data-theme="dark"] .page-item.active .page-link {
-  background-color: #0d6efd;
-  border-color: #0d6efd;
-}
-
-[data-theme="dark"] .page-item.disabled .page-link {
-  background-color: var(--bg-tertiary);
-  border-color: var(--border-color);
-  color: var(--text-muted);
-}
-
-/* Alert в темной теме */
-[data-theme="dark"] .alert-danger {
-  background-color: rgba(220, 53, 69, 0.2);
-  border-color: rgba(220, 53, 69, 0.3);
-  color: #ff6b6b;
-}
-
-/* Текст в темной теме */
-[data-theme="dark"] .text-muted {
-  color: var(--text-muted) !important;
-}
-
-[data-theme="dark"] h1,
-[data-theme="dark"] h2,
-[data-theme="dark"] h3,
-[data-theme="dark"] h4,
-[data-theme="dark"] h5,
-[data-theme="dark"] h6 {
-  color: var(--text-primary);
-}
-
 /* Слайдер в темной теме */
 [data-theme="dark"] .slider-nav {
   background-color: rgba(45, 45, 45, 0.9);
@@ -1104,234 +671,24 @@ html {
   background-color: var(--bg-tertiary);
 }
 
-/* Улучшенный header */
-header.bg-primary {
-  background: var(--gradient-primary) !important;
-  border-bottom: none;
-  box-shadow: var(--shadow-md);
-  padding-top: 1rem;
-  padding-bottom: 1rem;
+/* Плавная прокрутка */
+html {
+  scroll-behavior: smooth;
 }
 
-header.bg-primary h1,
-header.bg-primary .h3 {
-  font-weight: 800;
-  letter-spacing: -0.03em;
-  margin-bottom: 0;
+/* Skeleton loading (для будущего использования) */
+.skeleton {
+  background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+  background-size: 200% 100%;
+  animation: loading 1.5s infinite;
+  border-radius: 4px;
 }
 
-header.bg-primary .btn-outline-light {
-  border-color: rgba(255, 255, 255, 0.3);
-  color: white;
-  border-radius: var(--radius-md);
-  font-weight: 600;
-  padding: 8px 16px;
-  transition: all 0.3s ease;
-}
-
-header.bg-primary .btn-outline-light:hover {
-  background-color: rgba(255, 255, 255, 0.15);
-  border-color: white;
-  transform: translateY(-2px);
-  box-shadow: var(--shadow-sm);
-}
-
-header.bg-primary .badge {
-  font-size: 0.7rem;
-  padding: 4px 6px;
-  min-width: 20px;
-  height: 20px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-/* Улучшенный footer */
-footer.bg-dark {
-  background: var(--bg-primary) !important;
-  border-top: 1px solid var(--border-color);
-  padding-top: 2rem;
-  padding-bottom: 2rem;
-  margin-top: 3rem;
-}
-
-footer.bg-dark small {
-  font-size: 0.875rem;
-  color: var(--text-secondary);
-}
-
-footer.bg-dark .container {
-  max-width: 1200px;
-}
-
-/* Дополнительные стили для навигации */
-.navbar-brand {
-  font-weight: 800;
-  font-size: 1.5rem;
-  display: flex;
-  align-items: center;
-  gap: 10px;
-}
-
-.navbar-brand i {
-  font-size: 1.8rem;
-}
-
-/* Анимация для логотипа */
-@keyframes pulse {
-  0% { transform: scale(1); }
-  50% { transform: scale(1.05); }
-  100% { transform: scale(1); }
-}
-
-.navbar-brand i.bi-gear-wide-connected {
-  animation: pulse 3s infinite;
-}
-
-/* Микроанимации */
-@keyframes fadeInUp {
-  from {
-    opacity: 0;
-    transform: translateY(20px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
-@keyframes scaleIn {
-  from {
-    opacity: 0;
-    transform: scale(0.9);
-  }
-  to {
-    opacity: 1;
-    transform: scale(1);
-  }
-}
-
-@keyframes slideInRight {
-  from {
-    opacity: 0;
-    transform: translateX(20px);
-  }
-  to {
-    opacity: 1;
-    transform: translateX(0);
-  }
-}
-
-@keyframes bounce {
-  0%, 20%, 50%, 80%, 100% {
-    transform: translateY(0);
-  }
-  40% {
-    transform: translateY(-10px);
-  }
-  60% {
-    transform: translateY(-5px);
-  }
-}
-
-.animate-fade-in-up {
-  animation: fadeInUp 0.5s ease-out;
-}
-
-.animate-scale-in {
-  animation: scaleIn 0.3s ease-out;
-}
-
-.animate-slide-in-right {
-  animation: slideInRight 0.4s ease-out;
-}
-
-.animate-bounce {
-  animation: bounce 1s;
-}
-
-/* Анимации для кнопок */
-.btn {
-  position: relative;
-  overflow: hidden;
-}
-
-.btn::after {
-  content: '';
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  width: 5px;
-  height: 5px;
-  background: rgba(255, 255, 255, 0.5);
-  opacity: 0;
-  border-radius: 100%;
-  transform: scale(1, 1) translate(-50%);
-  transform-origin: 50% 50%;
-}
-
-.btn:focus:not(:active)::after {
-  animation: ripple 1s ease-out;
-}
-
-@keyframes ripple {
+@keyframes loading {
   0% {
-    transform: scale(0, 0);
-    opacity: 0.5;
+    background-position: 200% 0;
   }
   100% {
-    transform: scale(40, 40);
-    opacity: 0;
+    background-position: -200% 0;
   }
 }
-
-/* Анимация для карточек при появлении */
-.card-product {
-  animation: fadeInUp 0.5s ease-out;
-}
-
-/* Анимация для иконок избранного и сравнения */
-.btn-outline-danger i,
-.btn-outline-info i {
-  transition: transform 0.3s ease;
-}
-
-.btn-outline-danger:hover i,
-.btn-outline-info:hover i {
-  transform: scale(1.2);
-}
-
-/* Анимация для пагинации */
-.page-link {
-  transition: all 0.2s ease;
-}
-
-.page-link:hover {
-  transform: translateY(-2px);
-  box-shadow: var(--shadow-sm);
-}
-
-/* Анимация для переключателя темы */
-.theme-toggle-container .btn {
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-}
-
-.theme-toggle-container .btn:hover {
-  transform: scale(1.05);
-}
-
-/* Анимация для загрузки */
-.loading-spinner {
-  animation: spinner-border 0.75s linear infinite, pulse 1.5s infinite;
-}
-
-/* Анимация для модального окна */
-.modal-content-custom {
-  animation: scaleIn 0.3s ease-out;
-}
-
-/* Анимация для уведомлений (toast) */
-.toast {
-  animation: slideInRight 0.4s ease-out;
-}
-

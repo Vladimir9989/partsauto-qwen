@@ -1,0 +1,236 @@
+.adminPage {
+  min-height: 100vh;
+  background-color: var(--header-bg-secondary);
+  padding: 40px 0;
+}
+
+.container {
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 0 20px;
+}
+
+.adminPage h1 {
+  font-size: 28px;
+  color: var(--header-text);
+  margin-bottom: 24px;
+}
+
+.tabs {
+  display: flex;
+  gap: 12px;
+  margin-bottom: 24px;
+  border-bottom: 1px solid var(--header-border);
+}
+
+.tab {
+  padding: 12px 24px;
+  background: none;
+  border: none;
+  font-size: 16px;
+  font-weight: 500;
+  color: var(--header-text-muted);
+  cursor: pointer;
+  transition: all 0.2s ease;
+  border-bottom: 2px solid transparent;
+}
+
+.tab:hover {
+  color: var(--header-accent);
+}
+
+.activeTab {
+  color: var(--header-accent);
+  border-bottom-color: var(--header-accent);
+}
+
+.tabContent {
+  display: flex;
+  flex-direction: column;
+  gap: 30px;
+}
+
+.formCard, .listCard {
+  background-color: var(--header-bg);
+  border-radius: 12px;
+  padding: 24px;
+  border: 1px solid var(--header-border);
+}
+
+.formCard h3, .listHeader h3 {
+  font-size: 18px;
+  color: var(--header-text);
+  margin-bottom: 16px;
+}
+
+.listHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 16px;
+}
+
+.input, .passwordInput {
+  width: 100%;
+  padding: 12px;
+  border: 1px solid var(--header-border);
+  border-radius: 8px;
+  background-color: var(--header-bg-secondary);
+  color: var(--header-text);
+  font-size: 14px;
+  margin-bottom: 12px;
+}
+
+.textarea {
+  width: 100%;
+  padding: 12px;
+  border: 1px solid var(--header-border);
+  border-radius: 8px;
+  background-color: var(--header-bg-secondary);
+  color: var(--header-text);
+  font-size: 14px;
+  resize: vertical;
+  margin-bottom: 12px;
+}
+
+.submitBtn, .loginBtn {
+  background-color: var(--header-accent);
+  color: white;
+  border: none;
+  padding: 12px 24px;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+.submitBtn:hover, .loginBtn:hover {
+  background-color: var(--header-accent-hover);
+}
+
+.refreshBtn {
+  background-color: var(--header-bg-secondary);
+  color: var(--header-text);
+  border: 1px solid var(--header-border);
+  padding: 8px 16px;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.refreshBtn:hover {
+  border-color: var(--header-accent);
+  color: var(--header-accent);
+}
+
+.list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.listItem {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  padding: 12px;
+  background-color: var(--header-bg-secondary);
+  border-radius: 8px;
+  gap: 12px;
+}
+
+.itemContent {
+  flex: 1;
+}
+
+.itemTitle {
+  display: block;
+  color: var(--header-text);
+  font-weight: 500;
+  margin-bottom: 4px;
+}
+
+.itemDate {
+  display: block;
+  font-size: 12px;
+  color: var(--header-text-muted);
+  margin-bottom: 4px;
+}
+
+.itemPreview {
+  font-size: 12px;
+  color: var(--header-text-muted);
+  margin-top: 4px;
+}
+
+.deleteBtn {
+  background-color: transparent;
+  color: #ef4444;
+  border: 1px solid #ef4444;
+  padding: 6px 12px;
+  border-radius: 6px;
+  font-size: 12px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.deleteBtn:hover {
+  background-color: #ef4444;
+  color: white;
+}
+
+.loader, .empty {
+  text-align: center;
+  padding: 40px;
+  color: var(--header-text-muted);
+}
+
+.loginContainer {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: var(--header-bg-secondary);
+}
+
+.loginBox {
+  background-color: var(--header-bg);
+  padding: 40px;
+  border-radius: 16px;
+  width: 100%;
+  max-width: 400px;
+  text-align: center;
+  border: 1px solid var(--header-border);
+}
+
+.loginBox h1 {
+  font-size: 24px;
+  color: var(--header-text);
+  margin-bottom: 24px;
+}
+
+.passwordInput {
+  margin-bottom: 16px;
+}
+
+@media (max-width: 768px) {
+  .container {
+    padding: 0 16px;
+  }
+  
+  .formCard, .listCard {
+    padding: 16px;
+  }
+  
+  .listItem {
+    flex-direction: column;
+  }
+  
+  .deleteBtn {
+    align-self: flex-end;
+  }
+}

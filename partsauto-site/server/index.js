@@ -4,9 +4,83 @@ import { XMLParser } from 'fast-xml-parser';
 import fetch from 'node-fetch';
 import path from 'path';
 import { fileURLToPath } from 'url';
+import fs from 'fs';
+import multer from 'multer';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
+
+// Настройка хранилища для изображений
+const storage = multer.diskStorage({
+  destination: (req, file, cb) => {
+    const uploadDir = path.join(__dirname, '../public/uploads/cars');
+    if (!fs.existsSync(uploadDir)) {
+      fs.mkdirSync(uploadDir, { recursive: true });
+    }
+    cb(null, uploadDir);
+  },
+  filename: (req, file, cb) => {
+    const uniqueName = `${Date.now()}-${Math.round(Math.random() * 1E9)}${path.extname(file.originalname)}`;
+    cb(null, uniqueName);
+  }
+});
+
+const upload = multer({
+  storage,
+  limits: { fileSize: 5 * 1024 * 1024 }, // 5MB
+  fileFilter: (req, file, cb) => {
+    const allowedTypes = /jpeg|jpg|png|gif|webp/;
+    const extname = allowedTypes.test(path.extname(file.originalname).toLowerCase());
+    const mimetype = allowedTypes.test(file.mimetype);
+    if (extname && mimetype) {
+      return cb(null, true);
+    }
+    cb(new Error('Только изображения!'));
+  }
+});
+
+// Пути к файлам данных
+const CARS_DATA_FILE = path.join(__dirname, 'data', 'cars.json');
+const NEWS_DATA_FILE = path.join(__dirname, 'data', 'news.json');
+
+// Создаём папку data, если её нет
+if (!fs.existsSync(path.join(__dirname, 'data'))) {
+  fs.mkdirSync(path.join(__dirname, 'data'));
+}
+
+// === Функции для машин в разборе ===
+function getCarsList() {
+  try {
+    if (fs.existsSync(CARS_DATA_FILE)) {
+      return JSON.parse(fs.readFileSync(CARS_DATA_FILE, 'utf8'));
+    }
+  } catch (error) { console.error('Ошибка чтения cars.json:', error); }
+  return [];
+}
+
+function saveCarsList(cars) {
+  try {
+    fs.writeFileSync(CARS_DATA_FILE, JSON.stringify(cars, null, 2), 'utf8');
+    return true;
+  } catch (error) { console.error('Ошибка сохранения cars.json:', error); return false; }
+}
+
+// === Функции для новостей ===
+function getNewsList() {
+  try {
+    if (fs.existsSync(NEWS_DATA_FILE)) {
+      return JSON.parse(fs.readFileSync(NEWS_DATA_FILE, 'utf8'));
+    }
+  } catch (error) { console.error('Ошибка чтения news.json:', error); }
+  return [];
+}
+
+function saveNewsList(news) {
+  try {
+    fs.writeFileSync(NEWS_DATA_FILE, JSON.stringify(news, null, 2), 'utf8');
+    return true;
+  } catch (error) { console.error('Ошибка сохранения news.json:', error); return false; }
+}
 
 const app = express();
 const PORT = process.env.PORT || 3001;
@@ -162,6 +236,96 @@ app.get('/api/health', (req, res) => {
     cachedProducts: cachedProducts.length,
     lastFetch: lastFetch ? new Date(lastFetch).toISOString() : null
   });
+});
+
+// === Эндпоинты для машин в разборе ===
+app.get('/api/cars', (req, res) => {
+  res.json({ success: true, data: getCarsList() });
+});
+
+app.post('/api/cars', express.json(), (req, res) => {
+  const { title, date, link, imageUrl } = req.body;
+  if (!title) return res.status(400).json({ success: false, error: 'Не указан заголовок' });
+  
+  const cars = getCarsList();
+  const newCard = {
+    id: Date.now(),
+    title,
+    date: date || new Date().toLocaleDateString('ru-RU'),
+    link: link || '#',
+    imageUrl: imageUrl || null,
+    createdAt: new Date().toISOString()
+  };
+  cars.unshift(newCard);
+  saveCarsList(cars);
+  res.json({ success: true, data: newCard });
+});
+
+app.delete('/api/cars/:id', (req, res) => {
+  const id = parseInt(req.params.id);
+  const cars = getCarsList();
+  const filtered = cars.filter(car => car.id !== id);
+  if (cars.length === filtered.length) return res.status(404).json({ success: false, error: 'Не найдено' });
+  saveCarsList(filtered);
+  res.json({ success: true });
+});
+
+// === Эндпоинты для новостей ===
+app.get('/api/news', (req, res) => {
+  res.json({ success: true, data: getNewsList() });
+});
+
+app.post('/api/news', express.json(), (req, res) => {
+  const { title, date, content, imageUrl, link } = req.body;
+  if (!title) return res.status(400).json({ success: false, error: 'Не указан заголовок' });
+  
+  const news = getNewsList();
+  const newNews = {
+    id: Date.now(),
+    title,
+    date: date || new Date().toLocaleDateString('ru-RU'),
+    content: content || '',
+    imageUrl: imageUrl || null,
+    link: link || `/news/${Date.now()}`,
+    createdAt: new Date().toISOString()
+  };
+  news.unshift(newNews);
+  saveNewsList(news);
+  res.json({ success: true, data: newNews });
+});
+
+app.delete('/api/news/:id', (req, res) => {
+  const id = parseInt(req.params.id);
+  const news = getNewsList();
+  const filtered = news.filter(item => item.id !== id);
+  if (news.length === filtered.length) return res.status(404).json({ success: false, error: 'Не найдено' });
+  saveNewsList(filtered);
+  res.json({ success: true });
+});
+
+app.put('/api/news/:id', express.json(), (req, res) => {
+  const id = parseInt(req.params.id);
+  const news = getNewsList();
+  const index = news.findIndex(item => item.id === id);
+  if (index === -1) return res.status(404).json({ success: false, error: 'Не найдено' });
+  
+  news[index] = { ...news[index], ...req.body, updatedAt: new Date().toISOString() };
+  saveNewsList(news);
+  res.json({ success: true, data: news[index] });
+});
+
+// Загрузка изображения для машины
+app.post('/api/upload-car-image', upload.single('image'), (req, res) => {
+  try {
+    if (!req.file) {
+      return res.status(400).json({ success: false, error: 'Файл не загружен' });
+    }
+    const imageUrl = `/uploads/cars/${req.file.filename}`;
+    res.json({ success: true, imageUrl });
+  } catch (error) {
+    console.error('Ошибка загрузки:', error);
+    res.status(500).json({ success: false, error: 'Ошибка загрузки файла' });
+  }
 });
 
 // SPA fallback

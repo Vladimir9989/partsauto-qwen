@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useState, useEffect } from 'react'
 import { Swiper, SwiperSlide } from 'swiper/react'
 import { Navigation, Pagination } from 'swiper/modules'
 import 'swiper/css'
@@ -6,57 +6,79 @@ import 'swiper/css/navigation'
 import 'swiper/css/pagination'
 import styles from './CarsScroller.module.css'
 
+// Статические данные (fallback)
+const staticCards = [
+  {
+    id: 1014,
+    title: "Поступил в разбор Lada Vesta 2020г 1.6л МКПП двс 21129",
+    date: "29 января 2026",
+    link: "/news/1014"
+  },
+  {
+    id: 1013,
+    title: "Поступил в разбор Kia RIO 2013г 1.6л МКПП двс G4FC",
+    date: "29 января 2026",
+    link: "/news/1013"
+  },
+  {
+    id: 1012,
+    title: "Поступил в разбор Kia Spectra 2008г 1.6л МКПП двс S6D",
+    date: "29 января 2026",
+    link: "/news/1012"
+  },
+  {
+    id: 1009,
+    title: "Поступил в разбор Renault Logan 2008г 1.4л двс K7JA710",
+    date: "6 октября 2025",
+    link: "/news/1009"
+  },
+  {
+    id: 1008,
+    title: "Поступил в разбор Mitsubishi Colt 2005г 1.3л",
+    date: "6 октября 2025",
+    link: "/news/1008"
+  },
+  {
+    id: 1006,
+    title: "Поступил в разбор Chevrolet Lacetti 2008г 1.6л 109 л.с двс F16D3",
+    date: "11 июля 2025",
+    link: "/news/1006"
+  },
+  {
+    id: 1005,
+    title: "Поступил в разбор Opel Corsa D 2008г 1.2л 80 л.с двс Z12XER",
+    date: "10 июля 2025",
+    link: "/news/1005"
+  },
+  {
+    id: 1004,
+    title: "Поступил в разбор Mitsubishi Lancer 9 2005г STW 1.6л 98 л.с двс 4G18",
+    date: "10 июля 2025",
+    link: "/news/1004"
+  }
+]
+
 const CarsScroller = () => {
-  const cards = [
-    {
-      id: 1014,
-      title: "Поступил в разбор Lada Vesta 2020г 1.6л МКПП двс 21129",
-      date: "29 января 2026",
-      link: "/news/1014"
-    },
-    {
-      id: 1013,
-      title: "Поступил в разбор Kia RIO 2013г 1.6л МКПП двс G4FC",
-      date: "29 января 2026",
-      link: "/news/1013"
-    },
-    {
-      id: 1012,
-      title: "Поступил в разбор Kia Spectra 2008г 1.6л МКПП двс S6D",
-      date: "29 января 2026",
-      link: "/news/1012"
-    },
-    {
-      id: 1009,
-      title: "Поступил в разбор Renault Logan 2008г 1.4л двс K7JA710",
-      date: "6 октября 2025",
-      link: "/news/1009"
-    },
-    {
-      id: 1008,
-      title: "Поступил в разбор Mitsubishi Colt 2005г 1.3л",
-      date: "6 октября 2025",
-      link: "/news/1008"
-    },
-    {
-      id: 1006,
-      title: "Поступил в разбор Chevrolet Lacetti 2008г 1.6л 109 л.с двс F16D3",
-      date: "11 июля 2025",
-      link: "/news/1006"
-    },
-    {
-      id: 1005,
-      title: "Поступил в разбор Opel Corsa D 2008г 1.2л 80 л.с двс Z12XER",
-      date: "10 июля 2025",
-      link: "/news/1005"
-    },
-    {
-      id: 1004,
-      title: "Поступил в разбор Mitsubishi Lancer 9 2005г STW 1.6л 98 л.с двс 4G18",
-      date: "10 июля 2025",
-      link: "/news/1004"
-    }
-  ]
+  const [cards, setCards] = useState([])
+  const [loading, setLoading] = useState(true)
+
+  useEffect(() => {
+    fetch('/api/cars')
+      .then(res => res.json())
+      .then(data => {
+        if (data.success && data.data.length > 0) {
+          setCards(data.data)
+        } else {
+          setCards(staticCards)
+        }
+        setLoading(false)
+      })
+      .catch(err => {
+        console.error('Ошибка загрузки машин:', err)
+        setCards(staticCards)
+        setLoading(false)
+      })
+  }, [])
 
   // Функция для определения иконки
   const getCarIcon = (title) => {
@@ -70,39 +92,52 @@ const CarsScroller = () => {
     return '🚙';
   };
 
+  if (loading) {
+    return (
+      <section className={styles.section}>
+        <div className={styles.container}>
+          <h2 className={styles.title}>Машины в разборе</h2>
+          <div className={styles.loader}>Загрузка...</div>
+        </div>
+      </section>
+    )
+  }
+
   return (
     <section className={styles.section}>
       <div className={styles.container}>
         <h2 className={styles.title}>Машины в разборе</h2>
         
-        <Swiper
-          modules={[Navigation, Pagination]}
-          spaceBetween={20}
-          slidesPerView={1}
-          navigation
-          pagination={{ clickable: true }}
-          breakpoints={{
-            640: { slidesPerView: 2 },
-            1024: { slidesPerView: 4 }
-          }}
-          className={styles.swiper}
-        >
-          {cards.map(card => (
-            <SwiperSlide key={card.id}>
-              <div className={styles.card}>
-                <div className={styles.imagePlaceholder}>
-                  <div className={styles.placeholderContent}>
-                    {getCarIcon(card.title)}
+        <div className={styles.swiperWrapper}>
+          <Swiper
+            modules={[Navigation, Pagination]}
+            spaceBetween={20}
+            slidesPerView={1}
+            navigation
+            pagination={{ clickable: true }}
+            breakpoints={{
+              640: { slidesPerView: 2 },
+              1024: { slidesPerView: 4 }
+            }}
+            className={styles.swiper}
+          >
+            {cards.map(card => (
+              <SwiperSlide key={card.id}>
+                <div className={styles.card}>
+                  <div className={styles.imagePlaceholder}>
+                    <div className={styles.placeholderContent}>
+                      {getCarIcon(card.title)}
+                    </div>
                   </div>
+                  <time className={styles.date}>{card.date}</time>
+                  <a href={card.link} className={styles.cardTitle}>
+                    {card.title}
+                  </a>
                 </div>
-                <time className={styles.date}>{card.date}</time>
-                <a href={card.link} className={styles.cardTitle}>
-                  {card.title}
-                </a>
-              </div>
-            </SwiperSlide>
-          ))}
-        </Swiper>
+              </SwiperSlide>
+            ))}
+          </Swiper>
+        </div>
       </div>
     </section>
   )

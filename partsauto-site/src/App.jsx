@@ -4,6 +4,8 @@ import { Toaster } from 'react-hot-toast'
 import { HelmetProvider } from 'react-helmet-async'
 import CatalogPage from './pages/CatalogPage'
 import MainPage from './pages/MainPage'
+import AdminPage from './pages/AdminPage'
+import NewsPage from './pages/NewsPage'
 import Header from './components/Header/Header'
 import { useCartStore } from './store/useCartStore'
 import CartPanel from './components/CartPanel'
@@ -23,6 +25,8 @@ function App() {
         <Routes>
           <Route path="/" element={<MainPage />} />
           <Route path="/catalog" element={<CatalogPage />} />
+          <Route path="/admin" element={<AdminPage />} />
+          <Route path="/news" element={<NewsPage />} />
         </Routes>
         <Toaster
           position="top-right"

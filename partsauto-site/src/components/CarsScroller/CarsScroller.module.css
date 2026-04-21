@@ -1,0 +1,118 @@
+.section {
+  padding: 40px 0;
+  background-color: var(--header-bg-secondary);
+}
+
+.container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 16px;
+}
+
+.title {
+  font-size: 28px;
+  font-weight: bold;
+  margin-bottom: 24px;
+  color: var(--header-text);
+  position: relative;
+  display: inline-block;
+}
+
+.title::after {
+  content: '';
+  position: absolute;
+  bottom: -8px;
+  left: 0;
+  width: 60px;
+  height: 3px;
+  background-color: var(--header-accent);
+}
+
+.swiper {
+  padding-bottom: 50px !important;
+}
+
+.card {
+  background-color: var(--header-bg);
+  border-radius: 12px;
+  overflow: hidden;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  cursor: pointer;
+}
+
+.card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+}
+
+.imagePlaceholder {
+  width: 100%;
+  aspect-ratio: 198 / 132;
+  background: linear-gradient(135deg, var(--header-bg-secondary) 0%, var(--header-border) 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.placeholderContent {
+  font-size: 32px;
+  opacity: 0.5;
+}
+
+.date {
+  display: block;
+  padding: 12px 12px 0;
+  font-size: 14px;
+  color: var(--header-text-muted);
+}
+
+.cardTitle {
+  display: block;
+  padding: 8px 12px 16px;
+  font-size: 16px;
+  font-weight: 500;
+  color: var(--header-text);
+  text-decoration: none;
+  transition: color 0.2s ease;
+}
+
+.cardTitle:hover {
+  color: var(--header-accent);
+}
+
+/* Кастомные стили для навигации Swiper */
+:global(.swiper-button-next),
+:global(.swiper-button-prev) {
+  color: var(--header-accent) !important;
+  background-color: rgba(0, 0, 0, 0.5);
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+}
+
+:global(.swiper-button-next:after),
+:global(.swiper-button-prev:after) {
+  font-size: 18px !important;
+}
+
+:global(.swiper-pagination-bullet) {
+  background-color: var(--header-text-muted) !important;
+}
+
+:global(.swiper-pagination-bullet-active) {
+  background-color: var(--header-accent) !important;
+}
+
+@media (max-width: 768px) {
+  .title {
+    font-size: 22px;
+  }
+  
+  .cardTitle {
+    font-size: 14px;
+  }
+  
+  .date {
+    font-size: 12px;
+  }
+}

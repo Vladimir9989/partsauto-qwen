@@ -1,5 +1,6 @@
 import { Helmet } from 'react-helmet-async'
 import styles from './MainPage.module.css'
+import CarsScroller from '../components/CarsScroller/CarsScroller'
 
 function MainPage() {
   const normalText = 'Выкуп авто в любом состоянии '
@@ -20,11 +21,13 @@ function MainPage() {
             >
               Выкуп авто в любом состоянии
             </span>
-            <span className={styles.accent}>&nbsp;деньги сразу</span>
+            <span className={styles.accent}> деньги сразу</span>
           </h1>
 
         </div>
       </div>
+
+      <CarsScroller />
     </>
   )
 }

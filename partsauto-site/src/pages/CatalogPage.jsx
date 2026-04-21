@@ -8,7 +8,7 @@ import ProductCard from '../components/ProductCard'
 import FiltersPanel from '../components/FiltersPanel'
 import Pagination from '../components/Pagination'
 import SkeletonCard from '../components/SkeletonCard'
-import { API_URL, ITEMS_PER_PAGE, SEARCH_DEBOUNCE_DELAY, PRICE_DEBOUNCE_DELAY } from '../config'
+import { API_URL, ITEMS_PER_PAGE, SEARCH_DEBOUNCE_DELAY } from '../config'
 import styles from './CatalogPage.module.css'
 
 function CatalogPage() {
@@ -197,7 +197,7 @@ function CatalogPage() {
         generation: generation || ''
       }))
     }
-  }, [])
+  }, [searchParams])
 
   // Сброс страницы при изменении фильтров
   useEffect(() => {

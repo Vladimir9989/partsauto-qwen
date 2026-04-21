@@ -3,18 +3,12 @@ import { motion } from 'framer-motion'
 import { useCartStore } from '../store/useCartStore'
 import toast from 'react-hot-toast'
 import { CARD_ANIMATION_DELAY } from '../config'
+import { formatPrice, getImageUrl } from '../utils/formatters'
 import styles from './ProductCard.module.css'
 
 // Компонент слайдера изображений для карточки товара
 const ProductImageSlider = React.memo(({ images, title }) => {
   const [currentIndex, setCurrentIndex] = useState(0)
-
-  const getImageUrl = useCallback((img) => {
-    if (typeof img === 'object') {
-      return img['@_url'] || img.url || ''
-    }
-    return img || ''
-  }, [])
 
   if (!images || images.length === 0) {
     return (
@@ -118,11 +112,6 @@ ProductImageSlider.displayName = 'ProductImageSlider'
 const ProductCard = ({ product, index, onProductClick }) => {
   const { addToCart, isInCart } = useCartStore()
 
-  const formatPrice = useCallback((price) => {
-    if (!price) return 'Цена не указана'
-    return `${parseInt(price).toLocaleString('ru-RU')} ₽`
-  }, [])
-
   // Обработчик добавления в корзину (заменяет избранное)
   const handleAddToCart = useCallback((e) => {
     e.stopPropagation()
@@ -151,13 +140,13 @@ const ProductCard = ({ product, index, onProductClick }) => {
       <div className={styles.card}>
         <div
           onClick={handleCardClick}
-          style={{ cursor: 'pointer' }}
+          className={styles.clickable}
         >
           <ProductImageSlider images={product.images} title={product.title} />
         </div>
 
         <div className={styles.cardBody}>
-          <h6 className={styles.cardTitle} onClick={handleCardClick} style={{ cursor: 'pointer' }}>
+          <h6 className={`${styles.cardTitle} ${styles.clickable}`} onClick={handleCardClick}>
             {product.title}
           </h6>
 

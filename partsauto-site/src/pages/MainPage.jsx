@@ -4,8 +4,6 @@ import CarsScroller from '../components/CarsScroller/CarsScroller'
 import CarSearch from '../components/CarSearch/CarSearch'
 
 function MainPage() {
-  const normalText = 'Выкуп авто в любом состоянии '
-
   return (
     <>
       <Helmet>

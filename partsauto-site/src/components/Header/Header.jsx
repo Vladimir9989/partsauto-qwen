@@ -22,6 +22,11 @@ function Header({ onCartClick, cartItemsCount = 0 }) {
     } else {
       document.body.style.overflow = '';
     }
+    
+    // Cleanup: восстанавливаем overflow при размонтировании
+    return () => {
+      document.body.style.overflow = '';
+    };
   }, [isMobileMenuOpen]);
 
   return (

@@ -2,6 +2,7 @@ import { useState, useCallback } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { useCartStore } from '../store/useCartStore'
 import toast from 'react-hot-toast'
+import { formatPrice, getImageUrl } from '../utils/formatters'
 
 const ProductModal = ({ product, onClose }) => {
   const [currentImageIndex, setCurrentImageIndex] = useState(0)
@@ -11,18 +12,6 @@ const ProductModal = ({ product, onClose }) => {
 
   const images = product.images || []
   const hasImages = images.length > 0
-  
-  const getImageUrl = (img) => {
-    if (typeof img === 'object') {
-      return img['@_url'] || img.url || ''
-    }
-    return img || ''
-  }
-
-  const formatPrice = (price) => {
-    if (!price) return 'Цена не указана'
-    return `${parseInt(price).toLocaleString('ru-RU')} ₽`
-  }
 
   // Обработчик добавления в корзину (заменяет избранное)
   const handleAddToCart = useCallback(() => {

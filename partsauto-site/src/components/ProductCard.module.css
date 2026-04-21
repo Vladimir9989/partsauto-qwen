@@ -247,3 +247,7 @@
 .activeIndicator {
   background-color: var(--header-accent);
 }
+
+.clickable {
+  cursor: pointer;
+}

@@ -8,6 +8,7 @@ import AdminPage from './pages/AdminPage'
 import NewsPage from './pages/NewsPage'
 import NewsDetailPage from './pages/NewsDetailPage'
 import Header from './components/Header/Header'
+import Footer from './components/Footer/Footer'
 import { useCartStore } from './store/useCartStore'
 import CartPanel from './components/CartPanel'
 
@@ -30,6 +31,7 @@ function App() {
           <Route path="/news" element={<NewsPage />} />
           <Route path="/news/:id" element={<NewsDetailPage />} />
         </Routes>
+        <Footer />
         <Toaster
           position="top-right"
           toastOptions={{

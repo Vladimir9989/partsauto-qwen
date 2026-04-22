@@ -11,7 +11,7 @@ function HeaderBottom({ isMobileMenuOpen, setIsMobileMenuOpen, onCartClick, cart
       <div className={styles.container}>
         <div className={styles.headerContent}>
           <Link to="/" className={styles.logo}>
-            PartsAuto
+            <img src="/logo.png" alt="PartsAuto" className={styles.logoImage} />
           </Link>
           
           {/* Десктопная навигация */}

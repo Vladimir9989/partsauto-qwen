@@ -17,6 +17,22 @@
   margin-bottom: 30px;
 }
 
+.logoLink {
+  display: block;
+  text-decoration: none;
+  color: inherit;
+}
+
+.logoLink:hover {
+  color: var(--header-accent);
+}
+
+.logoImage {
+  height: 110px;
+  width: auto;
+  display: block;
+}
+
 .logo {
   font-size: 24px;
   font-weight: bold;

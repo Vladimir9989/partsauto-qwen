@@ -11,7 +11,9 @@ const Footer = () => {
       <div className={styles.container}>
         <div className={styles.content}>
           <div className={styles.column}>
-            <h3 className={styles.logo}>PartsAuto</h3>
+            <Link to="/" className={styles.logoLink}>
+              <img src="/logo.png" alt="PartsAuto" className={styles.logoImage} />
+            </Link>
             <p className={styles.description}>
               Оригинальные автозапчасти для вашего автомобиля
             </p>

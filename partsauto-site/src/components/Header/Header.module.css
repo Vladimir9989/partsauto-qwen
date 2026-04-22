@@ -49,8 +49,8 @@
 
 .headerTop {
   background-color: var(--header-bg-secondary);
-  padding: 8px 0;
   border-bottom: 1px solid var(--header-border);
+  padding-top: 8px;
 }
 
 .container {
@@ -124,8 +124,8 @@
 
 .socialsInfo {
   display: flex;
-  flex-direction: column;
   align-items: center;
+  gap: 10px;
   font-size: 14px;
   color: var(--header-text-muted);
 }
@@ -172,7 +172,6 @@
   background-color: var(--header-accent);
   color: white;
   border-radius: 50%;
-  padding: 2px 6px;
   font-size: 12px;
   font-weight: bold;
   min-width: 18px;
@@ -190,20 +189,13 @@
 
 .headerBottom {
   background-color: var(--header-bg-secondary);
-  padding: 16px 0;
   box-shadow: var(--header-shadow);
 }
 
-.logo {
-  font-size: 24px;
-  font-weight: bold;
-  color: var(--header-accent);
-  text-decoration: none;
-  transition: color 0.2s ease;
-}
-
-.logo:hover {
-  color: var(--header-accent-hover);
+.logoImage {
+  height: 100px;
+  width: auto;
+  display: block;
 }
 
 .headerContent {
@@ -559,20 +551,12 @@
     width: 100%;
   }
 
-  .logo {
-    flex-shrink: 0;
-  }
-
   .desktopCartInfo {
     flex-shrink: 0;
   }
 
   .container {
     padding: 0 16px;
-  }
-
-  .logo {
-    font-size: 22px;
   }
 
   .topRowBlock {

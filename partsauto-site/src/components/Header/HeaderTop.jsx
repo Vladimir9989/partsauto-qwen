@@ -7,7 +7,13 @@ function HeaderTop({ onCartClick, cartItemsCount = 0 }) {
     <div className={styles.headerTop}>
       <div className={styles.container}>
         <div className={styles.topRow}>
-          <div className={styles.locationInfo}>
+          <div
+            className={styles.locationInfo}
+            onClick={() => {
+              document.getElementById('contacts')?.scrollIntoView({ behavior: 'smooth' });
+            }}
+            title="Перейти к контактам"
+          >
             <FaMapMarkerAlt className={styles.locationIcon} />
             <span>г. Реж - Екатеринбург</span>
           </div>

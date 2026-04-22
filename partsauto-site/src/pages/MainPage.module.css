@@ -23,6 +23,8 @@
 
 /* Контейнер для текста с анимацией */
 .title {
+  display: flex;
+  flex-wrap: wrap;
   font-size: 2.5rem;
   font-weight: bold;
   margin-bottom: 0;
@@ -30,7 +32,10 @@
   position: relative;
   display: inline-block;
   cursor: pointer;
-  white-space: nowrap;
+}
+
+.title:hover {
+  transform: scale(1.05);
 }
 
 /* Обычный текст — белый, позиционируется для анимации */

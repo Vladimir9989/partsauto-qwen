@@ -19,7 +19,6 @@ function CatalogPage() {
   // Состояние
   const [products, setProducts] = useState([])
   const [loading, setLoading] = useState(true)
-  const [initialLoad, setInitialLoad] = useState(true)
   const [loadingProgress, setLoadingProgress] = useState('Загрузка...')
   const [brands, setBrands] = useState([])
   const [categories, setCategories] = useState([])
@@ -87,7 +86,7 @@ function CatalogPage() {
         setTotalResults(data.total)
         setTotalPages(data.totalPages)
         setLoadingProgress('')
-        setInitialLoad(false)
+        setLoading(false)
       } catch (error) {
         if (error.name === 'AbortError') {
           console.log('Запрос отменен')
@@ -96,8 +95,6 @@ function CatalogPage() {
         console.error('Ошибка:', error)
         setLoadingProgress('Ошибка загрузки')
         toast.error('Ошибка загрузки данных')
-        setInitialLoad(false)
-      } finally {
         setLoading(false)
       }
     }
@@ -344,10 +341,10 @@ function CatalogPage() {
 
             {/* Основной контент */}
             <main className={styles.productsMain}>
-              {loading && !initialLoad ? (
+              {loading ? (
                 <div className={styles.loadingContainer}>
                   <div className={styles.spinner}></div>
-                  <p className={styles.loadingText}>Каталог загружается</p>
+                  <p className={styles.loadingText}>Каталог загружается...</p>
                 </div>
               ) : products.length === 0 ? (
                 <div className={styles.emptyState}>

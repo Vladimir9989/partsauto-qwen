@@ -1,0 +1,212 @@
+.buybackPage {
+  background-color: var(--header-bg-secondary);
+  min-height: calc(100vh - 200px);
+  padding: 40px 0;
+}
+
+.container {
+  max-width: 1000px;
+  margin: 0 auto;
+  padding: 0 20px;
+}
+
+.pageTitle {
+  font-size: 32px;
+  font-weight: bold;
+  color: var(--header-text);
+  margin-bottom: 32px;
+  position: relative;
+  display: inline-block;
+}
+
+.pageTitle::after {
+  content: '';
+  position: absolute;
+  bottom: -8px;
+  left: 0;
+  width: 60px;
+  height: 3px;
+  background-color: var(--header-accent);
+}
+
+.content {
+  display: flex;
+  flex-direction: column;
+  gap: 30px;
+}
+
+.mainBlock {
+  background: linear-gradient(135deg, var(--header-accent) 0%, var(--header-accent-hover) 100%);
+  border-radius: 20px;
+  padding: 40px;
+  text-align: center;
+}
+
+.offerCard {
+  color: white;
+}
+
+.offerTitle {
+  font-size: 28px;
+  font-weight: bold;
+  margin-bottom: 16px;
+}
+
+.offerText {
+  font-size: 18px;
+  line-height: 1.5;
+  opacity: 0.95;
+}
+
+.conditionCard, .guaranteeCard, .termsCard {
+  background-color: var(--header-bg);
+  border-radius: 16px;
+  padding: 30px;
+  border: 1px solid var(--header-border);
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.conditionCard:hover, .guaranteeCard:hover, .termsCard:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+}
+
+.cardTitle {
+  font-size: 24px;
+  font-weight: bold;
+  color: var(--header-accent);
+  margin-bottom: 24px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid var(--header-border);
+}
+
+.conditionList {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.conditionItem {
+  display: flex;
+  gap: 16px;
+  align-items: flex-start;
+}
+
+.conditionNumber {
+  width: 36px;
+  height: 36px;
+  background-color: var(--header-accent);
+  color: white;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: bold;
+  font-size: 18px;
+  flex-shrink: 0;
+}
+
+.conditionText {
+  flex: 1;
+  font-size: 16px;
+  line-height: 1.5;
+  color: var(--header-text);
+}
+
+.conditionText a {
+  color: var(--header-accent);
+  text-decoration: none;
+  font-weight: 500;
+}
+
+.conditionText a:hover {
+  text-decoration: underline;
+}
+
+.guaranteeText {
+  font-size: 16px;
+  line-height: 1.6;
+  color: var(--header-text);
+}
+
+.guaranteeText p {
+  margin-bottom: 16px;
+}
+
+.highlight {
+  color: var(--header-accent);
+  font-weight: bold;
+  font-size: 18px;
+}
+
+.termsList {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.termsList li {
+  padding: 12px 0;
+  padding-left: 24px;
+  position: relative;
+  font-size: 15px;
+  line-height: 1.5;
+  color: var(--header-text);
+  border-bottom: 1px solid var(--header-border);
+}
+
+.termsList li:last-child {
+  border-bottom: none;
+}
+
+.termsList li::before {
+  content: '✓';
+  position: absolute;
+  left: 0;
+  color: var(--header-accent);
+  font-weight: bold;
+}
+
+@media (max-width: 768px) {
+  .buybackPage {
+    padding: 24px 0;
+  }
+  
+  .pageTitle {
+    font-size: 24px;
+  }
+  
+  .mainBlock {
+    padding: 24px;
+  }
+  
+  .offerTitle {
+    font-size: 22px;
+  }
+  
+  .offerText {
+    font-size: 16px;
+  }
+  
+  .conditionCard, .guaranteeCard, .termsCard {
+    padding: 20px;
+  }
+  
+  .cardTitle {
+    font-size: 20px;
+  }
+  
+  .conditionItem {
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+  }
+  
+  .conditionNumber {
+    margin-bottom: 8px;
+  }
+  
+  .highlight {
+    font-size: 16px;
+  }
+}

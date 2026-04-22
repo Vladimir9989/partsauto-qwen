@@ -19,7 +19,10 @@ function HeaderBottom({ isMobileMenuOpen, setIsMobileMenuOpen, onCartClick, cart
             <Link to="/catalog">Каталог запчастей</Link>
             <Link to="/car-buyback">Выкуп авто</Link>
             <Link to="/delivery">Оплата и доставка</Link>
-            <Link to="/contacts">Контакты</Link>
+            <a href="#contacts" onClick={(e) => {
+              e.preventDefault();
+              document.getElementById('contacts')?.scrollIntoView({ behavior: 'smooth' });
+            }}>Контакты</a>
             <Link to="/news">Новости о нас</Link>
             <Link to="/warranty">Гарантия и возврат</Link>
           </nav>
@@ -37,10 +40,13 @@ function HeaderBottom({ isMobileMenuOpen, setIsMobileMenuOpen, onCartClick, cart
                 <div className={styles.dropdownMenu}>
                   <Link to="/catalog">Каталог запчастей</Link>
                   <Link to="/delivery">Оплата и доставка</Link>
-                  <Link to="/contacts">Контакты</Link>
+                  <Link to="/car-buyback">Выкуп авто</Link>
+                  <a href="#contacts" onClick={(e) => {
+                    e.preventDefault();
+                    document.getElementById('contacts')?.scrollIntoView({ behavior: 'smooth' });
+                  }}>Контакты</a>
                   <Link to="/news">Новости о нас</Link>
                   <Link to="/warranty">Гарантия и возврат</Link>
-                  <Link to="/car-buyback">Выкуп авто</Link>
                 </div>
               )}
             </div>

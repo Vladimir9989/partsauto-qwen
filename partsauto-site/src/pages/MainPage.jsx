@@ -2,6 +2,7 @@ import { Helmet } from 'react-helmet-async'
 import styles from './MainPage.module.css'
 import CarsScroller from '../components/CarsScroller/CarsScroller'
 import CarSearch from '../components/CarSearch/CarSearch'
+import ContactsSection from '../components/ContactsSection/ContactsSection'
 
 function MainPage() {
   return (
@@ -28,6 +29,7 @@ function MainPage() {
 
       <CarsScroller />
       <CarSearch />
+      <ContactsSection />
     </>
   )
 }

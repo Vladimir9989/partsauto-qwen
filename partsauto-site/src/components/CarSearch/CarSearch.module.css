@@ -50,6 +50,7 @@
 }
 
 .select {
+  box-sizing: border-box;
   width: 100%;
   padding: 14px 16px;
   background-color: var(--header-bg-secondary);

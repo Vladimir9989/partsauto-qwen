@@ -27,7 +27,7 @@ const storage = multer.diskStorage({
 
 const upload = multer({
   storage,
-  limits: { fileSize: 5 * 1024 * 1024 }, // 5MB
+  limits: { fileSize: 5 * 1024 * 1024 },
   fileFilter: (req, file, cb) => {
     const allowedTypes = /jpeg|jpg|png|gif|webp/;
     const extname = allowedTypes.test(path.extname(file.originalname).toLowerCase());
@@ -43,12 +43,10 @@ const upload = multer({
 const CARS_DATA_FILE = path.join(__dirname, 'data', 'cars.json');
 const NEWS_DATA_FILE = path.join(__dirname, 'data', 'news.json');
 
-// Создаём папку data, если её нет
 if (!fs.existsSync(path.join(__dirname, 'data'))) {
   fs.mkdirSync(path.join(__dirname, 'data'));
 }
 
-// === Функции для машин в разборе ===
 function getCarsList() {
   try {
     if (fs.existsSync(CARS_DATA_FILE)) {
@@ -65,7 +63,6 @@ function saveCarsList(cars) {
   } catch (error) { console.error('Ошибка сохранения cars.json:', error); return false; }
 }
 
-// === Функции для новостей ===
 function getNewsList() {
   try {
     if (fs.existsSync(NEWS_DATA_FILE)) {
@@ -86,13 +83,13 @@ const app = express();
 const PORT = process.env.PORT || 3001;
 
 app.use(cors());
-app.use(express.static(path.join(__dirname, '../')));
+app.use(express.json());
 
 const XML_URL = process.env.XML_URL || 'https://ycf.partsauto.market/partsauto-feeds/avito_feeds/cb9901e562a4f410bd4f9bf80c21d094.xml';
 
 let cachedProducts = [];
 let lastFetch = null;
-const CACHE_DURATION = process.env.CACHE_DURATION ? parseInt(process.env.CACHE_DURATION) : 5 * 60 * 1000; // 5 минут
+const CACHE_DURATION = process.env.CACHE_DURATION ? parseInt(process.env.CACHE_DURATION) : 5 * 60 * 1000;
 
 const parser = new XMLParser({
   ignoreAttributes: false,
@@ -105,21 +102,17 @@ async function fetchAndParseXML() {
   console.log('Загрузка XML...');
   const response = await fetch(XML_URL);
   const xmlText = await response.text();
-  
   const result = parser.parse(xmlText);
-  
   const ads = result.Ads?.Ad || [];
   console.log(`Найдено объявлений: ${ads.length}`);
   
   const products = ads.map(ad => {
-    // Получаем изображения
     let images = [];
     if (ad.Images && ad.Images.Image) {
       const imageData = ad.Images.Image;
       if (Array.isArray(imageData)) {
         images = imageData.map(img => {
           if (typeof img === 'object') {
-            // Атрибут url имеет префикс @_ из-за настроек парсера
             return img['@_url'] || img.url || '';
           } else if (typeof img === 'string' && img.trim()) {
             return img.trim();
@@ -136,12 +129,10 @@ async function fetchAndParseXML() {
       }
     }
     
-    // Гарантируем, что images - это массив строк
     if (!Array.isArray(images)) {
       images = [];
     }
 
-    // Цена
     let price = '';
     if (ad.Price) {
       if (typeof ad.Price === 'object') {
@@ -176,6 +167,7 @@ async function fetchAndParseXML() {
   return products;
 }
 
+// ===== ВСЕ API МАРШРУТЫ =====
 app.get('/api/products', async (req, res) => {
   try {
     const now = Date.now();
@@ -185,7 +177,6 @@ app.get('/api/products', async (req, res) => {
       console.log(`Загружено ${cachedProducts.length} товаров`);
     }
 
-    // Фильтрация на сервере
     let results = cachedProducts;
     const { search, brand, category, carModel, generation, priceMin, priceMax, page, limit } = req.query;
 
@@ -209,26 +200,19 @@ app.get('/api/products', async (req, res) => {
     if (minPrice !== null) results = results.filter(p => (parseFloat(p.price) || 0) >= minPrice);
     if (maxPrice !== null) results = results.filter(p => (parseFloat(p.price) || 0) <= maxPrice);
 
-    // Пагинация на сервере
     const pageNum = parseInt(page) || 1;
     const limitNum = parseInt(limit) || 20;
     const total = results.length;
     const start = (pageNum - 1) * limitNum;
     const items = results.slice(start, start + limitNum);
 
-    res.json({
-      products: items,
-      total,
-      page: pageNum,
-      totalPages: Math.ceil(total / limitNum),
-    });
+    res.json({ products: items, total, page: pageNum, totalPages: Math.ceil(total / limitNum) });
   } catch (error) {
     console.error('Ошибка загрузки:', error.message);
     res.status(500).json({ error: error.message });
   }
 });
 
-// Health check endpoint
 app.get('/api/health', (req, res) => {
   res.json({
     status: 'ok',
@@ -240,7 +224,6 @@ app.get('/api/health', (req, res) => {
   });
 });
 
-// === Эндпоинты для машин в разборе ===
 app.get('/api/cars', (req, res) => {
   res.json({ success: true, data: getCarsList() });
 });
@@ -272,22 +255,17 @@ app.delete('/api/cars/:id', (req, res) => {
   res.json({ success: true });
 });
 
-// === Эндпоинты для новостей ===
 app.get('/api/news', (req, res) => {
   res.json({ success: true, data: getNewsList() });
 });
 
 app.get('/api/news/:id', (req, res) => {
-  const id = parseInt(req.params.id)
-  const news = getNewsList()
-  const item = news.find(n => n.id === id)
-  
-  if (!item) {
-    return res.status(404).json({ success: false, error: 'Новость не найдена' })
-  }
-  
-  res.json({ success: true, data: item })
-})
+  const id = parseInt(req.params.id);
+  const news = getNewsList();
+  const item = news.find(n => n.id === id);
+  if (!item) return res.status(404).json({ success: false, error: 'Новость не найдена' });
+  res.json({ success: true, data: item });
+});
 
 app.post('/api/news', express.json(), (req, res) => {
   const { title, date, content, imageUrl, link } = req.body;
@@ -328,7 +306,6 @@ app.put('/api/news/:id', express.json(), (req, res) => {
   res.json({ success: true, data: news[index] });
 });
 
-// Загрузка изображения для машины
 app.post('/api/upload-car-image', upload.single('image'), (req, res) => {
   try {
     if (!req.file) {
@@ -342,7 +319,6 @@ app.post('/api/upload-car-image', upload.single('image'), (req, res) => {
   }
 });
 
-// Настройка хранилища для изображений новостей
 const newsStorage = multer.diskStorage({
   destination: (req, file, cb) => {
     const uploadDir = path.join(__dirname, '../public/uploads/news');
@@ -359,7 +335,7 @@ const newsStorage = multer.diskStorage({
 
 const uploadNewsImage = multer({
   storage: newsStorage,
-  limits: { fileSize: 10 * 1024 * 1024 }, // 10MB
+  limits: { fileSize: 10 * 1024 * 1024 },
   fileFilter: (req, file, cb) => {
     const allowedTypes = /jpeg|jpg|png|gif|webp/;
     const extname = allowedTypes.test(path.extname(file.originalname).toLowerCase());
@@ -371,7 +347,6 @@ const uploadNewsImage = multer({
   }
 });
 
-// Загрузка изображения для новости
 app.post('/api/upload-news-image', uploadNewsImage.single('image'), (req, res) => {
   try {
     if (!req.file) {
@@ -385,24 +360,12 @@ app.post('/api/upload-news-image', uploadNewsImage.single('image'), (req, res) =
   }
 });
 
-// Раздача статических файлов из папки dist (для продакшена)
+// ===== СТАТИКА И FALLBACK (В КОНЦЕ!) =====
 app.use(express.static(path.join(__dirname, '../dist')));
 
-// SPA fallback - для всех не-API запросов отдаём index.html
-app.use((req, res, next) => {
-  // Пропускаем API запросы и статические файлы
-  if (req.path.startsWith('/api') || req.path.startsWith('/uploads')) {
-    return next();
-  }
-  // Отдаём index.html для всех остальных маршрутов (React Router)
-  res.sendFile(path.join(__dirname, '../dist/index.html'));
-});
-
-// Обработка ошибок (404 для API)
+// SPA fallback - для всех остальных запросов отдаём index.html
 app.use((req, res) => {
-  if (req.path.startsWith('/api')) {
-    res.status(404).json({ error: 'API endpoint not found' });
-  }
+  res.sendFile(path.join(__dirname, '../dist/index.html'));
 });
 
 app.listen(PORT, '0.0.0.0', () => {

@@ -16,26 +16,19 @@ export default defineConfig({
   },
   
   build: {
-    // Улучшенная генерация имён файлов с хэшами
+    minify: 'terser',
+    terserOptions: {
+      compress: {
+        drop_console: true,
+        drop_debugger: true,
+      },
+    },
+    chunkSizeWarningLimit: 1000,
     rollupOptions: {
       output: {
         entryFileNames: 'assets/[name]-[hash].js',
         chunkFileNames: 'assets/[name]-[hash].js',
-        assetFileNames: 'assets/[name]-[hash].[ext]'
-      }
-    },
-    // Оптимизация размера
-    minify: 'terser',
-    terserOptions: {
-      compress: {
-        drop_console: true, // убирает console.log в продакшене
-        drop_debugger: true,
-      },
-    },
-    // Разделение на чанки для лучшего кэширования
-    chunkSizeWarningLimit: 1000,
-    rollupOptions: {
-      output: {
+        assetFileNames: 'assets/[name]-[hash].[ext]',
         manualChunks: {
           'react-vendor': ['react', 'react-dom'],
         },

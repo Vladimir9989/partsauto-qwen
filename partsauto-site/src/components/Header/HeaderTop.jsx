@@ -1,8 +1,9 @@
+import { Link } from 'react-router-dom';
 import { FaMapMarkerAlt, FaPhone, FaShoppingCart } from 'react-icons/fa';
 import { IconMax, IconAvito, IconVK, IconTelegram, IconDrom } from '../Icons';
 import styles from './Header.module.css';
 
-function HeaderTop({ onCartClick, cartItemsCount = 0 }) {
+function HeaderTop({ cartItemsCount = 0 }) {
   return (
     <div className={styles.headerTop}>
       <div className={styles.container}>
@@ -32,18 +33,18 @@ function HeaderTop({ onCartClick, cartItemsCount = 0 }) {
                 <IconDrom className={styles.socialIcon} />
               </div>
             </div>
-            {/* Десктопная корзина с обработчиком клика */}
-            <div 
+            {/* Десктопная корзина с переходом на страницу */}
+            <Link
+              to="/cart"
               className={styles.desktopCartInfo}
-              onClick={onCartClick}
-              style={{ cursor: 'pointer' }}
+              style={{ cursor: 'pointer', textDecoration: 'none', color: 'inherit' }}
               title="Открыть корзину"
             >
               <FaShoppingCart className={styles.cartIcon} />
               {cartItemsCount > 0 && (
                 <span className={styles.cartBadge}>{cartItemsCount}</span>
               )}
-            </div>
+            </Link>
           </div>
         </div>
       </div>

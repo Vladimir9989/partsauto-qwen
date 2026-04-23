@@ -1,0 +1,574 @@
+/* src/pages/CartPage.module.css */
+
+.backLink {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 24px;
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--header-text-muted);
+  text-decoration: none;
+  transition: color 0.2s ease;
+}
+
+.backLink i {
+  font-size: 16px;
+}
+
+.backLink:hover {
+  color: var(--header-accent);
+}
+
+.pageWrapper {
+  background-color: var(--header-bg-secondary);
+  width: 100%;
+}
+
+.container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 40px 20px;
+  /* background-color можно убрать, он теперь на pageWrapper */
+}
+
+.header {
+  margin-bottom: 32px;
+  text-align: center;
+}
+
+.header h1 {
+  font-size: 32px;
+  font-weight: bold;
+  color: var(--header-text);
+  margin-bottom: 8px;
+  position: relative;
+  display: inline-block;
+}
+
+.header h1::after {
+  content: '';
+  position: absolute;
+  bottom: -8px;
+  left: 0;
+  width: 60px;
+  height: 3px;
+  background-color: var(--header-accent);
+}
+
+.subtitle {
+  color: var(--header-text-muted);
+  font-size: 14px;
+  margin-top: 16px;
+}
+
+.content {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 30px;
+}
+
+/* Левая колонка — товары */
+.cartSection {
+  background-color: var(--header-bg);
+  border-radius: 16px;
+  border: 1px solid var(--header-border);
+  padding: 24px;
+}
+
+.sectionTitle {
+  font-size: 20px;
+  font-weight: bold;
+  color: var(--header-text);
+  margin-bottom: 20px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid var(--header-border);
+}
+
+.emptyCart {
+  text-align: center;
+  padding: 60px 20px;
+  color: var(--header-text-muted);
+}
+
+.emptyCart i {
+  font-size: 64px;
+  margin-bottom: 16px;
+  display: inline-block;
+}
+
+.emptyCart h3 {
+  font-size: 20px;
+  margin-bottom: 8px;
+  color: var(--header-text);
+}
+
+.cartItems {
+  margin-bottom: 24px;
+}
+
+.cartItem {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 16px 0;
+  border-bottom: 1px solid var(--header-border);
+}
+
+.cartItem:last-child {
+  border-bottom: none;
+}
+
+.itemImage {
+  width: 80px;
+  height: 80px;
+  flex-shrink: 0;
+  background-color: var(--header-bg-secondary);
+  border-radius: 8px;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.itemImage img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.noImage {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 100%;
+  color: var(--header-text-muted);
+  font-size: 24px;
+}
+
+.itemDetails {
+  flex: 1;
+}
+
+.itemTitle {
+  font-size: 16px;
+  font-weight: 500;
+  color: var(--header-text);
+  margin-bottom: 6px;
+}
+
+.itemPrice {
+  font-size: 14px;
+  color: var(--header-accent);
+  font-weight: bold;
+  margin-bottom: 10px;
+}
+
+.itemControls {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.quantityControls {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.quantityBtn {
+  width: 28px;
+  height: 28px;
+  background-color: var(--header-bg-secondary);
+  border: 1px solid var(--header-border);
+  border-radius: 6px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  color: var(--header-text);
+}
+
+.quantityBtn:hover:not(:disabled) {
+  border-color: var(--header-accent);
+  color: var(--header-accent);
+}
+
+.quantityBtn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.quantityValue {
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--header-text);
+  min-width: 24px;
+  text-align: center;
+}
+
+.removeBtn {
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: #ef4444;
+  transition: color 0.2s ease;
+  font-size: 18px;
+  display: flex;
+  align-items: center;
+}
+
+.removeBtn:hover {
+  color: #dc2626;
+}
+
+.itemTotal {
+  font-size: 16px;
+  font-weight: bold;
+  color: var(--header-text);
+  min-width: 100px;
+  text-align: right;
+}
+
+.cartSummary {
+  background-color: var(--header-bg-secondary);
+  border-radius: 12px;
+  padding: 16px;
+  margin-top: 16px;
+}
+
+.summaryRow {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 14px;
+  color: var(--header-text-muted);
+  padding: 8px 0;
+}
+
+.summaryTotal {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 18px;
+  font-weight: bold;
+  color: var(--header-text);
+  padding-top: 12px;
+  margin-top: 8px;
+  border-top: 1px solid var(--header-border);
+}
+
+/* Правая колонка — форма */
+.formSection {
+  background-color: var(--header-bg);
+  border-radius: 16px;
+  border: 1px solid var(--header-border);
+  padding: 24px;
+}
+
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+/* Вкладки */
+.tabs {
+  display: flex;
+  gap: 12px;
+  border-bottom: 1px solid var(--header-border);
+  margin-bottom: 8px;
+}
+
+.tab {
+  flex: 1;
+  background: none;
+  border: none;
+  padding: 12px 16px;
+  font-size: 16px;
+  font-weight: 500;
+  color: var(--header-text-muted);
+  cursor: pointer;
+  transition: all 0.2s ease;
+  border-bottom: 2px solid transparent;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+
+.tab i {
+  font-size: 18px;
+}
+
+.tab:hover {
+  color: var(--header-accent);
+}
+
+.tab.active {
+  color: var(--header-accent);
+  border-bottom-color: var(--header-accent);
+}
+
+.tabContent {
+  margin: 8px 0 16px;
+}
+
+.pickupSection, .deliverySection {
+  background-color: var(--header-bg-secondary);
+  border-radius: 12px;
+  padding: 16px;
+}
+
+.formSubtitle {
+  font-size: 16px;
+  font-weight: bold;
+  color: var(--header-text);
+  margin-bottom: 16px;
+}
+
+.radioGroup {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.radioLabel {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  cursor: pointer;
+}
+
+.radioLabel input[type="radio"] {
+  display: none;
+}
+
+.radioCustom {
+  width: 18px;
+  height: 18px;
+  border: 2px solid var(--header-border);
+  border-radius: 50%;
+  position: relative;
+  transition: all 0.2s ease;
+}
+
+.radioLabel input[type="radio"]:checked + .radioCustom {
+  border-color: var(--header-accent);
+}
+
+.radioLabel input[type="radio"]:checked + .radioCustom::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 10px;
+  height: 10px;
+  background-color: var(--header-accent);
+  border-radius: 50%;
+}
+
+.radioText {
+  display: flex;
+  flex-direction: column;
+}
+
+.radioText strong {
+  font-size: 15px;
+  color: var(--header-text);
+}
+
+.radioText small {
+  font-size: 12px;
+  color: var(--header-text-muted);
+}
+
+/* Общие поля формы */
+.formGroup {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.label {
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--header-text);
+}
+
+.required {
+  color: #ef4444;
+}
+
+.input, .textarea {
+  padding: 12px;
+  background-color: var(--header-bg-secondary);
+  border: 1px solid var(--header-border);
+  border-radius: 8px;
+  font-size: 14px;
+  color: var(--header-text);
+  transition: all 0.2s ease;
+  width: 100%;
+}
+
+.input:focus, .textarea:focus {
+  outline: none;
+  border-color: var(--header-accent);
+}
+
+.inputError {
+  border-color: #ef4444;
+}
+
+.error {
+  font-size: 12px;
+  color: #ef4444;
+  margin-top: 4px;
+}
+
+.textarea {
+  resize: vertical;
+  min-height: 80px;
+}
+
+/* Чекбокс */
+.checkboxGroup {
+  margin: 8px 0;
+}
+
+.checkboxLabel {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  cursor: pointer;
+}
+
+.checkboxLabel input[type="checkbox"] {
+  display: none;
+}
+
+.checkboxCustom {
+  width: 18px;
+  height: 18px;
+  border: 2px solid var(--header-border);
+  border-radius: 4px;
+  position: relative;
+  transition: all 0.2s ease;
+}
+
+.checkboxLabel input[type="checkbox"]:checked + .checkboxCustom {
+  background-color: var(--header-accent);
+  border-color: var(--header-accent);
+}
+
+.checkboxLabel input[type="checkbox"]:checked + .checkboxCustom::after {
+  content: '✓';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  color: white;
+  font-size: 12px;
+}
+
+.checkboxText {
+  font-size: 13px;
+  color: var(--header-text-muted);
+}
+
+.link {
+  color: var(--header-accent);
+  text-decoration: none;
+}
+
+.link:hover {
+  text-decoration: underline;
+}
+
+/* Кнопка отправки */
+.submitBtn {
+  background-color: var(--header-accent);
+  border: none;
+  border-radius: 8px;
+  padding: 14px;
+  font-size: 16px;
+  font-weight: bold;
+  color: white;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+
+.submitBtn:hover:not(:disabled) {
+  background-color: var(--header-accent-hover);
+}
+
+.submitBtn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+/* Адаптивность */
+@media (max-width: 1024px) {
+  .content {
+    grid-template-columns: 1fr;
+    gap: 24px;
+  }
+}
+
+@media (max-width: 768px) {
+  .container {
+    padding: 20px 16px;
+  }
+  
+  .header h1 {
+    font-size: 24px;
+  }
+  
+  .cartItem {
+    flex-wrap: wrap;
+  }
+  
+  .itemTotal {
+    text-align: left;
+    margin-left: 96px;
+  }
+  
+  .tabs {
+    flex-direction: column;
+    border-bottom: none;
+    gap: 8px;
+  }
+  
+  .tab {
+    border: 1px solid var(--header-border);
+    border-radius: 8px;
+  }
+  
+  .tab.active {
+    border-color: var(--header-accent);
+  }
+}
+
+@media (max-width: 480px) {
+  .cartItem {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+  
+  .itemTotal {
+    margin-left: 0;
+    width: 100%;
+    text-align: right;
+  }
+  
+  .tabs {
+    flex-direction: column;
+  }
+}

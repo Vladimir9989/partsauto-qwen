@@ -13,7 +13,7 @@ const navLinks = [
   { to: '/warranty', label: 'Гарантия и возврат' },
 ];
 
-function Header({ onCartClick, cartItemsCount = 0 }) {
+function Header({ cartItemsCount = 0 }) {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
   useEffect(() => {
@@ -31,11 +31,10 @@ function Header({ onCartClick, cartItemsCount = 0 }) {
 
   return (
     <header className={styles.header}>
-      <HeaderTop onCartClick={onCartClick} cartItemsCount={cartItemsCount} />
-      <HeaderBottom 
+      <HeaderTop cartItemsCount={cartItemsCount} />
+      <HeaderBottom
         isMobileMenuOpen={isMobileMenuOpen}
         setIsMobileMenuOpen={setIsMobileMenuOpen}
-        onCartClick={onCartClick}
         cartItemsCount={cartItemsCount}
       />
       <MobileMenu

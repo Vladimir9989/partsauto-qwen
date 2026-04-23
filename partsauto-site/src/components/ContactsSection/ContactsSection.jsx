@@ -11,7 +11,7 @@ const ContactsSection = () => {
           <div className={styles.contactCard}>
             <div className={styles.cardContent}>
               <div className={styles.cardInfo}>
-                <h3 className={styles.cardTitle}>Пункт выдачи товаров ArtRazbor</h3>
+                <h3 className={styles.cardTitle}>Пункт выдачи товаров Разбор Выкуп</h3>
                 
                 <div className={styles.contactItem}>
                   <i className="bi bi-geo-alt"></i>
@@ -50,7 +50,7 @@ const ContactsSection = () => {
           <div className={styles.contactCard}>
             <div className={styles.cardContent}>
               <div className={styles.cardInfo}>
-                <h3 className={styles.cardTitle}>Пункт выдачи товаров ArtRazbor</h3>
+                <h3 className={styles.cardTitle}>Пункт выдачи товаров Разбор Выкуп</h3>
                 
                 <div className={styles.contactItem}>
                   <i className="bi bi-geo-alt"></i>

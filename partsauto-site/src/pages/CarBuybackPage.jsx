@@ -17,7 +17,7 @@ function CarBuybackPage() {
             {/* Основной блок с предложением */}
             <div className={styles.mainBlock}>
               <div className={styles.offerCard}>
-                <h2 className={styles.offerTitle}>Компания ArtRazbor платит от 10 000 рублей</h2>
+                <h2 className={styles.offerTitle}>Компания Разбор Выкуп платит от 10 000 рублей</h2>
                 <p className={styles.offerText}>
                   за предложенные к выкупу автомобили в Уральском регионе и соседних областях.
                 </p>

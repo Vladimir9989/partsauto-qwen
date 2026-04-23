@@ -1,16 +1,19 @@
 import { useState, useCallback, useMemo } from 'react'
 import { useCartStore } from '../store/useCartStore'
 import { Helmet } from 'react-helmet-async'
-import { Link } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
+import toast from 'react-hot-toast'
 import styles from './CartPage.module.css'
 
 function CartPage() {
-  const { cartItems, removeFromCart, totalPrice } = useCartStore()
+  const navigate = useNavigate()
+  const { cartItems, removeFromCart, clearCart } = useCartStore()
   const [activeTab, setActiveTab] = useState('pickup')
   const [pickupPoint, setPickupPoint] = useState('ekb')
-  const [form, setForm] = useState({ name: '', phone: '', email: '', comment: '' })
+  const [form, setForm] = useState({ name: '', phone: '', email: '', comment: '', city: '' })
   const [agree, setAgree] = useState(false)
   const [errors, setErrors] = useState({})
+  const [isSubmitting, setIsSubmitting] = useState(false)
 
   // Пересчитываем общую сумму (без учёта количества, т.к. оно всегда 1)
   const actualTotalPrice = useMemo(() => {
@@ -56,13 +59,15 @@ function CartPage() {
     return Object.keys(newErrors).length === 0
   }
 
-  const handleSubmitOrder = (e) => {
+  const handleSubmitOrder = async (e) => {
     e.preventDefault()
     if (!validateForm()) return
     if (cartItems.length === 0) {
-      alert('Корзина пуста')
+      toast.error('Корзина пуста')
       return
     }
+
+    setIsSubmitting(true)
 
     const orderData = {
       items: cartItems.map(item => ({ ...item.product, quantity: 1 })),
@@ -77,8 +82,37 @@ function CartPage() {
       timestamp: new Date().toISOString()
     }
 
-    console.log('Заказ:', orderData)
-    alert(`Заказ оформлен!\n\nИмя: ${form.name}\nТелефон: ${form.phone}\nТип доставки: ${orderData.deliveryType}\nИтого: ${formatPrice(actualTotalPrice)}\n\nВскоре с вами свяжется менеджер.`)
+    try {
+      const response = await fetch('/api/send-order-email', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(orderData)
+      })
+
+      const data = await response.json()
+
+      if (!response.ok) {
+        throw new Error(data.error || 'Ошибка отправки заказа')
+      }
+
+      // Успешная отправка
+      toast.success('Заказ успешно оформлен! Менеджер свяжется с вами в ближайшее время.')
+      
+      // Очищаем корзину
+      clearCart()
+      
+      // Перенаправляем на главную через 2 секунды
+      setTimeout(() => {
+        navigate('/')
+      }, 2000)
+    } catch (error) {
+      console.error('Ошибка при отправке заказа:', error)
+      toast.error(`Ошибка: ${error.message}`)
+    } finally {
+      setIsSubmitting(false)
+    }
   }
 
   return (
@@ -253,8 +287,8 @@ function CartPage() {
                   {errors.agree && <span className={styles.error}>{errors.agree}</span>}
                 </div>
 
-                <button type="submit" className={styles.submitBtn} disabled={cartItems.length === 0}>
-                  <i className="bi bi-check-circle"></i> Оформить заказ
+                <button type="submit" className={styles.submitBtn} disabled={cartItems.length === 0 || isSubmitting}>
+                  <i className="bi bi-check-circle"></i> {isSubmitting ? 'Отправка...' : 'Оформить заказ'}
                 </button>
               </form>
             </div>

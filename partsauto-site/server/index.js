@@ -6,6 +6,7 @@ import path from 'path';
 import { fileURLToPath } from 'url';
 import fs from 'fs';
 import multer from 'multer';
+import nodemailer from 'nodemailer';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -84,6 +85,26 @@ const PORT = process.env.PORT || 3001;
 
 app.use(cors());
 app.use(express.json());
+
+// Настройка Nodemailer для отправки email
+const transporter = nodemailer.createTransport({
+  host: process.env.SMTP_HOST || 'smtp.ethereal.email',
+  port: process.env.SMTP_PORT || 587,
+  secure: process.env.SMTP_SECURE === 'true' || false,
+  auth: {
+    user: process.env.SMTP_USER || 'antoinette.dibbert96@ethereal.email',
+    pass: process.env.SMTP_PASS || 'qgFc4F8DzdYax1dumh'
+  }
+});
+
+// Проверка подключения к SMTP
+transporter.verify((error, success) => {
+  if (error) {
+    console.error('Ошибка подключения к SMTP:', error);
+  } else {
+    console.log('SMTP сервер готов к отправке писем');
+  }
+});
 
 const XML_URL = process.env.XML_URL || 'https://ycf.partsauto.market/partsauto-feeds/avito_feeds/cb9901e562a4f410bd4f9bf80c21d094.xml';
 
@@ -357,6 +378,111 @@ app.post('/api/upload-news-image', uploadNewsImage.single('image'), (req, res) =
   } catch (error) {
     console.error('Ошибка загрузки:', error);
     res.status(500).json({ success: false, error: 'Ошибка загрузки файла' });
+  }
+});
+
+// ===== ЭНДПОИНТ ДЛЯ ОТПРАВКИ EMAIL ЗАКАЗА =====
+app.post('/api/send-order-email', async (req, res) => {
+  try {
+    const { name, phone, email, items, totalPrice, deliveryType, pickupPoint, city, comment, timestamp } = req.body;
+
+    // Валидация обязательных полей
+    if (!name || !phone || !items || !totalPrice) {
+      return res.status(400).json({ success: false, error: 'Отсутствуют обязательные поля' });
+    }
+
+    // Формирование HTML письма для менеджера
+    const itemsHtml = items.map(item => `
+      <tr>
+        <td style="padding: 8px; border-bottom: 1px solid #ddd;">${item.title || 'Без названия'}</td>
+        <td style="padding: 8px; border-bottom: 1px solid #ddd; text-align: right;">${item.price || '0'} ₽</td>
+      </tr>
+    `).join('');
+
+    const managerEmailHtml = `
+      <h2>Новый заказ от ${name}</h2>
+      <p><strong>Дата:</strong> ${new Date(timestamp).toLocaleString('ru-RU')}</p>
+      <p><strong>Имя:</strong> ${name}</p>
+      <p><strong>Телефон:</strong> ${phone}</p>
+      <p><strong>Email:</strong> ${email || 'не указан'}</p>
+      <p><strong>Тип доставки:</strong> ${deliveryType}</p>
+      ${pickupPoint ? `<p><strong>Пункт самовывоза:</strong> ${pickupPoint}</p>` : ''}
+      ${city ? `<p><strong>Город доставки:</strong> ${city}</p>` : ''}
+      ${comment ? `<p><strong>Комментарий:</strong> ${comment}</p>` : ''}
+      
+      <h3>Товары:</h3>
+      <table style="width: 100%; border-collapse: collapse;">
+        <thead>
+          <tr style="background-color: #f5f5f5;">
+            <th style="padding: 8px; text-align: left; border-bottom: 2px solid #ddd;">Товар</th>
+            <th style="padding: 8px; text-align: right; border-bottom: 2px solid #ddd;">Цена</th>
+          </tr>
+        </thead>
+        <tbody>
+          ${itemsHtml}
+        </tbody>
+      </table>
+      
+      <h3 style="margin-top: 20px;">Итого: <span style="color: #d9534f;">${totalPrice} ₽</span></h3>
+    `;
+
+    // Формирование письма для клиента
+    const clientEmailHtml = `
+      <h2>Спасибо за ваш заказ!</h2>
+      <p>Здравствуйте, ${name}!</p>
+      <p>Ваш заказ успешно принят. Менеджер свяжется с вами в ближайшее время по номеру <strong>${phone}</strong>.</p>
+      
+      <h3>Детали заказа:</h3>
+      <p><strong>Тип доставки:</strong> ${deliveryType}</p>
+      ${pickupPoint ? `<p><strong>Пункт самовывоза:</strong> ${pickupPoint}</p>` : ''}
+      ${city ? `<p><strong>Город доставки:</strong> ${city}</p>` : ''}
+      
+      <h3>Товары:</h3>
+      <table style="width: 100%; border-collapse: collapse;">
+        <thead>
+          <tr style="background-color: #f5f5f5;">
+            <th style="padding: 8px; text-align: left; border-bottom: 2px solid #ddd;">Товар</th>
+            <th style="padding: 8px; text-align: right; border-bottom: 2px solid #ddd;">Цена</th>
+          </tr>
+        </thead>
+        <tbody>
+          ${itemsHtml}
+        </tbody>
+      </table>
+      
+      <h3 style="margin-top: 20px;">Итого: <span style="color: #d9534f;">${totalPrice} ₽</span></h3>
+      
+      <p style="margin-top: 30px; color: #666; font-size: 12px;">
+        С уважением,<br>
+        Команда PartsAuto
+      </p>
+    `;
+
+    // Email менеджеру
+    const managerEmail = process.env.MANAGER_EMAIL || 'antoinette.dibbert96@ethereal.email';
+    
+    await transporter.sendMail({
+      from: process.env.SMTP_USER || 'antoinette.dibbert96@ethereal.email',
+      to: managerEmail,
+      subject: `Новый заказ от ${name}`,
+      html: managerEmailHtml
+    });
+
+    // Email клиенту (если указан)
+    if (email) {
+      await transporter.sendMail({
+        from: process.env.SMTP_USER || 'antoinette.dibbert96@ethereal.email',
+        to: email,
+        subject: 'Ваш заказ принят - PartsAuto',
+        html: clientEmailHtml
+      });
+    }
+
+    console.log(`Заказ от ${name} успешно отправлен на email`);
+    res.json({ success: true, message: 'Заказ успешно отправлен' });
+  } catch (error) {
+    console.error('Ошибка отправки email:', error);
+    res.status(500).json({ success: false, error: 'Ошибка отправки заказа: ' + error.message });
   }
 });
 

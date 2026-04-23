@@ -6,10 +6,10 @@ import './cart-styles.css'
 
 // Компонент панели корзины (модальное окно)
 const CartPanel = ({ isOpen, onClose }) => {
-  const { cartItems, removeFromCart, updateQuantity, clearCart, totalItems, totalPrice } = useCartStore()
+  const { cartItems, removeFromCart, updateQuantity, clearCart, totalItems, totalPrice, hasRequestPrice } = useCartStore()
 
   const formatPrice = useCallback((price) => {
-    if (!price) return '0 ₽'
+    if (!price || price === 0) return 'Цена по запросу'
     return `${parseInt(price).toLocaleString('ru-RU')} ₽`
   }, [])
 
@@ -140,14 +140,21 @@ const CartPanel = ({ isOpen, onClose }) => {
                 <div className="cart-panel-footer">
                   <div className="cart-total">
                     <span>Итого:</span>
-                    <strong>{formatPrice(totalPrice)}</strong>
+                    <strong>{hasRequestPrice && totalPrice === 0 ? 'Цена по запросу' : formatPrice(totalPrice)}</strong>
                   </div>
+                  
+                  {hasRequestPrice && (
+                    <div style={{ marginBottom: '12px', padding: '8px', backgroundColor: '#fff3cd', borderRadius: '4px', fontSize: '11px', color: '#856404', border: '1px solid #ffeaa7' }}>
+                      <i className="bi bi-exclamation-triangle" style={{ marginRight: '4px' }}></i>
+                      <strong>Внимание!</strong> Есть товары с ценой "по запросу"
+                    </div>
+                  )}
                   
                   <div className="d-grid gap-2">
                     <button className="btn btn-primary">
                       <i className="bi bi-check-circle"></i> Оформить заказ
                     </button>
-                    <button 
+                    <button
                       className="btn btn-outline-danger btn-sm"
                       onClick={handleClearCart}
                     >

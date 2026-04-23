@@ -5,14 +5,20 @@ import { persist } from 'zustand/middleware'
 const calculateTotals = (cartItems) => {
   let totalItems = 0
   let totalPrice = 0
+  let hasRequestPrice = false
   
   cartItems.forEach(item => {
     totalItems += item.quantity
-    const price = parseInt(item.product.price) || 0
-    totalPrice += price * item.quantity
+    const price = parseInt(item.product.price)
+    
+    if (!price || price === 0) {
+      hasRequestPrice = true
+    } else {
+      totalPrice += price * item.quantity
+    }
   })
   
-  return { totalItems, totalPrice }
+  return { totalItems, totalPrice, hasRequestPrice }
 }
 
 // Store для корзины
@@ -20,6 +26,9 @@ export const useCartStore = create(
   persist(
     (set, get) => ({
       cartItems: [], // Массив объектов { product, quantity }
+      totalItems: 0,
+      totalPrice: 0,
+      hasRequestPrice: false, // Флаг: есть ли товары "Цена по запросу"
       
       // Добавить товар в корзину
       addToCart: (product, quantity = 1) => {
@@ -40,8 +49,8 @@ export const useCartStore = create(
         }
         
         // Пересчитать итоги
-        const { totalItems, totalPrice } = calculateTotals(get().cartItems)
-        set({ totalItems, totalPrice })
+        const { totalItems, totalPrice, hasRequestPrice } = calculateTotals(get().cartItems)
+        set({ totalItems, totalPrice, hasRequestPrice })
         
         return { success: true, message: existingItem ? 'Количество товара увеличено' : 'Товар добавлен в корзину', isNew: !existingItem }
       },
@@ -53,8 +62,8 @@ export const useCartStore = create(
         set({ cartItems: updatedItems })
         
         // Пересчитать итоги
-        const { totalItems, totalPrice } = calculateTotals(updatedItems)
-        set({ totalItems, totalPrice })
+        const { totalItems, totalPrice, hasRequestPrice } = calculateTotals(updatedItems)
+        set({ totalItems, totalPrice, hasRequestPrice })
       },
       
       // Обновить количество товара
@@ -73,20 +82,20 @@ export const useCartStore = create(
         set({ cartItems: updatedItems })
         
         // Пересчитать итоги
-        const { totalItems, totalPrice } = calculateTotals(updatedItems)
-        set({ totalItems, totalPrice })
+        const { totalItems, totalPrice, hasRequestPrice } = calculateTotals(updatedItems)
+        set({ totalItems, totalPrice, hasRequestPrice })
       },
       
       // Пересчитать итоги корзины
       updateCartTotals: () => {
         const { cartItems } = get()
-        const { totalItems, totalPrice } = calculateTotals(cartItems)
-        set({ totalItems, totalPrice })
+        const { totalItems, totalPrice, hasRequestPrice } = calculateTotals(cartItems)
+        set({ totalItems, totalPrice, hasRequestPrice })
       },
       
       // Очистить корзину
       clearCart: () => {
-        set({ cartItems: [], totalItems: 0, totalPrice: 0 })
+        set({ cartItems: [], totalItems: 0, totalPrice: 0, hasRequestPrice: false })
       },
       
       // Проверить наличие товара в корзине
@@ -113,7 +122,8 @@ export const useCartStore = create(
       partialize: (state) => ({
         cartItems: state.cartItems,
         totalItems: state.totalItems,
-        totalPrice: state.totalPrice
+        totalPrice: state.totalPrice,
+        hasRequestPrice: state.hasRequestPrice
       }),
     }
   )

@@ -7,7 +7,7 @@ import styles from './CartPage.module.css'
 
 function CartPage() {
   const navigate = useNavigate()
-  const { cartItems, removeFromCart, clearCart } = useCartStore()
+  const { cartItems, removeFromCart, clearCart, hasRequestPrice } = useCartStore()
   const [activeTab, setActiveTab] = useState('pickup')
   const [pickupPoint, setPickupPoint] = useState('ekb')
   const [form, setForm] = useState({ name: '', phone: '', email: '', comment: '', city: '' })
@@ -24,7 +24,7 @@ function CartPage() {
   }, [cartItems])
 
   const formatPrice = useCallback((price) => {
-    if (!price) return '0 ₽'
+    if (!price || price === 0) return 'Цена по запросу'
     return `${parseInt(price).toLocaleString('ru-RU')} ₽`
   }, [])
 
@@ -40,9 +40,46 @@ function CartPage() {
     removeFromCart(productId)
   }, [removeFromCart])
 
+  const formatPhoneNumber = (value) => {
+    // Удаляем все символы кроме цифр
+    let cleaned = value.replace(/\D/g, '')
+    
+    // Если первая цифра 8 или 9, заменяем на 7
+    if (cleaned.length > 0 && (cleaned[0] === '8' || cleaned[0] === '9')) {
+      cleaned = '7' + cleaned.slice(1)
+    }
+    
+    // Если нет первой цифры, добавляем 7
+    if (cleaned.length === 0) {
+      return '+7'
+    }
+    
+    // Если первая цифра не 7, добавляем 7 в начало
+    if (cleaned[0] !== '7') {
+      cleaned = '7' + cleaned
+    }
+    
+    // Ограничиваем до 11 цифр (7 + 10 цифр номера)
+    const limited = cleaned.slice(0, 11)
+    
+    // Применяем маску: +7 (XXX) XXX-XX-XX
+    if (limited.length === 1) return '+' + limited
+    if (limited.length <= 4) return '+' + limited.slice(0, 1) + ' (' + limited.slice(1)
+    if (limited.length <= 7) return '+' + limited.slice(0, 1) + ' (' + limited.slice(1, 4) + ') ' + limited.slice(4)
+    if (limited.length <= 9) return '+' + limited.slice(0, 1) + ' (' + limited.slice(1, 4) + ') ' + limited.slice(4, 7) + '-' + limited.slice(7)
+    return '+' + limited.slice(0, 1) + ' (' + limited.slice(1, 4) + ') ' + limited.slice(4, 7) + '-' + limited.slice(7, 9) + '-' + limited.slice(9)
+  }
+
   const handleFormChange = (e) => {
     const { name, value } = e.target
-    setForm(prev => ({ ...prev, [name]: value }))
+    let formattedValue = value
+    
+    // Применяем маску для телефона
+    if (name === 'phone') {
+      formattedValue = formatPhoneNumber(value)
+    }
+    
+    setForm(prev => ({ ...prev, [name]: formattedValue }))
     if (errors[name]) {
       setErrors(prev => ({ ...prev, [name]: '' }))
     }
@@ -77,7 +114,7 @@ function CartPage() {
       city: activeTab === 'delivery' ? form.city : null,
       name: form.name,
       phone: form.phone,
-      email: form.email,
+      email: form.email || null,
       comment: form.comment,
       timestamp: new Date().toISOString()
     }
@@ -190,7 +227,7 @@ function CartPage() {
                   <div className={styles.cartSummary}>
                     <div className={styles.summaryRow}>
                       <span>Сумма товаров:</span>
-                      <strong>{formatPrice(actualTotalPrice)}</strong>
+                      <strong>{hasRequestPrice && actualTotalPrice === 0 ? 'Цена по запросу' : formatPrice(actualTotalPrice)}</strong>
                     </div>
                     <div className={styles.summaryRow}>
                       <span>Доставка:</span>
@@ -198,8 +235,14 @@ function CartPage() {
                     </div>
                     <div className={styles.summaryTotal}>
                       <span>Итого:</span>
-                      <strong>{formatPrice(actualTotalPrice)}</strong>
+                      <strong>{hasRequestPrice && actualTotalPrice === 0 ? 'Цена по запросу' : formatPrice(actualTotalPrice)}</strong>
                     </div>
+                    {hasRequestPrice && (
+                      <div style={{ marginTop: '12px', padding: '10px', backgroundColor: '#fff3cd', borderRadius: '4px', fontSize: '12px', color: '#856404', border: '1px solid #ffeaa7' }}>
+                        <i className="bi bi-exclamation-triangle" style={{ marginRight: '6px' }}></i>
+                        <strong>Внимание!</strong> В вашей корзине есть товары с ценой "по запросу". Менеджер уточнит их стоимость при обработке заказа.
+                      </div>
+                    )}
                   </div>
                 </>
               )}

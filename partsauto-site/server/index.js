@@ -7,6 +7,8 @@ import { fileURLToPath } from 'url';
 import fs from 'fs';
 import multer from 'multer';
 import nodemailer from 'nodemailer';
+import dotenv from 'dotenv';
+dotenv.config();
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -387,17 +389,48 @@ app.post('/api/send-order-email', async (req, res) => {
     const { name, phone, email, items, totalPrice, deliveryType, pickupPoint, city, comment, timestamp } = req.body;
 
     // Валидация обязательных полей
-    if (!name || !phone || !items || !totalPrice) {
+    if (!name || !phone || !items || items.length === 0) {
       return res.status(400).json({ success: false, error: 'Отсутствуют обязательные поля' });
+    }
+    
+    // totalPrice может быть 0, если все товары "по запросу"
+    if (totalPrice === undefined || totalPrice === null) {
+      return res.status(400).json({ success: false, error: 'Ошибка расчёта суммы заказа' });
     }
 
     // Формирование HTML письма для менеджера
-    const itemsHtml = items.map(item => `
+    const itemsHtml = items.map(item => {
+      const price = item.price || '0';
+      const priceDisplay = price === '0' || price === 0
+        ? 'Менеджер уточнит стоимость и с вами свяжутся'
+        : `${price} ₽`;
+      return `
       <tr>
         <td style="padding: 8px; border-bottom: 1px solid #ddd;">${item.title || 'Без названия'}</td>
-        <td style="padding: 8px; border-bottom: 1px solid #ddd; text-align: right;">${item.price || '0'} ₽</td>
+        <td style="padding: 8px; border-bottom: 1px solid #ddd; text-align: right;">${priceDisplay}</td>
       </tr>
-    `).join('');
+    `;
+    }).join('');
+
+    // Проверяем наличие товаров с ценой "по запросу"
+    const hasRequestPrice = items.some(item => !item.price || item.price === '0' || item.price === 0);
+    const hasFixedPrice = items.some(item => item.price && item.price !== '0' && item.price !== 0);
+    
+    // Формируем отображение итоговой суммы
+    let totalPriceDisplay = '';
+    let totalPriceWarning = '';
+    
+    if (hasRequestPrice && !hasFixedPrice) {
+      // Все товары с ценой "по запросу"
+      totalPriceDisplay = 'Цена по запросу';
+    } else if (hasRequestPrice && hasFixedPrice) {
+      // Есть товары и с ценой, и без цены
+      totalPriceDisplay = `${totalPrice} ₽`;
+      totalPriceWarning = '<p style="margin-top: 10px; padding: 10px; background-color: #fff3cd; border-radius: 4px; font-size: 12px; color: #856404; border: 1px solid #ffeaa7;"><strong>⚠️ Внимание!</strong> В заказе есть товары с ценой "по запросу". Менеджер уточнит их стоимость при обработке заказа.</p>';
+    } else {
+      // Все товары с фиксированной ценой
+      totalPriceDisplay = `${totalPrice} ₽`;
+    }
 
     const managerEmailHtml = `
       <h2>Новый заказ от ${name}</h2>
@@ -422,8 +455,14 @@ app.post('/api/send-order-email', async (req, res) => {
           ${itemsHtml}
         </tbody>
       </table>
+      ${totalPriceWarning}
       
-      <h3 style="margin-top: 20px;">Итого: <span style="color: #d9534f;">${totalPrice} ₽</span></h3>
+      <h3 style="margin-top: 20px;">Итого: <span style="color: #d9534f;">${totalPriceDisplay}</span></h3>
+      
+      <p style="margin-top: 30px; color: #666; font-size: 12px;">
+        С уважением,<br>
+        Команда Разбор выкуп
+      </p>
     `;
 
     // Формирование письма для клиента
@@ -449,12 +488,13 @@ app.post('/api/send-order-email', async (req, res) => {
           ${itemsHtml}
         </tbody>
       </table>
+      ${totalPriceWarning}
       
-      <h3 style="margin-top: 20px;">Итого: <span style="color: #d9534f;">${totalPrice} ₽</span></h3>
+      <h3 style="margin-top: 20px;">Итого: <span style="color: #d9534f;">${totalPriceDisplay}</span></h3>
       
       <p style="margin-top: 30px; color: #666; font-size: 12px;">
         С уважением,<br>
-        Команда PartsAuto
+        Команда Разбор выкуп
       </p>
     `;
 
@@ -468,14 +508,22 @@ app.post('/api/send-order-email', async (req, res) => {
       html: managerEmailHtml
     });
 
-    // Email клиенту (если указан)
-    if (email) {
-      await transporter.sendMail({
-        from: process.env.SMTP_USER || 'antoinette.dibbert96@ethereal.email',
-        to: email,
-        subject: 'Ваш заказ принят - PartsAuto',
-        html: clientEmailHtml
-      });
+    // Email клиенту — ТОЛЬКО если email указан и корректный
+    if (email && email.trim() !== '' && /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+      try {
+        await transporter.sendMail({
+          from: process.env.SMTP_USER || 'antoinette.dibbert96@ethereal.email',
+          to: email,
+          subject: 'Ваш заказ принят — Разбор выкуп',
+          html: clientEmailHtml
+        });
+        console.log(`Письмо клиенту отправлено на ${email}`);
+      } catch (clientError) {
+        console.error('Ошибка отправки письма клиенту:', clientError);
+        // Не прерываем выполнение, менеджер уже получил уведомление
+      }
+    } else {
+      console.log(`Email клиента не указан или некорректен, письмо не отправлено`);
     }
 
     console.log(`Заказ от ${name} успешно отправлен на email`);

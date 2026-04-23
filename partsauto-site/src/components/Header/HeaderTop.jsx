@@ -1,9 +1,13 @@
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { FaMapMarkerAlt, FaPhone, FaShoppingCart } from 'react-icons/fa';
+import toast from 'react-hot-toast';
 import { IconMax, IconAvito, IconVK, IconTelegram, IconDrom } from '../Icons';
+import { useCartStore } from '../../store/useCartStore';
 import styles from './Header.module.css';
 
 function HeaderTop({ cartItemsCount = 0 }) {
+  const { totalItems } = useCartStore();
+
   return (
     <div className={styles.headerTop}>
       <div className={styles.container}>
@@ -36,13 +40,19 @@ function HeaderTop({ cartItemsCount = 0 }) {
             {/* Десктопная корзина с переходом на страницу */}
             <Link
               to="/cart"
+              onClick={(e) => {
+                if (totalItems === 0) {
+                  e.preventDefault();
+                  toast.error('Корзина пуста');
+                }
+              }}
               className={styles.desktopCartInfo}
-              style={{ cursor: 'pointer', textDecoration: 'none', color: 'inherit' }}
-              title="Открыть корзину"
+              style={{ cursor: totalItems === 0 ? 'not-allowed' : 'pointer', textDecoration: 'none', color: 'inherit' }}
+              title={totalItems === 0 ? 'Корзина пуста' : 'Перейти в корзину'}
             >
               <FaShoppingCart className={styles.cartIcon} />
-              {cartItemsCount > 0 && (
-                <span className={styles.cartBadge}>{cartItemsCount}</span>
+              {totalItems > 0 && (
+                <span className={styles.cartBadge}>{totalItems}</span>
               )}
             </Link>
           </div>

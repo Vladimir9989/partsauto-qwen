@@ -8,7 +8,13 @@ const navLinks = [
   { to: '/', label: 'Главная' },
   { to: '/catalog', label: 'Каталог запчастей' },
   { to: '/delivery', label: 'Оплата и доставка' },
-  { to: '/contacts', label: 'Контакты' },
+  { to: '/contacts', label: 'Контакты', onClick: (e) => {
+    e.preventDefault();
+    window.location.href = '/';
+    setTimeout(() => {
+      document.getElementById('contacts')?.scrollIntoView({ behavior: 'smooth' });
+    }, 200);
+  } },
   { to: '/news', label: 'Новости о нас' },
   { to: '/warranty', label: 'Гарантия и возврат' },
 ];

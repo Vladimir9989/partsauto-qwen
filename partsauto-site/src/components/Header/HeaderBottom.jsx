@@ -1,9 +1,24 @@
-import { Link } from 'react-router-dom';
+import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { FaBars, FaShoppingCart, FaChevronDown } from 'react-icons/fa';
 import { useState } from 'react';
 import styles from './Header.module.css';
 
 function HeaderBottom({ isMobileMenuOpen, setIsMobileMenuOpen, onCartClick, cartItemsCount = 0 }) {
+  const navigate = useNavigate();
+  const location = useLocation();
+
+  const handleContactsClick = (e) => {
+    e.preventDefault();
+    
+    if (location.pathname !== '/') {
+      navigate('/');
+      setTimeout(() => {
+        document.getElementById('contacts')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }, 250);
+    } else {
+      document.getElementById('contacts')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+  };
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
 
   return (
@@ -19,10 +34,7 @@ function HeaderBottom({ isMobileMenuOpen, setIsMobileMenuOpen, onCartClick, cart
             <Link to="/catalog">Каталог запчастей</Link>
             <Link to="/car-buyback">Выкуп авто</Link>
             <Link to="/delivery">Оплата и доставка</Link>
-            <a href="#contacts" onClick={(e) => {
-              e.preventDefault();
-              document.getElementById('contacts')?.scrollIntoView({ behavior: 'smooth' });
-            }}>Контакты</a>
+            <a href="#contacts" onClick={handleContactsClick}>Контакты</a>
             <Link to="/news">Новости о нас</Link>
             <Link to="/warranty">Гарантия и возврат</Link>
           </nav>
@@ -41,10 +53,7 @@ function HeaderBottom({ isMobileMenuOpen, setIsMobileMenuOpen, onCartClick, cart
                   <Link to="/catalog">Каталог запчастей</Link>
                   <Link to="/delivery">Оплата и доставка</Link>
                   <Link to="/car-buyback">Выкуп авто</Link>
-                  <a href="#contacts" onClick={(e) => {
-                    e.preventDefault();
-                    document.getElementById('contacts')?.scrollIntoView({ behavior: 'smooth' });
-                  }}>Контакты</a>
+                  <a href="#contacts" onClick={handleContactsClick}>Контакты</a>
                   <Link to="/news">Новости о нас</Link>
                   <Link to="/warranty">Гарантия и возврат</Link>
                 </div>

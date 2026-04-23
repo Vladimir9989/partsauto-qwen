@@ -1,5 +1,18 @@
-/* CSS-переменные для тёмной темы */
+/* CSS-переменные хедера — светлая тема (по умолчанию) */
 :root {
+  --header-bg: #dbeafe;
+  --header-bg-secondary: #eff6ff;
+  --header-text: #1e3a5f;
+  --header-text-muted: #4b6a8a;
+  --header-accent: #2563eb;
+  --header-accent-hover: #1d4ed8;
+  --header-border: #bfdbfe;
+  --header-overlay-bg: rgba(0, 0, 0, 0.5);
+  --header-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+}
+
+/* Тёмная тема через data-theme */
+[data-theme="dark"] {
   --header-bg: #0a0f1c;
   --header-bg-secondary: #111827;
   --header-text: #f3f4f6;
@@ -9,36 +22,6 @@
   --header-border: #1f2937;
   --header-overlay-bg: rgba(0, 0, 0, 0.75);
   --header-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.3);
-}
-
-/* Тёмная тема */
-@media (prefers-color-scheme: dark) {
-  :root {
-    --header-bg: #0a0f1c;
-    --header-bg-secondary: #111827;
-    --header-text: #f3f4f6;
-    --header-text-muted: #9ca3af;
-    --header-accent: #f97316;
-    --header-accent-hover: #ea580c;
-    --header-border: #1f2937;
-    --header-overlay-bg: rgba(0, 0, 0, 0.75);
-    --header-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.3);
-  }
-}
-
-/* Светлая тема (по умолчанию) */
-@media (prefers-color-scheme: light) {
-  :root {
-    --header-bg: #f9fafb;
-    --header-bg-secondary: #ffffff;
-    --header-text: #111827;
-    --header-text-muted: #6b7280;
-    --header-accent: #f97316;
-    --header-accent-hover: #ea580c;
-    --header-border: #e5e7eb;
-    --header-overlay-bg: rgba(0, 0, 0, 0.5);
-    --header-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
-  }
 }
 
 .header {
@@ -72,8 +55,9 @@
 
 .topRowBlock {
   display: flex;
-  gap: 40px;
+  gap: 20px;
   align-items: center;
+  flex-wrap: wrap;
 }
 
 .locationInfo {
@@ -155,11 +139,10 @@
 .desktopCartInfo {
   color: var(--header-text);
   display: flex;
-  align-items: flex-end;
+  align-items: center;
   gap: 4px;
   font-size: 26px;
   position: relative;
-  align-self: flex-end;
 }
 
 .cartIcon {
@@ -597,6 +580,43 @@
   .headerContent {
     gap: 16px;
   }
+}
+
+.themeToggle {
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--header-text);
+  transition: color 0.3s ease, transform 0.2s ease;
+  border-radius: 6px;
+  z-index: 10;
+  flex-shrink: 0;
+  pointer-events: auto;
+}
+
+.themeToggle:hover {
+  color: var(--header-accent);
+  transform: scale(1.1);
+}
+
+.themeToggle:active {
+  transform: scale(0.95);
+}
+
+.themeToggle:focus {
+  outline: 2px solid var(--header-accent);
+  outline-offset: 2px;
+}
+
+.themeIcon {
+  width: 20px;
+  height: 20px;
+  stroke: currentColor;
+  display: block;
 }
 
 /* Маленькие экраны (до 480px) */

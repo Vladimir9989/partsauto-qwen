@@ -1,12 +1,14 @@
 import { Link, useNavigate } from 'react-router-dom';
 import { FaMapMarkerAlt, FaPhone, FaShoppingCart } from 'react-icons/fa';
 import toast from 'react-hot-toast';
-import { IconMax, IconAvito, IconVK, IconTelegram, IconDrom } from '../Icons';
+import { IconMax, IconAvito, IconVK, IconTelegram, IconDrom, IconSun, IconMoon } from '../Icons';
 import { useCartStore } from '../../store/useCartStore';
+import { useTheme } from '../../context/ThemeContext';
 import styles from './Header.module.css';
 
 function HeaderTop({ cartItemsCount = 0 }) {
   const { totalItems } = useCartStore();
+  const { theme, toggleTheme } = useTheme();
 
   return (
     <div className={styles.headerTop}>
@@ -37,6 +39,19 @@ function HeaderTop({ cartItemsCount = 0 }) {
                 <IconDrom className={styles.socialIcon} />
               </div>
             </div>
+            {/* Кнопка переключения темы */}
+            <button
+              onClick={toggleTheme}
+              className={styles.themeToggle}
+              title={theme === 'dark' ? 'Светлая тема' : 'Тёмная тема'}
+              aria-label="Переключить тему"
+            >
+              {theme === 'dark' ? (
+                <IconSun className={styles.themeIcon} />
+              ) : (
+                <IconMoon className={styles.themeIcon} />
+              )}
+            </button>
             {/* Десктопная корзина с переходом на страницу */}
             <Link
               to="/cart"

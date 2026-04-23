@@ -4,8 +4,12 @@ import styles from './MainPage.module.css'
 import CarsScroller from '../components/CarsScroller/CarsScroller'
 import CarSearch from '../components/CarSearch/CarSearch'
 import ContactsSection from '../components/ContactsSection/ContactsSection'
+import { useTheme } from '../context/ThemeContext'
 
 function MainPage() {
+  const { theme } = useTheme()
+  const backgroundImage = theme === 'dark' ? 'url(/main-bg.jpg)' : 'url(/main-bg-blue.jpg)'
+
   return (
     <>
       <Helmet>
@@ -14,7 +18,7 @@ function MainPage() {
       </Helmet>
 
       <Link to="/car-buyback" style={{ textDecoration: 'none' }}>
-        <div className={styles.jumbotron} style={{ cursor: 'pointer' }}>
+        <div className={styles.jumbotron} style={{ cursor: 'pointer', backgroundImage }}>
           <div className={styles.content}>
             <h1 className={styles.title}>
               <span

@@ -36,7 +36,8 @@
 }
 
 .mainBlock {
-  background: linear-gradient(135deg, var(--header-accent) 0%, var(--header-accent-hover) 100%);
+  background-color: var(--header-bg-secondary);
+  border: 2px solid var(--header-accent);
   border-radius: 20px;
   padding: 40px;
   text-align: center;
@@ -47,6 +48,7 @@
 }
 
 .offerTitle {
+  color: var(--header-accent);
   font-size: 28px;
   font-weight: bold;
   margin-bottom: 16px;

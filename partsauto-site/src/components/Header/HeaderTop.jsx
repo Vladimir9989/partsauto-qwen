@@ -47,7 +47,7 @@ function HeaderTop({ cartItemsCount = 0 }) {
                 }
               }}
               className={styles.desktopCartInfo}
-              style={{ cursor: totalItems === 0 ? 'not-allowed' : 'pointer', textDecoration: 'none', color: 'inherit' }}
+              style={{ cursor: 'pointer', textDecoration: 'none', color: 'inherit' }}
               title={totalItems === 0 ? 'Корзина пуста' : 'Перейти в корзину'}
             >
               <FaShoppingCart className={styles.cartIcon} />

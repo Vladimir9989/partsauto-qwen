@@ -384,154 +384,160 @@ app.post('/api/upload-news-image', uploadNewsImage.single('image'), (req, res) =
 });
 
 // ===== ЭНДПОИНТ ДЛЯ ОТПРАВКИ EMAIL ЗАКАЗА =====
-app.post('/api/send-order-email', async (req, res) => {
-  try {
-    const { name, phone, email, items, totalPrice, deliveryType, pickupPoint, city, comment, timestamp } = req.body;
+app.post('/api/send-order-email', (req, res) => {
+  const { name, phone, email, items, totalPrice, deliveryType, pickupPoint, city, comment, timestamp } = req.body;
 
-    // Валидация обязательных полей
-    if (!name || !phone || !items || items.length === 0) {
-      return res.status(400).json({ success: false, error: 'Отсутствуют обязательные поля' });
-    }
-    
-    // totalPrice может быть 0, если все товары "по запросу"
-    if (totalPrice === undefined || totalPrice === null) {
-      return res.status(400).json({ success: false, error: 'Ошибка расчёта суммы заказа' });
-    }
-
-    // Формирование HTML письма для менеджера
-    const itemsHtml = items.map(item => {
-      const price = item.price || '0';
-      const priceDisplay = price === '0' || price === 0
-        ? 'Менеджер уточнит стоимость и с вами свяжутся'
-        : `${price} ₽`;
-      return `
-      <tr>
-        <td style="padding: 8px; border-bottom: 1px solid #ddd;">${item.title || 'Без названия'}</td>
-        <td style="padding: 8px; border-bottom: 1px solid #ddd; text-align: right;">${priceDisplay}</td>
-      </tr>
-    `;
-    }).join('');
-
-    // Проверяем наличие товаров с ценой "по запросу"
-    const hasRequestPrice = items.some(item => !item.price || item.price === '0' || item.price === 0);
-    const hasFixedPrice = items.some(item => item.price && item.price !== '0' && item.price !== 0);
-    
-    // Формируем отображение итоговой суммы
-    let totalPriceDisplay = '';
-    let totalPriceWarning = '';
-    
-    if (hasRequestPrice && !hasFixedPrice) {
-      // Все товары с ценой "по запросу"
-      totalPriceDisplay = 'Цена по запросу';
-    } else if (hasRequestPrice && hasFixedPrice) {
-      // Есть товары и с ценой, и без цены
-      totalPriceDisplay = `${totalPrice} ₽`;
-      totalPriceWarning = '<p style="margin-top: 10px; padding: 10px; background-color: #fff3cd; border-radius: 4px; font-size: 12px; color: #856404; border: 1px solid #ffeaa7;"><strong>⚠️ Внимание!</strong> В заказе есть товары с ценой "по запросу". Менеджер уточнит их стоимость при обработке заказа.</p>';
-    } else {
-      // Все товары с фиксированной ценой
-      totalPriceDisplay = `${totalPrice} ₽`;
-    }
-
-    const managerEmailHtml = `
-      <h2>Новый заказ от ${name}</h2>
-      <p><strong>Дата:</strong> ${new Date(timestamp).toLocaleString('ru-RU')}</p>
-      <p><strong>Имя:</strong> ${name}</p>
-      <p><strong>Телефон:</strong> ${phone}</p>
-      <p><strong>Email:</strong> ${email || 'не указан'}</p>
-      <p><strong>Тип доставки:</strong> ${deliveryType}</p>
-      ${pickupPoint ? `<p><strong>Пункт самовывоза:</strong> ${pickupPoint}</p>` : ''}
-      ${city ? `<p><strong>Город доставки:</strong> ${city}</p>` : ''}
-      ${comment ? `<p><strong>Комментарий:</strong> ${comment}</p>` : ''}
-      
-      <h3>Товары:</h3>
-      <table style="width: 100%; border-collapse: collapse;">
-        <thead>
-          <tr style="background-color: #f5f5f5;">
-            <th style="padding: 8px; text-align: left; border-bottom: 2px solid #ddd;">Товар</th>
-            <th style="padding: 8px; text-align: right; border-bottom: 2px solid #ddd;">Цена</th>
-          </tr>
-        </thead>
-        <tbody>
-          ${itemsHtml}
-        </tbody>
-      </table>
-      ${totalPriceWarning}
-      
-      <h3 style="margin-top: 20px;">Итого: <span style="color: #d9534f;">${totalPriceDisplay}</span></h3>
-      
-      <p style="margin-top: 30px; color: #666; font-size: 12px;">
-        С уважением,<br>
-        Команда Разбор выкуп
-      </p>
-    `;
-
-    // Формирование письма для клиента
-    const clientEmailHtml = `
-      <h2>Спасибо за ваш заказ!</h2>
-      <p>Здравствуйте, ${name}!</p>
-      <p>Ваш заказ успешно принят. Менеджер свяжется с вами в ближайшее время по номеру <strong>${phone}</strong>.</p>
-      
-      <h3>Детали заказа:</h3>
-      <p><strong>Тип доставки:</strong> ${deliveryType}</p>
-      ${pickupPoint ? `<p><strong>Пункт самовывоза:</strong> ${pickupPoint}</p>` : ''}
-      ${city ? `<p><strong>Город доставки:</strong> ${city}</p>` : ''}
-      
-      <h3>Товары:</h3>
-      <table style="width: 100%; border-collapse: collapse;">
-        <thead>
-          <tr style="background-color: #f5f5f5;">
-            <th style="padding: 8px; text-align: left; border-bottom: 2px solid #ddd;">Товар</th>
-            <th style="padding: 8px; text-align: right; border-bottom: 2px solid #ddd;">Цена</th>
-          </tr>
-        </thead>
-        <tbody>
-          ${itemsHtml}
-        </tbody>
-      </table>
-      ${totalPriceWarning}
-      
-      <h3 style="margin-top: 20px;">Итого: <span style="color: #d9534f;">${totalPriceDisplay}</span></h3>
-      
-      <p style="margin-top: 30px; color: #666; font-size: 12px;">
-        С уважением,<br>
-        Команда Разбор выкуп
-      </p>
-    `;
-
-    // Email менеджеру
-    const managerEmail = process.env.MANAGER_EMAIL || 'antoinette.dibbert96@ethereal.email';
-    
-    await transporter.sendMail({
-      from: process.env.SMTP_USER || 'antoinette.dibbert96@ethereal.email',
-      to: managerEmail,
-      subject: `Новый заказ от ${name}`,
-      html: managerEmailHtml
-    });
-
-    // Email клиенту — ТОЛЬКО если email указан и корректный
-    if (email && email.trim() !== '' && /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
-      try {
-        await transporter.sendMail({
-          from: process.env.SMTP_USER || 'antoinette.dibbert96@ethereal.email',
-          to: email,
-          subject: 'Ваш заказ принят — Разбор выкуп',
-          html: clientEmailHtml
-        });
-        console.log(`Письмо клиенту отправлено на ${email}`);
-      } catch (clientError) {
-        console.error('Ошибка отправки письма клиенту:', clientError);
-        // Не прерываем выполнение, менеджер уже получил уведомление
-      }
-    } else {
-      console.log(`Email клиента не указан или некорректен, письмо не отправлено`);
-    }
-
-    console.log(`Заказ от ${name} успешно отправлен на email`);
-    res.json({ success: true, message: 'Заказ успешно отправлен' });
-  } catch (error) {
-    console.error('Ошибка отправки email:', error);
-    res.status(500).json({ success: false, error: 'Ошибка отправки заказа: ' + error.message });
+  // Валидация обязательных полей
+  if (!name || !phone || !items || items.length === 0) {
+    return res.status(400).json({ success: false, error: 'Отсутствуют обязательные поля' });
   }
+  
+  // totalPrice может быть 0, если все товары "по запросу"
+  if (totalPrice === undefined || totalPrice === null) {
+    return res.status(400).json({ success: false, error: 'Ошибка расчёта суммы заказа' });
+  }
+
+  // Сразу отвечаем клиенту
+  res.json({ success: true, message: 'Заказ принят в обработку' });
+
+  // Отправляем письма в фоне (не ждём)
+  (async () => {
+    try {
+      // Формирование HTML письма для менеджера
+      const itemsHtml = items.map(item => {
+        const price = item.price || '0';
+        const priceDisplay = price === '0' || price === 0
+          ? 'Менеджер уточнит стоимость и с вами свяжутся'
+          : `${price} ₽`;
+        return `
+        <tr>
+          <td style="padding: 8px; border-bottom: 1px solid #ddd;">${item.title || 'Без названия'}</td>
+          <td style="padding: 8px; border-bottom: 1px solid #ddd; text-align: right;">${priceDisplay}</td>
+        </tr>
+      `;
+      }).join('');
+
+      // Проверяем наличие товаров с ценой "по запросу"
+      const hasRequestPrice = items.some(item => !item.price || item.price === '0' || item.price === 0);
+      const hasFixedPrice = items.some(item => item.price && item.price !== '0' && item.price !== 0);
+      
+      // Формируем отображение итоговой суммы
+      let totalPriceDisplay = '';
+      let managerWarning = '';
+      let clientWarning = '';
+      
+      if (hasRequestPrice && !hasFixedPrice) {
+        // Все товары с ценой "по запросу"
+        totalPriceDisplay = 'Цена по запросу';
+      } else if (hasRequestPrice && hasFixedPrice) {
+        // Есть товары и с ценой, и без цены
+        totalPriceDisplay = `${totalPrice} ₽`;
+        managerWarning = '<p style="margin-top: 10px; padding: 10px; background-color: #fff3cd; border-radius: 4px; font-size: 12px; color: #856404; border: 1px solid #ffeaa7;"><strong>⚠️ Внимание!</strong> В заказе есть товары с ценой по запросу</p>';
+        clientWarning = '<p style="margin-top: 10px; padding: 10px; background-color: #fff3cd; border-radius: 4px; font-size: 12px; color: #856404; border: 1px solid #ffeaa7;"><strong>⚠️ Внимание!</strong> В заказе есть товары с ценой "по запросу". Менеджер уточнит их стоимость при обработке заказа.</p>';
+      } else {
+        // Все товары с фиксированной ценой
+        totalPriceDisplay = `${totalPrice} ₽`;
+      }
+
+      const managerEmailHtml = `
+        <h2>Новый заказ от ${name}</h2>
+        <p><strong>Дата:</strong> ${new Date(timestamp).toLocaleString('ru-RU')}</p>
+        <p><strong>Имя:</strong> ${name}</p>
+        <p><strong>Телефон:</strong> ${phone}</p>
+        <p><strong>Email:</strong> ${email || 'не указан'}</p>
+        <p><strong>Тип доставки:</strong> ${deliveryType}</p>
+        ${pickupPoint ? `<p><strong>Пункт самовывоза:</strong> ${pickupPoint}</p>` : ''}
+        ${city ? `<p><strong>Город доставки:</strong> ${city}</p>` : ''}
+        ${comment ? `<p><strong>Комментарий:</strong> ${comment}</p>` : ''}
+        
+        <h3>Товары:</h3>
+        <table style="width: 100%; border-collapse: collapse;">
+          <thead>
+            <tr style="background-color: #f5f5f5;">
+              <th style="padding: 8px; text-align: left; border-bottom: 2px solid #ddd;">Товар</th>
+              <th style="padding: 8px; text-align: right; border-bottom: 2px solid #ddd;">Цена</th>
+            </tr>
+          </thead>
+          <tbody>
+            ${itemsHtml}
+          </tbody>
+        </table>
+        ${managerWarning}
+        
+        <h3 style="margin-top: 20px;">Итого: <span style="color: #d9534f;">${totalPriceDisplay}</span></h3>
+        
+        <p style="margin-top: 30px; color: #666; font-size: 12px;">
+          С уважением,<br>
+          Команда Разбор выкуп
+        </p>
+      `;
+
+      // Формирование письма для клиента
+      const clientEmailHtml = `
+        <h2>Спасибо за ваш заказ!</h2>
+        <p>Здравствуйте, ${name}!</p>
+        <p>Ваш заказ успешно принят. Менеджер свяжется с вами в ближайшее время по номеру <strong>${phone}</strong>.</p>
+        
+        <h3>Детали заказа:</h3>
+        <p><strong>Тип доставки:</strong> ${deliveryType}</p>
+        ${pickupPoint ? `<p><strong>Пункт самовывоза:</strong> ${pickupPoint}</p>` : ''}
+        ${city ? `<p><strong>Город доставки:</strong> ${city}</p>` : ''}
+        
+        <h3>Товары:</h3>
+        <table style="width: 100%; border-collapse: collapse;">
+          <thead>
+            <tr style="background-color: #f5f5f5;">
+              <th style="padding: 8px; text-align: left; border-bottom: 2px solid #ddd;">Товар</th>
+              <th style="padding: 8px; text-align: right; border-bottom: 2px solid #ddd;">Цена</th>
+            </tr>
+          </thead>
+          <tbody>
+            ${itemsHtml}
+          </tbody>
+        </table>
+        ${clientWarning}
+        
+        <h3 style="margin-top: 20px;">Итого: <span style="color: #d9534f;">${totalPriceDisplay}</span></h3>
+        
+        <p style="margin-top: 30px; color: #666; font-size: 12px;">
+          С уважением,<br>
+          Команда Разбор выкуп
+        </p>
+      `;
+
+      // Email менеджеру
+      const managerEmail = process.env.MANAGER_EMAIL || 'antoinette.dibbert96@ethereal.email';
+      
+      await transporter.sendMail({
+        from: process.env.SMTP_USER || 'antoinette.dibbert96@ethereal.email',
+        to: managerEmail,
+        subject: `Новый заказ от ${name}`,
+        html: managerEmailHtml
+      });
+
+      // Email клиенту — ТОЛЬКО если email указан и корректный
+      if (email && email.trim() !== '' && /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+        try {
+          await transporter.sendMail({
+            from: process.env.SMTP_USER || 'antoinette.dibbert96@ethereal.email',
+            to: email,
+            subject: 'Ваш заказ принят — Разбор выкуп',
+            html: clientEmailHtml
+          });
+          console.log(`Письмо клиенту отправлено на ${email}`);
+        } catch (clientError) {
+          console.error('Ошибка отправки письма клиенту:', clientError);
+          // Не прерываем выполнение, менеджер уже получил уведомление
+        }
+      } else {
+        console.log(`Email клиента не указан или некорректен, письмо не отправлено`);
+      }
+
+      console.log(`Заказ от ${name} успешно отправлен на email`);
+    } catch (error) {
+      console.error('Ошибка отправки писем:', error);
+    }
+  })();
 });
 
 // ===== СТАТИКА И FALLBACK (В КОНЦЕ!) =====

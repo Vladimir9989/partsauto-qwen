@@ -1,7 +1,34 @@
 .buybackPage {
-  background-color: var(--header-bg-secondary);
+  position: relative;
   min-height: calc(100vh - 200px);
   padding: 40px 0;
+  overflow: hidden;
+}
+
+.buybackPage::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-image: url('/car-buyback-bg.jpg');
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  background-attachment: fixed;
+  z-index: -2;
+}
+
+.buybackPage::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.6);
+  z-index: -1;
 }
 
 .container {

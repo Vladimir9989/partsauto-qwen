@@ -277,12 +277,12 @@ function CartPage() {
                         <label className={styles.radioLabel}>
                           <input type="radio" name="pickupPoint" value="ekb" checked={pickupPoint === 'ekb'} onChange={(e) => setPickupPoint(e.target.value)} />
                           <span className={styles.radioCustom}></span>
-                          <span className={styles.radioText}><strong>Екатеринбург</strong><small>ул. Ленина, 10</small></span>
+                          <span className={styles.radioText}><strong>Екатеринбург</strong><small>осуществляется доставка по адресу ул. Блюхера 32 (возле тц Современник) машина приезжает около 15:15 на пол часа +-</small></span>
                         </label>
                         <label className={styles.radioLabel}>
                           <input type="radio" name="pickupPoint" value="rezh" checked={pickupPoint === 'rezh'} onChange={(e) => setPickupPoint(e.target.value)} />
                           <span className={styles.radioCustom}></span>
-                          <span className={styles.radioText}><strong>Реж</strong><small>ул. Советская, 5</small></span>
+                          <span className={styles.radioText}><strong>Реж</strong><small>ул. Трудовая 95/2, с понедельника по пятницу c 9:00-17:00</small></span>
                         </label>
                       </div>
                     </div>

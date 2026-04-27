@@ -141,7 +141,7 @@
 }
 
 .brandLink {
-  color: var(--header-text-muted);
+  color: var(--header-text);
   text-decoration: none;
   font-size: 14px;
   padding: 8px 12px;

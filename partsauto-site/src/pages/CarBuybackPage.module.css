@@ -61,6 +61,10 @@
   opacity: 0.95;
 }
 
+.offerTextAccent {
+  color: var(--header-accent);
+}
+
 .conditionCard, .guaranteeCard, .termsCard {
   background-color: var(--header-bg);
   border-radius: 16px;

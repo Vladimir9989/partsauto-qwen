@@ -32,11 +32,24 @@ function HeaderTop({ cartItemsCount = 0 }) {
             <div className={styles.socialsInfo}>
               <span>Мы в соцсетях:</span>
               <div className={styles.socialsBlock}>
+                {/* MAX без ссылки */}
                 <IconMax className={styles.socialIcon} />
-                <IconAvito className={styles.socialIcon} />
-                <IconVK className={styles.socialIcon} />
-                <IconTelegram className={styles.socialIcon} />
-                <IconDrom className={styles.socialIcon} />
+                {/* Avito со ссылкой */}
+                <a href="https://www.avito.ru/brands/i52916411" target="_blank" rel="noopener noreferrer">
+                  <IconAvito className={styles.socialIcon} />
+                </a>
+                {/* VK со ссылкой */}
+                <a href="https://vk.ru/razbor_vykup" target="_blank" rel="noopener noreferrer">
+                  <IconVK className={styles.socialIcon} />
+                </a>
+                {/* Telegram со ссылкой */}
+                <a href="https://t.me/razbor_vykup96" target="_blank" rel="noopener noreferrer">
+                  <IconTelegram className={styles.socialIcon} />
+                </a>
+                {/* Drom со ссылкой */}
+                <a href="https://baza.drom.ru/user/Nikitin1588/" target="_blank" rel="noopener noreferrer">
+                  <IconDrom className={styles.socialIcon} />
+                </a>
               </div>
             </div>
             {/* Кнопка переключения темы */}

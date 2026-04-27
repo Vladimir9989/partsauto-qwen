@@ -297,11 +297,45 @@
 }
 
 .advantageCard {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  min-height: 160px;
   text-align: center;
   padding: 20px;
-  background-color: var(--header-bg-secondary);
   border-radius: 12px;
   transition: transform 0.2s ease;
+  background-size: cover;
+  background-position: center;
+  color: white;
+  overflow: hidden;
+}
+
+/* Оверлей для затемнения фона */
+.advantageCard::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.4);
+  z-index: 1;
+}
+
+
+.advantageCardBg1 {
+  background-image: url(../../public/delivery-3.jpg);
+  background-position: center;
+}
+.advantageCardBg2 {
+  background-image: url(../../public/delivery-2.jpg);
+  background-position: center;
+}
+.advantageCardBg3 {
+  background-image: url(../../public/delivery-1.jpg);
+  background-position: center;
 }
 
 .advantageCard:hover {
@@ -316,14 +350,21 @@
 .advantageCard h3 {
   font-size: 16px;
   font-weight: bold;
-  color: var(--header-text);
   margin-bottom: 8px;
+  position: relative;
+  z-index: 2;
+  color: var(--header-text);
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);
 }
 
 .advantageCard p {
   font-size: 13px;
-  color: var(--header-text-muted);
+  color: var(--header-text);
   line-height: 1.4;
+  position: relative;
+  z-index: 2;
+  color: var(--header-text);
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);
 }
 
 /* Адаптивность */

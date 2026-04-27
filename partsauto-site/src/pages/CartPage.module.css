@@ -349,10 +349,14 @@
 .radioCustom {
   width: 18px;
   height: 18px;
-  border: 2px solid var(--header-border);
+  min-width: 18px;  /* ← добавить, чтобы не сжимался */
+  min-height: 18px;
+  border: 2px solid var(--header-text);
   border-radius: 50%;
   position: relative;
   transition: all 0.2s ease;
+  flex-shrink: 0;   /* ← добавить, чтобы не сжимался */
+  margin-top: 2px;
 }
 
 .radioLabel input[type="radio"]:checked + .radioCustom {

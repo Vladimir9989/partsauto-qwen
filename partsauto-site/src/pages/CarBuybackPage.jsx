@@ -21,6 +21,9 @@ function CarBuybackPage() {
                 <p className={styles.offerText}>
                   за предложенные к выкупу автомобили в Уральском регионе и соседних областях.
                 </p>
+                <p className={styles.offerTextAccent}>
+                  выкупим ваш автомобиль в любом состоянии: целые , после ДТП, неисправные
+                </p>
               </div>
             </div>
 
@@ -31,7 +34,7 @@ function CarBuybackPage() {
                 <div className={styles.conditionItem}>
                   <div className={styles.conditionNumber}>1</div>
                   <div className={styles.conditionText}>
-                    Обратиться к нашим менеджерам <a href="tel:+79000466636">+7 900 046-66-36</a> и предложить авто на выкуп
+                    Обратиться к нашим менеджерам <a href="tel:+79000466636">+7 982 604-80-40</a> и предложить авто на выкуп
                   </div>
                 </div>
                 <div className={styles.conditionItem}>

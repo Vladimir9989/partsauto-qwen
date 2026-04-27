@@ -143,7 +143,7 @@ async function fetchAndParseXML() {
      }
 
      // Парсинг модели автомобиля (может быть "Daewoo Matiz, I")
-     let carMake = offer.brandcars || '';
+     let carMake = offer.brandcars || 'Разное';
      let carModel = offer.modelcars || '';
      let generation = '';
      

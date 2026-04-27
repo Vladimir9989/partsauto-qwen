@@ -24,7 +24,14 @@ const CarSearch = () => {
         const res = await fetch('/api/products?page=1&limit=1000')
         const data = await res.json()
         const uniqueBrands = [...new Set(data.products.map(p => p.brand).filter(Boolean))]
-        setBrands(uniqueBrands.sort())
+        const sorted = uniqueBrands.sort()
+        // Переместить "Разное" в конец
+        const miscIndex = sorted.indexOf('Разное')
+        if (miscIndex > -1) {
+          sorted.splice(miscIndex, 1)
+          sorted.push('Разное')
+        }
+        setBrands(sorted)
       } catch (error) {
         console.error('Ошибка загрузки брендов:', error)
       } finally {
@@ -36,6 +43,14 @@ const CarSearch = () => {
 
   // Загрузка моделей при выборе бренда
   const handleBrandClick = async (brand) => {
+    // Если выбрано "Разное", сразу переходим в каталог
+    if (brand === 'Разное') {
+      const params = new URLSearchParams()
+      params.set('brand', brand)
+      navigate(`/catalog?${params.toString()}`)
+      return
+    }
+
     setSelectedBrand(brand)
     setSelectedModel('')
     setSelectedGeneration('')

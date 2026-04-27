@@ -127,7 +127,14 @@ function CatalogPage() {
             if (p.brand) brandsSet.add(p.brand)
             if (p.category) categoriesSet.add(p.category)
           })
-          setBrands([...brandsSet].sort())
+          const sortedBrands = [...brandsSet].sort()
+          // Переместить "Разное" в конец
+          const miscIndex = sortedBrands.indexOf('Разное')
+          if (miscIndex > -1) {
+            sortedBrands.splice(miscIndex, 1)
+            sortedBrands.push('Разное')
+          }
+          setBrands(sortedBrands)
           setCategories([...categoriesSet].sort())
         }
       } catch (error) {

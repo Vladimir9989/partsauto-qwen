@@ -15,7 +15,7 @@ const ContactsSection = () => {
                 
                 <div className={styles.contactItem}>
                   <i className="bi bi-geo-alt"></i>
-                  <span>г. Реж, ул. Павлика Морозова, 61</span>
+                  <span>г. Реж, ул. Трудовая 95/2</span>
                 </div>
                 
                 <div className={styles.contactItem}>
@@ -36,7 +36,7 @@ const ContactsSection = () => {
               
               <div className={styles.cardMap}>
                 <iframe
-                  src="https://yandex.ru/map-widget/v1/?um=constructor%3A0907e5d698966e6d8261903851f30b9a2b054695f4db023949fbda44f5648157&source=constructor"
+                  src="https://yandex.ru/map-widget/v1/?ll=61.352828,57.371336&z=17&pt=61.352828,57.371336,pm2blm"
                   width="100%"
                   height="250"
                   frameBorder="0"
@@ -75,7 +75,7 @@ const ContactsSection = () => {
               
               <div className={styles.cardMap}>
                 <iframe
-                  src="https://yandex.ru/map-widget/v1/?um=constructor%3Aafd76b21196d6d26057b6b69d144704cf227ce1aaf6464d207eb75a5e84a14e4&source=constructor"
+                  src="https://yandex.ru/map-widget/v1/?ll=60.652949,56.856499&z=17&pt=60.652949,56.856499,pm2rdm"
                   width="100%"
                   height="250"
                   frameBorder="0"

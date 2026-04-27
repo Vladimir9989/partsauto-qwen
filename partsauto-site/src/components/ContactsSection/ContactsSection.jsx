@@ -30,7 +30,7 @@ const ContactsSection = () => {
                 
                 <div className={styles.contactItem}>
                   <i className="bi bi-clock"></i>
-                  <span>Пн-Сб: 9:00-20:00, Вс: 9:00-19:00</span>
+                  <span>Пн-Пт: 9:00-17:00, Сб-Вс: Выходной</span>
                 </div>
               </div>
               
@@ -69,7 +69,7 @@ const ContactsSection = () => {
                 
                 <div className={styles.contactItem}>
                   <i className="bi bi-clock"></i>
-                  <span>Пн-Сб: 9:00-20:00, Вс: 9:00-19:00</span>
+                  <span>Пн-Пт: 9:00-17:00, Сб-Вс: Выходной</span>
                 </div>
               </div>
               

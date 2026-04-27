@@ -23,11 +23,7 @@ export const ThemeProvider = ({ children }) => {
   // Применение темы при изменении
   useEffect(() => {
     const applyTheme = (themeName) => {
-      if (themeName === 'dark') {
-        document.documentElement.setAttribute('data-theme', 'dark');
-      } else {
-        document.documentElement.removeAttribute('data-theme');
-      }
+      document.documentElement.setAttribute('data-theme', themeName);
     };
 
     applyTheme(theme);
@@ -36,11 +32,7 @@ export const ThemeProvider = ({ children }) => {
   // Применение темы при первой загрузке
   useEffect(() => {
     const applyTheme = (themeName) => {
-      if (themeName === 'dark') {
-        document.documentElement.setAttribute('data-theme', 'dark');
-      } else {
-        document.documentElement.removeAttribute('data-theme');
-      }
+      document.documentElement.setAttribute('data-theme', themeName);
     };
 
     applyTheme(theme);

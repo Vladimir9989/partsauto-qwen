@@ -89,20 +89,6 @@ const FiltersPanel = ({
         </select>
       </div>
 
-      <div className={styles.formGroup}>
-        <label className={styles.label}>Категория</label>
-        <select
-          className={styles.select}
-          value={filters.category}
-          onChange={(e) => handleFilterChange('category', e.target.value)}
-        >
-          <option value="">Все категории</option>
-          {categories.map((cat, index) => (
-            <option key={`category-${cat}-${index}`} value={cat}>{cat}</option>
-          ))}
-        </select>
-      </div>
-
       <button
         className={styles.clearBtn}
         onClick={onClearFilters}

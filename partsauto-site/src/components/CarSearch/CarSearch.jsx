@@ -73,14 +73,26 @@ const CarSearch = () => {
   const handleModelClick = async (model) => {
     setSelectedModel(model)
     setSelectedGeneration('')
-    setCurrentView('generations')
     setLoading(true)
     
     try {
       const res = await fetch(`/api/products?brand=${encodeURIComponent(selectedBrand)}&carModel=${encodeURIComponent(model)}&limit=1000`)
       const data = await res.json()
       const uniqueGenerations = [...new Set(data.products.map(p => p.generation).filter(Boolean))]
+      
+      // Если нет поколений, сразу переходим в каталог
+      if (uniqueGenerations.length === 0) {
+        const params = new URLSearchParams()
+        params.set('brand', selectedBrand)
+        params.set('carModel', model)
+        navigate(`/catalog?${params.toString()}`)
+        setLoading(false)
+        return
+      }
+      
+      // Если есть поколения, показываем их для выбора
       setGenerations(uniqueGenerations.sort())
+      setCurrentView('generations')
     } catch (error) {
       console.error('Ошибка загрузки поколений:', error)
     } finally {

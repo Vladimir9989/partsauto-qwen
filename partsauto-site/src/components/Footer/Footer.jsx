@@ -45,7 +45,7 @@ const Footer = () => {
         </div>
         
         <div className={styles.bottom}>
-          <p>© {currentYear} PartsAuto. Все права защищены.</p>
+          <p>© {currentYear} Разбор Выкуп. Все права защищены.</p>
         </div>
       </div>
     </footer>

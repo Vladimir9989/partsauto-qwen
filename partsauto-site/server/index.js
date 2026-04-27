@@ -108,7 +108,7 @@ transporter.verify((error, success) => {
   }
 });
 
-const XML_URL = process.env.XML_URL || 'https://ycf.partsauto.market/partsauto-feeds/avito_feeds/cb9901e562a4f410bd4f9bf80c21d094.xml';
+const XML_URL = process.env.XML_URL || 'https://ycf.partsauto.market/partsauto-feeds/drom_feeds/cb9901e562a4f410bd4f9bf80c21d094.xml';
 
 let cachedProducts = [];
 let lastFetch = null;
@@ -122,73 +122,82 @@ const parser = new XMLParser({
 });
 
 async function fetchAndParseXML() {
-  console.log('Загрузка XML...');
-  const response = await fetch(XML_URL);
-  const xmlText = await response.text();
-  const result = parser.parse(xmlText);
-  const ads = result.Ads?.Ad || [];
-  console.log(`Найдено объявлений: ${ads.length}`);
-  
-  const products = ads.map(ad => {
-    let images = [];
-    if (ad.Images && ad.Images.Image) {
-      const imageData = ad.Images.Image;
-      if (Array.isArray(imageData)) {
-        images = imageData.map(img => {
-          if (typeof img === 'object') {
-            return img['@_url'] || img.url || '';
-          } else if (typeof img === 'string' && img.trim()) {
-            return img.trim();
-          }
-          return '';
-        }).filter(url => url && url.trim() !== '');
-      } else if (typeof imageData === 'object') {
-        const url = imageData['@_url'] || imageData.url || '';
-        if (url.trim()) {
-          images = [url.trim()];
-        }
-      } else if (typeof imageData === 'string' && imageData.trim()) {
-        images = [imageData.trim()];
-      }
-    }
-    
-    if (!Array.isArray(images)) {
-      images = [];
-    }
+   console.log('Загрузка XML...');
+   const response = await fetch(XML_URL);
+   const xmlText = await response.text();
+   const result = parser.parse(xmlText);
+   const offers = result.offers?.offer || [];
+   console.log(`Найдено объявлений: ${offers.length}`);
+   
+   const products = offers.map(offer => {
+     // Парсинг изображений из строки, разделённой запятыми
+     let images = [];
+     if (offer.picture) {
+       const pictureStr = typeof offer.picture === 'string' ? offer.picture : '';
+       if (pictureStr.trim()) {
+         images = pictureStr
+           .split(',')
+           .map(url => url.trim())
+           .filter(url => url && url.length > 0);
+       }
+     }
 
-    let price = '';
-    if (ad.Price) {
-      if (typeof ad.Price === 'object') {
-        price = ad.Price.Value || '';
-      } else {
-        price = ad.Price;
-      }
-    }
+     // Парсинг модели автомобиля (может быть "Daewoo Matiz, I")
+     let carMake = offer.brandcars || '';
+     let carModel = offer.modelcars || '';
+     let generation = '';
+     
+     // Если в modelcars есть поколение, извлекаем его
+     if (carModel && typeof carModel === 'string') {
+       const modelParts = carModel.split(',').map(p => p.trim());
+       if (modelParts.length > 1) {
+         carModel = modelParts[0];
+         generation = modelParts.slice(1).join(', ');
+       }
+     } else if (carModel && typeof carModel !== 'string') {
+       carModel = String(carModel);
+     }
 
-    return {
-      id: ad.Id || '',
-      title: ad.Title || '',
-      description: ad.Description || '',
-      price: price,
-      brand: ad.Brand || '',
-      condition: ad.Condition || '',
-      originality: ad.Originality || '',
-      originalVendor: ad.OriginalVendor || '',
-      carMake: ad.Make || '',
-      carModel: ad.Model || '',
-      generation: ad.Generation || '',
-      category: ad.SparePartType || ad.Category || '',
-      installationLocation: ad.InstallationLocation || '',
-      address: ad.Address || '',
-      phone: ad.ContactPhone || '',
-      dateStart: ad.DateBegin || '',
-      dateEnd: ad.DateEnd || '',
-      images: images.filter(img => img),
-    };
-  });
+     // Определяем категорию по расположению детали
+     let category = '';
+     if (offer.lr || offer.fr) {
+       const parts = [];
+       if (offer.lr) parts.push(offer.lr);
+       if (offer.fr) parts.push(offer.fr);
+       category = parts.join(' ');
+     }
 
-  return products;
-}
+     // Преобразуем цену 0 в пустую строку для отображения "Цена по запросу"
+     let price = offer.price || '';
+     if (price === '0' || price === 0) {
+       price = '';
+     }
+
+     return {
+       id: offer['@_id'] || '',
+       title: offer.name || '',
+       description: offer.description || '',
+       price: price,
+       brand: carMake,
+       condition: offer.condition || 'Б/у',
+       originality: '',
+       originalVendor: '',
+       carMake: carMake,
+       carModel: carModel,
+       generation: generation,
+       category: category,
+       installationLocation: `${offer.lr || ''} ${offer.fr || ''}`.trim(),
+       address: '',
+       phone: '',
+       dateStart: '',
+       dateEnd: '',
+       images: images,
+       year: offer.year || '',
+     };
+   });
+
+   return products;
+ }
 
 // ===== ВСЕ API МАРШРУТЫ =====
 app.get('/api/products', async (req, res) => {

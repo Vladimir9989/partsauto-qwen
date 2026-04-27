@@ -32,8 +32,10 @@ function HeaderTop({ cartItemsCount = 0 }) {
             <div className={styles.socialsInfo}>
               <span>Мы в соцсетях:</span>
               <div className={styles.socialsBlock}>
-                {/* MAX без ссылки */}
-                <IconMax className={styles.socialIcon} />
+                {/* MAX со ссылкой */}
+                <a href="https://max.ru/u/f9LHodD0cOJoDb7kIscXdjgziJ349cODdwYvmd-N8YuLY1aqneOJbblNc8k" target="_blank" rel="noopener noreferrer">
+                  <IconMax className={styles.socialIcon} />
+                </a>
                 {/* Avito со ссылкой */}
                 <a href="https://www.avito.ru/brands/i52916411" target="_blank" rel="noopener noreferrer">
                   <IconAvito className={styles.socialIcon} />

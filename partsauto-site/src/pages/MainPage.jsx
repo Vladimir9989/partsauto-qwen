@@ -1,6 +1,6 @@
 import { Helmet } from 'react-helmet-async'
 import { Link } from 'react-router-dom'
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import styles from './MainPage.module.css'
 import CarsScroller from '../components/CarsScroller/CarsScroller'
 import CarSearch from '../components/CarSearch/CarSearch'
@@ -9,8 +9,21 @@ import { useTheme } from '../context/ThemeContext'
 
 function MainPage() {
   const { theme } = useTheme()
-  const backgroundImage = theme === 'dark' ? 'url(/main-bg.jpg)' : 'url(/main-bg-blue.jpg)'
+  const [imageIndex, setImageIndex] = useState(0)
   const [isModalOpen, setIsModalOpen] = useState(false)
+
+  const darkImages = ['url(/main-bg.jpg)', 'url(/main-bg-2.jpg)']
+  const lightImages = ['url(/main-bg-blue.jpg)', 'url(/main-bg-blue-2.jpg)']
+  const images = theme === 'dark' ? darkImages : lightImages
+  const backgroundImage = images[imageIndex]
+
+  useEffect(() => {
+    setImageIndex(0)
+    const interval = setInterval(() => {
+      setImageIndex((prev) => (prev + 1) % images.length)
+    }, 5000)
+    return () => clearInterval(interval)
+  }, [theme, images.length])
 
   return (
     <>

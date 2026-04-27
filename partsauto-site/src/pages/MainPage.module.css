@@ -9,6 +9,7 @@
   justify-content: center;
   box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
   padding-bottom: 30px;
+  transition: background-image 0.5s ease-in-out;
 }
 
 .content {

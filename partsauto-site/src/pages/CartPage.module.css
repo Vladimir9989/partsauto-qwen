@@ -457,7 +457,7 @@
 .checkboxCustom {
   width: 18px;
   height: 18px;
-  border: 2px solid var(--header-border);
+  border: 2px solid var(--header-accent-hover);
   border-radius: 4px;
   position: relative;
   transition: all 0.2s ease;

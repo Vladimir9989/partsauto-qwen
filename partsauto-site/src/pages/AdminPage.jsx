@@ -349,6 +349,13 @@ function AdminPage() {
                         )}
                         <span className={styles.itemTitle}>{car.title}</span>
                         <span className={styles.itemDate}>{car.date}</span>
+                        {car.description && (
+                          <div className={styles.itemDescription}>
+                            {car.description.length > 100
+                              ? car.description.substring(0, 100) + '...'
+                              : car.description}
+                          </div>
+                        )}
                       </div>
                       <button onClick={() => deleteCar(car.id)} className={styles.deleteBtn}>
                         Удалить

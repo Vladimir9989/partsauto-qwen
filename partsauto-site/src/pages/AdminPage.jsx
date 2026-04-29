@@ -20,6 +20,14 @@ function AdminPage() {
   const [uploading, setUploading] = useState(false)
   const [carsLoading, setCarsLoading] = useState(false)
   
+  // Состояния для редактирования машины
+  const [editingCar, setEditingCar] = useState(null)
+  const [editTitle, setEditTitle] = useState('')
+  const [editDescription, setEditDescription] = useState('')
+  const [editImage, setEditImage] = useState(null)
+  const [editImagePreview, setEditImagePreview] = useState('')
+  const [editingUploading, setEditingUploading] = useState(false)
+  
   // Состояния для новостей
   const [news, setNews] = useState([])
   const [newNewsTitle, setNewNewsTitle] = useState('')
@@ -201,6 +209,83 @@ function AdminPage() {
     }
   }
 
+  // Открытие модального окна редактирования
+  const openEditModal = (car) => {
+    setEditingCar(car)
+    setEditTitle(car.title)
+    setEditDescription(car.description || '')
+    setEditImagePreview(car.imageUrl || '')
+    setEditImage(null)
+  }
+
+  // Закрытие модального окна редактирования
+  const closeEditModal = () => {
+    setEditingCar(null)
+    setEditTitle('')
+    setEditDescription('')
+    setEditImage(null)
+    setEditImagePreview('')
+  }
+
+  // Обработка изменения изображения при редактировании
+  const handleEditImageChange = (e) => {
+    const file = e.target.files[0]
+    if (file) {
+      setEditImage(file)
+      const reader = new FileReader()
+      reader.onload = (event) => {
+        setEditImagePreview(event.target.result)
+      }
+      reader.readAsDataURL(file)
+    }
+  }
+
+  // Сохранение изменений машины
+  const saveEditCar = async () => {
+    if (!editTitle.trim()) {
+      toast.error('Введите заголовок')
+      return
+    }
+
+    setEditingUploading(true)
+    let imageUrl = editImagePreview
+
+    // Если выбрано новое изображение, загружаем его
+    if (editImage) {
+      try {
+        imageUrl = await uploadCarImage(editImage)
+      } catch (error) {
+        toast.error('Ошибка загрузки фото: ' + error.message)
+        setEditingUploading(false)
+        return
+      }
+    }
+
+    try {
+      const res = await fetch(`/api/cars/${editingCar.id}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          title: editTitle,
+          description: editDescription,
+          imageUrl: imageUrl
+        })
+      })
+      const data = await res.json()
+      if (data.success) {
+        toast.success('Машина обновлена')
+        closeEditModal()
+        loadCars()
+      } else {
+        toast.error(data.error)
+      }
+    } catch (error) {
+      toast.error('Ошибка сохранения')
+    } finally {
+      setEditingUploading(false)
+    }
+  }
+
   // Добавление новости
   const addNews = async (e) => {
     e.preventDefault()
@@ -341,8 +426,8 @@ function AdminPage() {
                     <li key={car.id} className={styles.listItem}>
                       <div className={styles.itemContent}>
                         {car.imageUrl && (
-                          <img 
-                            src={car.imageUrl} 
+                          <img
+                            src={car.imageUrl}
                             alt={car.title}
                             className={styles.itemImage}
                           />
@@ -357,9 +442,14 @@ function AdminPage() {
                           </div>
                         )}
                       </div>
-                      <button onClick={() => deleteCar(car.id)} className={styles.deleteBtn}>
-                        Удалить
-                      </button>
+                      <div className={styles.itemActions}>
+                        <button onClick={() => openEditModal(car)} className={styles.editBtn}>
+                          ✏️ Редактировать
+                        </button>
+                        <button onClick={() => deleteCar(car.id)} className={styles.deleteBtn}>
+                          Удалить
+                        </button>
+                      </div>
                     </li>
                   ))}
                 </ul>
@@ -428,6 +518,48 @@ function AdminPage() {
             </div>
           </div>
         )}
+
+       {editingCar && (
+         <div className={styles.modalOverlay} onClick={closeEditModal}>
+           <div className={styles.modalContent} onClick={(e) => e.stopPropagation()}>
+             <h3>Редактировать машину</h3>
+             
+             <input
+               type="text"
+               placeholder="Заголовок"
+               value={editTitle}
+               onChange={(e) => setEditTitle(e.target.value)}
+               className={styles.input}
+             />
+             
+             <textarea
+               placeholder="Описание"
+               value={editDescription}
+               onChange={(e) => setEditDescription(e.target.value)}
+               className={styles.textarea}
+               rows={4}
+             />
+             
+             {editImagePreview && (
+               <img src={editImagePreview} alt="Превью" className={styles.editImagePreview} />
+             )}
+             
+             <input
+               type="file"
+               accept="image/*"
+               onChange={handleEditImageChange}
+               className={styles.fileInput}
+             />
+             
+             <div className={styles.modalActions}>
+               <button onClick={saveEditCar} disabled={editingUploading} className={styles.submitBtn}>
+                 {editingUploading ? 'Сохранение...' : 'Сохранить'}
+               </button>
+               <button onClick={closeEditModal} className={styles.cancelBtn}>Отмена</button>
+             </div>
+           </div>
+         </div>
+       )}
       </div>
     </div>
   )

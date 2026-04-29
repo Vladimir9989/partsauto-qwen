@@ -279,6 +279,28 @@ app.post('/api/cars', express.json(), (req, res) => {
   res.json({ success: true, data: newCard });
 });
 
+app.put('/api/cars/:id', express.json(), (req, res) => {
+  const id = parseInt(req.params.id);
+  const { title, description, imageUrl } = req.body;
+  const cars = getCarsList();
+  const index = cars.findIndex(car => car.id === id);
+  
+  if (index === -1) {
+    return res.status(404).json({ success: false, error: 'Карточка не найдена' });
+  }
+  
+  cars[index] = {
+    ...cars[index],
+    title: title || cars[index].title,
+    description: description !== undefined ? description : cars[index].description,
+    imageUrl: imageUrl !== undefined ? imageUrl : cars[index].imageUrl,
+    updatedAt: new Date().toISOString()
+  };
+  
+  saveCarsList(cars);
+  res.json({ success: true, data: cars[index] });
+});
+
 app.delete('/api/cars/:id', (req, res) => {
   const id = parseInt(req.params.id);
   const cars = getCarsList();

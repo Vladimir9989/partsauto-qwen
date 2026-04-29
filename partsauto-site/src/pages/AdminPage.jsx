@@ -15,6 +15,7 @@ function AdminPage() {
   // Состояния для машин
   const [cars, setCars] = useState([])
   const [newCarTitle, setNewCarTitle] = useState('')
+  const [newCarDescription, setNewCarDescription] = useState('')
   const [newCarImage, setNewCarImage] = useState(null)
   const [uploading, setUploading] = useState(false)
   const [carsLoading, setCarsLoading] = useState(false)
@@ -164,12 +165,13 @@ function AdminPage() {
       const res = await fetch('/api/cars', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ title: newCarTitle, imageUrl })
+        body: JSON.stringify({ title: newCarTitle, imageUrl, description: newCarDescription })
       })
       const data = await res.json()
       if (data.success) {
         toast.success('Машина добавлена')
         setNewCarTitle('')
+        setNewCarDescription('')
         setNewCarImage(null)
         const fileInput = document.getElementById('carImageInput')
         if (fileInput) fileInput.value = ''
@@ -302,6 +304,13 @@ function AdminPage() {
                   value={newCarTitle}
                   onChange={(e) => setNewCarTitle(e.target.value)}
                   className={styles.input}
+                />
+                <textarea
+                  placeholder="Описание (будет отображаться только в модальном окне)"
+                  value={newCarDescription}
+                  onChange={(e) => setNewCarDescription(e.target.value)}
+                  className={styles.textarea}
+                  rows={4}
                 />
                 <input
                   id="carImageInput"

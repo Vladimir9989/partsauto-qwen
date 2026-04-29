@@ -248,10 +248,10 @@
 }
 
 .modalDescription {
-  font-size: 15px;
+  font-size: 14px;
   line-height: 1.6;
-  color: var(--header-text);
-  margin-bottom: 20px;
+  color: var(--header-text-muted);
+  margin-top: 12px;
   white-space: pre-wrap;
 }
 

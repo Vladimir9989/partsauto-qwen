@@ -261,7 +261,7 @@ app.get('/api/cars', (req, res) => {
 });
 
 app.post('/api/cars', express.json(), (req, res) => {
-  const { title, date, link, imageUrl } = req.body;
+  const { title, date, link, imageUrl, description } = req.body;
   if (!title) return res.status(400).json({ success: false, error: 'Не указан заголовок' });
   
   const cars = getCarsList();
@@ -271,6 +271,7 @@ app.post('/api/cars', express.json(), (req, res) => {
     date: date || new Date().toLocaleDateString('ru-RU'),
     link: link || '#',
     imageUrl: imageUrl || null,
+    description: description || '',
     createdAt: new Date().toISOString()
   };
   cars.unshift(newCard);

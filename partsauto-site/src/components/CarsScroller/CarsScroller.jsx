@@ -69,6 +69,15 @@ const staticCards = [
 const CarsScroller = () => {
   const [cards, setCards] = useState([])
   const [loading, setLoading] = useState(true)
+  const [selectedCard, setSelectedCard] = useState(null)
+
+  const handleCardClick = (card) => {
+    setSelectedCard(card)
+  }
+
+  const handleCloseModal = () => {
+    setSelectedCard(null)
+  }
 
   useEffect(() => {
     fetch('/api/cars')
@@ -100,6 +109,17 @@ const CarsScroller = () => {
     return '🚙';
   };
 
+  // Обработчик клавиатуры для закрытия модального окна по Escape
+  useEffect(() => {
+    const handleKeyDown = (e) => {
+      if (e.key === 'Escape' && selectedCard) {
+        handleCloseModal()
+      }
+    }
+    window.addEventListener('keydown', handleKeyDown)
+    return () => window.removeEventListener('keydown', handleKeyDown)
+  }, [selectedCard])
+
   if (loading) {
     return (
       <section className={styles.section}>
@@ -112,50 +132,83 @@ const CarsScroller = () => {
   }
 
   return (
-    <section className={styles.section}>
-      <div className={styles.container}>
-        <h2 className={styles.title}>Машины в разборе</h2>
-        
-        <div className={styles.swiperWrapper}>
-          <Swiper
-            modules={[Navigation, Pagination]}
-            spaceBetween={20}
-            slidesPerView={1}
-            navigation
-            pagination={{ clickable: true }}
-            breakpoints={{
-              640: { slidesPerView: 2 },
-              1024: { slidesPerView: 4 }
-            }}
-            className={styles.swiper}
-          >
-            {cards.map(card => (
-              <SwiperSlide key={card.id}>
-                <div className={styles.card}>
-                  <div className={styles.imagePlaceholder}>
-                    {card.imageUrl ? (
-                      <img 
-                        src={card.imageUrl} 
-                        alt={card.title}
-                        className={styles.carImage}
-                      />
-                    ) : (
-                      <div className={styles.placeholderContent}>
-                        {getCarIcon(card.title)}
+    <>
+      <section className={styles.section}>
+        <div className={styles.container}>
+          <h2 className={styles.title}>Машины в разборе</h2>
+          
+          <div className={styles.swiperWrapper}>
+            <Swiper
+              modules={[Navigation, Pagination]}
+              spaceBetween={20}
+              slidesPerView={1}
+              navigation
+              pagination={{ clickable: true }}
+              breakpoints={{
+                640: { slidesPerView: 2 },
+                1024: { slidesPerView: 4 }
+              }}
+              className={styles.swiper}
+            >
+              {cards.map(card => (
+                <SwiperSlide key={card.id}>
+                  <div className={styles.card}>
+                    <div
+                      onClick={() => handleCardClick(card)}
+                      style={{ cursor: 'pointer' }}
+                    >
+                      <div className={styles.imagePlaceholder}>
+                        {card.imageUrl ? (
+                          <img
+                            src={card.imageUrl}
+                            alt={card.title}
+                            className={styles.carImage}
+                          />
+                        ) : (
+                          <div className={styles.placeholderContent}>
+                            {getCarIcon(card.title)}
+                          </div>
+                        )}
                       </div>
-                    )}
+                      <time className={styles.date}>{card.date}</time>
+                      <a href={card.link} className={styles.cardTitle}>
+                        {card.title}
+                      </a>
+                    </div>
                   </div>
-                  <time className={styles.date}>{card.date}</time>
-                  <a href={card.link} className={styles.cardTitle}>
-                    {card.title}
-                  </a>
-                </div>
-              </SwiperSlide>
-            ))}
-          </Swiper>
+                </SwiperSlide>
+              ))}
+            </Swiper>
+          </div>
         </div>
-      </div>
-    </section>
+      </section>
+      
+      {selectedCard && (
+        <div className={styles.modalOverlay} onClick={handleCloseModal}>
+          <div className={styles.modalContent} onClick={(e) => e.stopPropagation()}>
+            <button className={styles.modalClose} onClick={handleCloseModal}>×</button>
+            
+            <div className={styles.modalImage}>
+              {selectedCard.imageUrl ? (
+                <img src={selectedCard.imageUrl} alt={selectedCard.title} />
+              ) : (
+                <div className={styles.modalNoImage}>
+                  {getCarIcon(selectedCard.title)}
+                </div>
+              )}
+            </div>
+            
+            <div className={styles.modalInfo}>
+              <h3 className={styles.modalTitle}>{selectedCard.title}</h3>
+              <time className={styles.modalDate}>{selectedCard.date}</time>
+              {selectedCard.description && (
+                <p className={styles.modalDescription}>{selectedCard.description}</p>
+              )}
+            </div>
+          </div>
+        </div>
+      )}
+    </>
   )
 }
 

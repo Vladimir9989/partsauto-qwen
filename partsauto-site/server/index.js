@@ -485,53 +485,33 @@ async function sendTelegramNotification(orderData) {
     // Отправляем сообщение через Telegram Bot API с повторными попытками
     const telegramUrl = `https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMessage`;
     const maxRetries = 3;
-    const retryDelay = 2000; // 2 секунды
+    const retryDelay = 2000;
 
-    let lastError = null;
     for (let attempt = 1; attempt <= maxRetries; attempt++) {
       try {
         const response = await fetch(telegramUrl, {
           method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({
-            chat_id: TELEGRAM_CHAT_ID,
-            text: message
-          })
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ chat_id: TELEGRAM_CHAT_ID, text: message })
         });
 
         if (!response.ok) {
           const errorData = await response.json();
-          console.error(`Ошибка отправки в Telegram (попытка ${attempt}/${maxRetries}):`, errorData);
-          lastError = errorData;
-          
-          // Если это не ошибка таймаута, не повторяем
-          if (errorData.error_code !== 'ETIMEDOUT') {
-            return false;
-          }
-        } else {
-          console.log('Уведомление успешно отправлено в Telegram');
-          return true;
+          console.error(`Ошибка Telegram API (попытка ${attempt}/${maxRetries}):`, errorData);
+          return false; // Ошибка API — не повторяем
         }
+
+        console.log('Уведомление успешно отправлено в Telegram');
+        return true;
       } catch (error) {
-        console.error(`Ошибка при отправке в Telegram (попытка ${attempt}/${maxRetries}):`, error.message);
-        lastError = error;
-        
-        // Если это ошибка ETIMEDOUT, повторяем
-        if (error.code === 'ETIMEDOUT' || error.message.includes('ETIMEDOUT')) {
-          if (attempt < maxRetries) {
-            console.log(`Ожидание ${retryDelay}ms перед повторной попыткой...`);
-            await new Promise(resolve => setTimeout(resolve, retryDelay));
-          }
-        } else {
-          // Для других ошибок не повторяем
-          return false;
+        console.error(`Сетевая ошибка Telegram (попытка ${attempt}/${maxRetries}):`, error.message);
+        if (attempt < maxRetries) {
+          console.log(`Ожидание ${retryDelay}ms перед повторной попыткой...`);
+          await new Promise(resolve => setTimeout(resolve, retryDelay));
         }
       }
     }
-
-    console.error('Не удалось отправить уведомление в Telegram после 3 попыток:', lastError);
+    console.error('Не удалось отправить в Telegram после 3 попыток');
     return false;
   } catch (error) {
     console.error('Ошибка при отправке уведомления в Telegram:', error);

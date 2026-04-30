@@ -240,10 +240,10 @@ function CatalogPage() {
   return (
     <>
       <Helmet>
-        <title>PartsAuto - Каталог автозапчастей</title>
-        <meta name="description" content="Каталог автозапчастей PartsAuto. Найдите нужные запчасти для вашего автомобиля по выгодным ценам." />
-        <meta property="og:title" content="PartsAuto - Каталог автозапчастей" />
-        <meta property="og:description" content="Каталог автозапчастей PartsAuto" />
+        <title>Разбор Выкуп - Каталог автозапчастей</title>
+        <meta name="description" content="Каталог автозапчастей Разбор Выкуп. Найдите нужные запчасти для вашего автомобиля по выгодным ценам." />
+        <meta property="og:title" content="Разбор Выкуп - Каталог автозапчастей" />
+        <meta property="og:description" content="Каталог автозапчастей Разбор Выкуп" />
         <meta property="og:type" content="website" />
       </Helmet>
 

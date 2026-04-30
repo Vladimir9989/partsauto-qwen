@@ -30,7 +30,7 @@ function MainPage() {
   return (
     <>
       <Helmet>
-        <title>PartsAuto - Выкуп авто</title>
+        <title>Разбор Выкуп - Выкуп авто</title>
         <meta name="description" content="Выкуп авто в любом состоянии деньги сразу" />
       </Helmet>
       <div className={styles.jumbotron} style={{ cursor: 'pointer', backgroundImage }}>

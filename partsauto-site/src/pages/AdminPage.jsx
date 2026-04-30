@@ -33,6 +33,12 @@ function AdminPage() {
   const [newNewsTitle, setNewNewsTitle] = useState('')
   const [newNewsContent, setNewNewsContent] = useState('')
   const [newsLoading, setNewsLoading] = useState(false)
+  
+  // Состояния для редактирования новостей
+  const [editingNews, setEditingNews] = useState(null)
+  const [editNewsTitle, setEditNewsTitle] = useState('')
+  const [editNewsContent, setEditNewsContent] = useState('')
+  const [editingNewsSubmit, setEditingNewsSubmit] = useState(false)
 
   const editor = useEditor({
     extensions: [
@@ -49,6 +55,29 @@ function AdminPage() {
     content: newNewsContent,
     onUpdate: ({ editor }) => {
       setNewNewsContent(editor.getHTML())
+    },
+    editorProps: {
+      attributes: {
+        class: styles.tiptapEditor,
+      },
+    },
+  })
+
+  const editEditor = useEditor({
+    extensions: [
+      StarterKit.configure({
+        heading: {
+          levels: [1, 2, 3],
+        },
+      }),
+      Image.configure({
+        inline: true,
+        allowBase64: false,
+      }),
+    ],
+    content: editNewsContent,
+    onUpdate: ({ editor }) => {
+      setEditNewsContent(editor.getHTML())
     },
     editorProps: {
       attributes: {
@@ -76,6 +105,29 @@ function AdminPage() {
         toast.success('Изображение добавлено', { id: 'upload-image' })
       } catch (error) {
         toast.error('Ошибка загрузки изображения', { id: 'upload-image' })
+      }
+    }
+  }
+
+  // Функция для загрузки изображений в редакторе редактирования
+  const addEditImage = () => {
+    const input = document.createElement('input')
+    input.setAttribute('type', 'file')
+    input.setAttribute('accept', 'image/*')
+    input.click()
+    
+    input.onchange = async () => {
+      const file = input.files[0]
+      if (!file) return
+      
+      toast.loading('Загрузка изображения...', { id: 'upload-edit-image' })
+      
+      try {
+        const imageUrl = await uploadNewsImageToServer(file)
+        editEditor?.chain().focus().setImage({ src: imageUrl }).run()
+        toast.success('Изображение добавлено', { id: 'upload-edit-image' })
+      } catch (error) {
+        toast.error('Ошибка загрузки изображения', { id: 'upload-edit-image' })
       }
     }
   }
@@ -330,6 +382,54 @@ function AdminPage() {
     }
   }
 
+  // Открытие модального окна редактирования новости
+  const openEditNewsModal = (newsItem) => {
+    setEditingNews(newsItem)
+    setEditNewsTitle(newsItem.title)
+    setEditNewsContent(newsItem.content || '')
+    editEditor?.commands.setContent(newsItem.content || '')
+  }
+
+  // Закрытие модального окна редактирования новости
+  const closeEditNewsModal = () => {
+    setEditingNews(null)
+    setEditNewsTitle('')
+    setEditNewsContent('')
+    editEditor?.commands.setContent('')
+  }
+
+  // Сохранение изменений новости
+  const saveEditNews = async () => {
+    if (!editNewsTitle.trim()) {
+      toast.error('Введите заголовок')
+      return
+    }
+
+    setEditingNewsSubmit(true)
+    try {
+      const res = await fetch(`/api/news/${editingNews.id}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          title: editNewsTitle,
+          content: editNewsContent
+        })
+      })
+      const data = await res.json()
+      if (data.success) {
+        toast.success('Новость обновлена')
+        closeEditNewsModal()
+        loadNews()
+      } else {
+        toast.error(data.error)
+      }
+    } catch (error) {
+      toast.error('Ошибка сохранения')
+    } finally {
+      setEditingNewsSubmit(false)
+    }
+  }
+
   // Загрузка данных при первой авторизации и при смене вкладки
   useEffect(() => {
     if (isAuthenticated) {
@@ -497,23 +597,28 @@ function AdminPage() {
                 <div className={styles.empty}>Нет добавленных новостей</div>
               ) : (
                 <ul className={styles.list}>
-                  {news.map(item => (
-                    <li key={item.id} className={styles.listItem}>
-                      <div className={styles.itemContent}>
-                        <span className={styles.itemTitle}>{item.title}</span>
-                        <span className={styles.itemDate}>{item.date}</span>
-                        {item.content && (
-                          <div className={styles.itemPreview}>
-                            {item.content.substring(0, 100)}...
-                          </div>
-                        )}
-                      </div>
-                      <button onClick={() => deleteNews(item.id)} className={styles.deleteBtn}>
-                        Удалить
-                      </button>
-                    </li>
-                  ))}
-                </ul>
+                   {news.map(item => (
+                     <li key={item.id} className={styles.listItem}>
+                       <div className={styles.itemContent}>
+                         <span className={styles.itemTitle}>{item.title}</span>
+                         <span className={styles.itemDate}>{item.date}</span>
+                         {item.content && (
+                           <div className={styles.itemPreview}>
+                             {item.content.substring(0, 100)}...
+                           </div>
+                         )}
+                       </div>
+                       <div className={styles.itemActions}>
+                         <button onClick={() => openEditNewsModal(item)} className={styles.editBtn}>
+                           ✏️ Редактировать
+                         </button>
+                         <button onClick={() => deleteNews(item.id)} className={styles.deleteBtn}>
+                           Удалить
+                         </button>
+                       </div>
+                     </li>
+                   ))}
+                 </ul>
               )}
             </div>
           </div>
@@ -556,6 +661,42 @@ function AdminPage() {
                  {editingUploading ? 'Сохранение...' : 'Сохранить'}
                </button>
                <button onClick={closeEditModal} className={styles.cancelBtn}>Отмена</button>
+             </div>
+           </div>
+         </div>
+       )}
+
+       {editingNews && (
+         <div className={styles.modalOverlay} onClick={closeEditNewsModal}>
+           <div className={styles.modalContent} onClick={(e) => e.stopPropagation()}>
+             <h3>Редактировать новость</h3>
+             
+             <input
+               type="text"
+               placeholder="Заголовок новости"
+               value={editNewsTitle}
+               onChange={(e) => setEditNewsTitle(e.target.value)}
+               className={styles.input}
+             />
+             
+             <div className={styles.editorWrapper}>
+               <div className={styles.toolbar}>
+                 <button type="button" onClick={() => editEditor?.chain().focus().toggleBold().run()} className={editEditor?.isActive('bold') ? styles.activeTool : ''}>B</button>
+                 <button type="button" onClick={() => editEditor?.chain().focus().toggleItalic().run()} className={editEditor?.isActive('italic') ? styles.activeTool : ''}>I</button>
+                 <button type="button" onClick={() => editEditor?.chain().focus().toggleHeading({ level: 2 }).run()} className={editEditor?.isActive('heading', { level: 2 }) ? styles.activeTool : ''}>H2</button>
+                 <button type="button" onClick={() => editEditor?.chain().focus().toggleHeading({ level: 3 }).run()} className={editEditor?.isActive('heading', { level: 3 }) ? styles.activeTool : ''}>H3</button>
+                 <button type="button" onClick={() => editEditor?.chain().focus().toggleBulletList().run()} className={editEditor?.isActive('bulletList') ? styles.activeTool : ''}>• Список</button>
+                 <button type="button" onClick={() => editEditor?.chain().focus().toggleOrderedList().run()} className={editEditor?.isActive('orderedList') ? styles.activeTool : ''}>1. Список</button>
+                 <button type="button" onClick={addEditImage}>📷 Изображение</button>
+               </div>
+               <EditorContent editor={editEditor} className={styles.tiptapEditor} />
+             </div>
+             
+             <div className={styles.modalActions}>
+               <button onClick={saveEditNews} disabled={editingNewsSubmit} className={styles.submitBtn}>
+                 {editingNewsSubmit ? 'Сохранение...' : 'Сохранить'}
+               </button>
+               <button onClick={closeEditNewsModal} className={styles.cancelBtn}>Отмена</button>
              </div>
            </div>
          </div>

@@ -10,6 +10,10 @@ import nodemailer from 'nodemailer';
 import dotenv from 'dotenv';
 dotenv.config();
 
+// Переменные окружения для Telegram
+const TELEGRAM_BOT_TOKEN = process.env.TELEGRAM_BOT_TOKEN;
+const TELEGRAM_CHAT_ID = process.env.TELEGRAM_CHAT_ID;
+
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
@@ -415,6 +419,98 @@ app.post('/api/upload-news-image', uploadNewsImage.single('image'), (req, res) =
   }
 });
 
+// ===== ФУНКЦИЯ ДЛЯ ОТПРАВКИ УВЕДОМЛЕНИЯ В TELEGRAM =====
+async function sendTelegramNotification(orderData) {
+  if (!TELEGRAM_BOT_TOKEN || !TELEGRAM_CHAT_ID) {
+    console.warn('Telegram не настроен (отсутствуют TELEGRAM_BOT_TOKEN или TELEGRAM_CHAT_ID)');
+    return;
+  }
+
+  try {
+    const { name, phone, email, items, totalPrice, deliveryType, pickupPoint, city, comment, timestamp } = orderData;
+
+    // Формируем список товаров с ценами
+    let itemsList = '';
+    let hasRequestPrice = false;
+    
+    items.forEach((item, index) => {
+      const price = item.price || '0';
+      const priceDisplay = price === '0' || price === 0 ? '❓ По запросу' : `${price} ₽`;
+      itemsList += `${index + 1}. ${item.title || 'Без названия'} — ${priceDisplay}\n`;
+      
+      if (price === '0' || price === 0) {
+        hasRequestPrice = true;
+      }
+    });
+
+    // Формируем сообщение с Markdown форматированием
+    let message = `🛒 *НОВЫЙ ЗАКАЗ*\n\n`;
+    message += `👤 *Клиент:* ${name}\n`;
+    message += `📱 *Телефон:* ${phone}\n`;
+    
+    if (email && email.trim() !== '') {
+      message += `📧 *Email:* ${email}\n`;
+    }
+    
+    message += `\n🚚 *Доставка:* ${deliveryType}\n`;
+    
+    if (pickupPoint) {
+      message += `📍 *Пункт самовывоза:* ${pickupPoint}\n`;
+    }
+    
+    if (city) {
+      message += `🏙️ *Город:* ${city}\n`;
+    }
+    
+    if (comment) {
+      message += `💬 *Комментарий:* ${comment}\n`;
+    }
+    
+    message += `\n📦 *Товары:*\n${itemsList}`;
+    
+    // Формируем итоговую сумму
+    let totalDisplay = '';
+    if (hasRequestPrice && items.every(item => !item.price || item.price === '0' || item.price === 0)) {
+      totalDisplay = '❓ По запросу';
+    } else if (hasRequestPrice) {
+      totalDisplay = `${totalPrice} ₽ (+ товары по запросу)`;
+      message += `\n⚠️ *ВНИМАНИЕ:* В заказе есть товары с ценой по запросу!\n`;
+    } else {
+      totalDisplay = `${totalPrice} ₽`;
+    }
+    
+    message += `\n💰 *Итого:* ${totalDisplay}\n`;
+    message += `\n🕐 *Время заказа:* ${new Date(timestamp).toLocaleString('ru-RU')}`;
+
+    // Отправляем сообщение через Telegram Bot API
+    const telegramUrl = `https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMessage`;
+    
+    const response = await fetch(telegramUrl, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        chat_id: TELEGRAM_CHAT_ID,
+        text: message,
+        parse_mode: 'Markdown'
+      })
+    });
+
+    if (!response.ok) {
+      const errorData = await response.json();
+      console.error('Ошибка отправки в Telegram:', errorData);
+      return false;
+    }
+
+    console.log('Уведомление успешно отправлено в Telegram');
+    return true;
+  } catch (error) {
+    console.error('Ошибка при отправке уведомления в Telegram:', error);
+    return false;
+  }
+}
+
 // ===== ЭНДПОИНТ ДЛЯ ОТПРАВКИ EMAIL ЗАКАЗА =====
 app.post('/api/send-order-email', (req, res) => {
   const { name, phone, email, items, totalPrice, deliveryType, pickupPoint, city, comment, timestamp } = req.body;
@@ -566,6 +662,14 @@ app.post('/api/send-order-email', (req, res) => {
       }
 
       console.log(`Заказ от ${name} успешно отправлен на email`);
+
+      // Отправляем уведомление в Telegram (не ждём результат, чтобы не влиять на основной ответ)
+      try {
+        await sendTelegramNotification(req.body);
+      } catch (telegramError) {
+        console.error('Ошибка отправки уведомления в Telegram:', telegramError);
+        // Ошибка Telegram не влияет на основной ответ клиенту
+      }
     } catch (error) {
       console.error('Ошибка отправки писем:', error);
     }

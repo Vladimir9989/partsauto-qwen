@@ -443,30 +443,30 @@ async function sendTelegramNotification(orderData) {
       }
     });
 
-    // Формируем сообщение с Markdown форматированием
-    let message = `🛒 *НОВЫЙ ЗАКАЗ*\n\n`;
-    message += `👤 *Клиент:* ${name}\n`;
-    message += `📱 *Телефон:* ${phone}\n`;
+    // Формируем сообщение БЕЗ Markdown форматирования (обычный текст с эмодзи)
+    let message = `🛒 НОВЫЙ ЗАКАЗ\n\n`;
+    message += `👤 Клиент: ${name}\n`;
+    message += `📱 Телефон: ${phone}\n`;
     
     if (email && email.trim() !== '') {
-      message += `📧 *Email:* ${email}\n`;
+      message += `📧 Email: ${email}\n`;
     }
     
-    message += `\n🚚 *Доставка:* ${deliveryType}\n`;
+    message += `\n🚚 Доставка: ${deliveryType}\n`;
     
     if (pickupPoint) {
-      message += `📍 *Пункт самовывоза:* ${pickupPoint}\n`;
+      message += `📍 Пункт самовывоза: ${pickupPoint}\n`;
     }
     
     if (city) {
-      message += `🏙️ *Город:* ${city}\n`;
+      message += `🏙️ Город: ${city}\n`;
     }
     
     if (comment) {
-      message += `💬 *Комментарий:* ${comment}\n`;
+      message += `💬 Комментарий: ${comment}\n`;
     }
     
-    message += `\n📦 *Товары:*\n${itemsList}`;
+    message += `\n📦 Товары:\n${itemsList}`;
     
     // Формируем итоговую сумму
     let totalDisplay = '';
@@ -474,13 +474,13 @@ async function sendTelegramNotification(orderData) {
       totalDisplay = '❓ По запросу';
     } else if (hasRequestPrice) {
       totalDisplay = `${totalPrice} ₽ (+ товары по запросу)`;
-      message += `\n⚠️ *ВНИМАНИЕ:* В заказе есть товары с ценой по запросу!\n`;
+      message += `\n⚠️ ВНИМАНИЕ: В заказе есть товары с ценой по запросу!\n`;
     } else {
       totalDisplay = `${totalPrice} ₽`;
     }
     
-    message += `\n💰 *Итого:* ${totalDisplay}\n`;
-    message += `\n🕐 *Время заказа:* ${new Date(timestamp).toLocaleString('ru-RU')}`;
+    message += `\n💰 Итого: ${totalDisplay}\n`;
+    message += `\n🕐 Время заказа: ${new Date(timestamp).toLocaleString('ru-RU')}`;
 
     // Отправляем сообщение через Telegram Bot API
     const telegramUrl = `https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMessage`;
@@ -492,8 +492,7 @@ async function sendTelegramNotification(orderData) {
       },
       body: JSON.stringify({
         chat_id: TELEGRAM_CHAT_ID,
-        text: message,
-        parse_mode: 'Markdown'
+        text: message
       })
     });
 

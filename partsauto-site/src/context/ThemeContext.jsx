@@ -42,7 +42,7 @@ function loadDeliveryScript(theme) {
   const color = DELIVERY_BTN_COLORS[theme] || DELIVERY_BTN_COLORS.dark;
   const script = document.createElement('script');
   script.id = 'dcsbl';
-  script.src = `https://dostavka.sbl.su/api/delivery.js?btnBg=${encodeURIComponent(color)}`;
+  script.src = `https://dostavka.sbl.su/api/delivery.js?comp=0&startCt=Реж&startCntr=RU&btnBg=${encodeURIComponent(color)}`;
   document.body.appendChild(script);
 }
 

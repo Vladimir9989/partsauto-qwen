@@ -1,9 +1,12 @@
 import React from 'react'
 import { Link } from 'react-router-dom'
 import { FaPhone, FaMapMarkerAlt } from 'react-icons/fa'
+import { useTheme } from '../../context/ThemeContext'
 import styles from './Footer.module.css'
 
 const Footer = () => {
+  const { theme } = useTheme()
+  const logoSrc = theme === 'dark' ? '/logo-orange.png' : '/logo-blue.png'
   const currentYear = new Date().getFullYear()
   
   return (
@@ -12,7 +15,7 @@ const Footer = () => {
         <div className={styles.content}>
           <div className={styles.column}>
             <Link to="/" className={styles.logoLink}>
-              <img src="/logo.png" alt="PartsAuto" className={styles.logoImage} />
+              <img src={logoSrc} alt="PartsAuto" className={styles.logoImage} />
             </Link>
             <p className={styles.description}>
               Оригинальные автозапчасти для вашего автомобиля

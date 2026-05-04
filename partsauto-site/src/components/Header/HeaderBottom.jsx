@@ -1,9 +1,12 @@
 import { Link } from 'react-router-dom';
 import { FaBars, FaShoppingCart, FaChevronDown } from 'react-icons/fa';
 import { useState } from 'react';
+import { useTheme } from '../../context/ThemeContext';
 import styles from './Header.module.css';
 
 function HeaderBottom({ isMobileMenuOpen, setIsMobileMenuOpen, onCartClick, onContactsClick, cartItemsCount = 0 }) {
+  const { theme } = useTheme();
+  const logoSrc = theme === 'dark' ? '/logo.png' : '/logo-blue.png';
   
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
 
@@ -12,7 +15,7 @@ function HeaderBottom({ isMobileMenuOpen, setIsMobileMenuOpen, onCartClick, onCo
       <div className={styles.container}>
         <div className={styles.headerContent}>
           <Link to="/" className={styles.logo}>
-            <img src="/logo.png" alt="PartsAuto" className={styles.logoImage} />
+            <img src={logoSrc} alt="PartsAuto" className={styles.logoImage} />
           </Link>
           
           {/* Десктопная навигация */}

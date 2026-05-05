@@ -18,7 +18,7 @@ function DeliveryPage() {
             <div className={styles.advantagesGrid}>
               <div className={`${styles.advantageCard} ${styles.advantageCardBg1}`}>
                 <h3>Большой выбор автозапчастей</h3>
-                <p>Более 120 000 товаров в наличии</p>
+                <p>Более 200 000 товаров в наличии</p>
               </div>
               <div className={`${styles.advantageCard} ${styles.advantageCardBg2}`}>
                 <h3>Расширенный сервис</h3>

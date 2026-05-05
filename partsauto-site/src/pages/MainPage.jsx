@@ -79,9 +79,8 @@ function MainPage() {
             <h3 className={styles.modalTitle}>Не нашли нужную запчасть?</h3>
             <p className={styles.modalText}>
               В каталоге на сайте представлена только часть нашего ассортимента.<br/><br/>
-              На самом деле у нас <strong>более 200 000 запчастей</strong> в наличии!<br/><br/>
-              Если вы не нашли нужную деталь — просто свяжитесь с нами.<br/><br/>
-              <strong>Возможно именно вас она ждет на нашем складе!</strong>
+              В наличии <strong>более 200 000 запчастей!</strong><br/><br/>
+              Если вы не нашли нужную деталь на сайте - просто свяжитесь с нами, удобным для вас способом!
             </p>
             <button className={styles.modalBtn} onClick={() => setIsModalOpen(false)}>Хорошо, спасибо</button>
           </div>

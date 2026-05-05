@@ -22,7 +22,7 @@ function DeliveryPage() {
               </div>
               <div className={`${styles.advantageCard} ${styles.advantageCardBg2}`}>
                 <h3>Расширенный сервис</h3>
-                <p>Предпродажная проверка запчастей</p>
+                <p>Предоставим дополнительную информацию о детали ( фото, видео )</p>
               </div>
               <div className={`${styles.advantageCard} ${styles.advantageCardBg3}`}>
                 <h3>Быстрая доставка</h3>
@@ -75,7 +75,7 @@ function DeliveryPage() {
               </div>
 
               <div className={styles.priceBlock}>
-                <h3 className={styles.subtitle}>Стоимость доставки до ТК бесплатная</h3>
+                <h3 className={styles.subtitle}>Стоимость доставки до ТК по согласованию</h3>
               </div>
 
               <div className={styles.trackingBlock}>

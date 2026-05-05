@@ -67,7 +67,6 @@
   border: 2px solid var(--header-accent);
   border-radius: 20px;
   padding: 40px;
-  text-align: center;
 }
 
 .offerCard {
@@ -98,6 +97,7 @@
   padding: 30px;
   border: 1px solid var(--header-border);
   transition: transform 0.3s ease, box-shadow 0.3s ease;
+  margin-bottom: 40px;
 }
 
 .conditionCard:hover, .guaranteeCard:hover, .termsCard:hover {

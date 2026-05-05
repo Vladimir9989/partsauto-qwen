@@ -12,7 +12,27 @@ function CarBuybackPage() {
       <div className={styles.buybackPage}>
         <div className={styles.container}>
           <h1 className={styles.pageTitle}>Выкуп авто</h1>
-          
+          <div className={styles.termsCard}>
+            <h3 className={styles.cardTitle}>Срочный выкуп автомобиля!!!</h3>
+            <p className={styles.offerText}>
+              Срочно нужны деньги или хотите быстро продать машину?
+            </p>
+            <p className={styles.offerText}>
+              Мы выкупим ваш автомобиль в день обращения!
+            </p>
+            <p className={styles.offerText}>
+              Интересуют любые варианты:
+            </p>
+            <ul className={styles.termsList}>
+              <li>Целые и с пробегом</li>
+              <li>Битые, после ДТП (даже не на ходу)</li>
+              <li>Кредитные, залоговые</li>
+              <li>Сгоревшие, неисправные, старые</li>
+              <li>специалист приедет к вам (по городу и области), выезд и оценка — БЕСПЛАТНО</li>
+              <li> оформление документов берем на себя, Быстрое оформление сделки</li>
+              <li>Выплата 100% суммы сразу (наличными или на карту)</li>
+            </ul>
+          </div>
           <div className={styles.content}>
             {/* Основной блок с предложением */}
             <div className={styles.mainBlock}>
@@ -25,10 +45,6 @@ function CarBuybackPage() {
                   выкупим ваш автомобиль в любом состоянии: целые , после ДТП, неисправные
                 </p>
               </div>
-            </div>
-
-            {/* Блок с условием выплаты */}
-            <div className={styles.conditionCard}>
               <h3 className={styles.cardTitle}>Как получить выплату?</h3>
               <div className={styles.conditionList}>
                 <div className={styles.conditionItem}>
@@ -50,25 +66,32 @@ function CarBuybackPage() {
                   </div>
                 </div>
               </div>
-            </div>
-
-            {/* Блок с гарантией выплаты */}
-            <div className={styles.guaranteeCard}>
               <h3 className={styles.cardTitle}>Ваша гарантия</h3>
               <div className={styles.guaranteeText}>
                 <p>Если менеджеры нашей компании выкупают авто по Вашей рекомендации, то Вам гарантирована денежная выплата от 10 000 рублей и больше.</p>
                 <p className={styles.highlight}>Выплату получает тот, кто предоставил контакт первым.</p>
               </div>
+              <div className={styles.termsCard}>
+                <h3 className={styles.cardTitle}>Условия акции</h3>
+                <ul className={styles.termsList}>
+                  <li>В акции участвуют все легковые автомобили, грузовые автомобили, мототехника, спецтехника</li>
+                  <li>Выплаты производятся за автомобили, которые не опубликованы на сайтах Авито, Дром и в других открытых источниках</li>
+                </ul>
+              </div>
             </div>
 
+            {/* Блок с условием выплаты */}
+            {/* <div className={styles.conditionCard}>
+              
+            </div> */}
+
+            {/* Блок с гарантией выплаты */}
+            {/* <div className={styles.guaranteeCard}>
+              
+            </div> */}
+
             {/* Блок с условиями акции */}
-            <div className={styles.termsCard}>
-              <h3 className={styles.cardTitle}>Условия акции</h3>
-              <ul className={styles.termsList}>
-                <li>В акции участвуют все легковые автомобили, грузовые автомобили, мототехника, спецтехника</li>
-                <li>Выплаты производятся за автомобили, которые не опубликованы на сайтах Авито, Дром и в других открытых источниках</li>
-              </ul>
-            </div>
+
           </div>
         </div>
       </div>

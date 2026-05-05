@@ -14,7 +14,7 @@ const ImageSlider = ({ images, title }) => {
     if (images.length <= 1) return
     const timer = setInterval(() => {
       setCurrentIndex(prev => (prev + 1) % images.length)
-    }, 113000)
+    }, 3000)
     return () => clearInterval(timer)
   }, [images.length])
   
@@ -40,6 +40,67 @@ const ImageSlider = ({ images, title }) => {
               <span
                 key={idx}
                 className={`${styles.dot} ${idx === currentIndex ? styles.activeDot : ''}`}
+                onClick={(e) => {
+                  e.stopPropagation()
+                  setCurrentIndex(idx)
+                }}
+                aria-label={`Фото ${idx + 1}`}
+              />
+            ))}
+          </div>
+        </>
+      )}
+    </div>
+  )
+}
+
+// Компонент слайдера изображений для модального окна
+const ModalImageSlider = ({ images, title, onImageClick }) => {
+  const [currentIndex, setCurrentIndex] = useState(0)
+  
+  useEffect(() => {
+    if (images.length <= 1) return
+    const timer = setInterval(() => {
+      setCurrentIndex(prev => (prev + 1) % images.length)
+    }, 3000)
+    return () => clearInterval(timer)
+  }, [images.length])
+  
+  const goToPrev = (e) => {
+    e.stopPropagation()
+    setCurrentIndex(prev => prev === 0 ? images.length - 1 : prev - 1)
+  }
+  
+  const goToNext = (e) => {
+    e.stopPropagation()
+    setCurrentIndex(prev => (prev + 1) % images.length)
+  }
+  
+  const handleImageClick = (e) => {
+    e.stopPropagation()
+    if (onImageClick) {
+      onImageClick(images[currentIndex])
+    }
+  }
+  
+  return (
+    <div className={styles.modalSliderContainer}>
+      <img
+        src={images[currentIndex]}
+        alt={title}
+        className={styles.modalSliderImage}
+        onClick={handleImageClick}
+        style={{ cursor: 'zoom-in' }}
+      />
+      {images.length > 1 && (
+        <>
+          <button className={styles.modalSliderPrev} onClick={goToPrev} aria-label="Предыдущее фото">‹</button>
+          <button className={styles.modalSliderNext} onClick={goToNext} aria-label="Следующее фото">›</button>
+          <div className={styles.modalSliderDots}>
+            {images.map((_, idx) => (
+              <span
+                key={idx}
+                className={`${styles.modalDot} ${idx === currentIndex ? styles.modalDotActive : ''}`}
                 onClick={(e) => {
                   e.stopPropagation()
                   setCurrentIndex(idx)
@@ -118,6 +179,7 @@ const CarsScroller = () => {
   const [cards, setCards] = useState([])
   const [loading, setLoading] = useState(true)
   const [selectedCard, setSelectedCard] = useState(null)
+  const [lightboxImage, setLightboxImage] = useState(null)
 
   const handleCardClick = (card) => {
     setSelectedCard(card)
@@ -125,6 +187,14 @@ const CarsScroller = () => {
 
   const handleCloseModal = () => {
     setSelectedCard(null)
+  }
+
+  const handleImageClick = (imageUrl) => {
+    setLightboxImage(imageUrl)
+  }
+
+  const handleCloseLightbox = () => {
+    setLightboxImage(null)
   }
 
   useEffect(() => {
@@ -237,7 +307,11 @@ const CarsScroller = () => {
             
             <div className={styles.modalImage}>
               {selectedCard.images && selectedCard.images.length > 0 ? (
-                <img src={selectedCard.images[0]} alt={selectedCard.title} />
+                <ModalImageSlider
+                  images={selectedCard.images}
+                  title={selectedCard.title}
+                  onImageClick={handleImageClick}
+                />
               ) : (
                 <div className={styles.modalNoImage}>
                   {getCarIcon(selectedCard.title)}
@@ -253,6 +327,14 @@ const CarsScroller = () => {
               )}
             </div>
           </div>
+        </div>
+      )}
+      
+      {/* Lightbox для увеличенного просмотра изображения */}
+      {lightboxImage && (
+        <div className={styles.lightboxOverlay} onClick={handleCloseLightbox}>
+          <button className={styles.lightboxClose} onClick={handleCloseLightbox}>×</button>
+          <img src={lightboxImage} alt="Увеличенное изображение" className={styles.lightboxImage} />
         </div>
       )}
     </>

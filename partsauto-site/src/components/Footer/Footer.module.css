@@ -74,6 +74,21 @@
   color: var(--header-accent);
 }
 
+.linkButton {
+  background: none;
+  border: none;
+  color: var(--header-text-muted);
+  text-decoration: none;
+  font-size: 14px;
+  cursor: pointer;
+  transition: color 0.2s ease;
+  padding: 0;
+}
+
+.linkButton:hover {
+  color: var(--header-accent);
+}
+
 .contacts li {
   display: flex;
   align-items: center;

@@ -3,6 +3,7 @@ import { useCartStore } from '../store/useCartStore'
 import { Helmet } from 'react-helmet-async'
 import { Link, useNavigate } from 'react-router-dom'
 import toast from 'react-hot-toast'
+import { IconMax, IconAvito, IconVK, IconTelegram, IconDrom } from '../components/Icons'
 import styles from './CartPage.module.css'
 
 function CartPage() {
@@ -155,7 +156,7 @@ function CartPage() {
   return (
     <>
       <Helmet>
-        <title>Корзина - PartsAuto</title>
+        <title>Корзина - Разбор Выкуп</title>
         <meta name="description" content="Оформление заказа" />
       </Helmet>
 
@@ -249,7 +250,7 @@ function CartPage() {
             </div>
 
             {/* Правая колонка - форма (без изменений) */}
-            <div className={styles.formSection}>
+            <div className={styles.formSection} style={{ display: 'none' }}>
               <form onSubmit={handleSubmitOrder} className={styles.form}>
                 {/* Вкладки доставки */}
                 <div className={styles.tabs}>
@@ -334,6 +335,67 @@ function CartPage() {
                   <i className="bi bi-check-circle"></i> {isSubmitting ? 'Отправка...' : 'Оформить заказ'}
                 </button>
               </form>
+            </div>
+
+            {/* Временный блок с информацией о пунктах самовывоза */}
+            <div className={styles.tempInfoBlock}>
+              <h3 className={styles.tempTitle}>Пункты самовывоза</h3>
+              
+              <div className={styles.tempLocation}>
+                <h4>Екатеринбург</h4>
+                <p>осуществляется доставка по адресу ул. Блюхера 32 (возле тц Современник) машина приезжает около 15:15 на пол часа +- (предварительно свяжитесь с нами)</p>
+                <button
+                  className={styles.tempMapLink}
+                  onClick={() => {
+                    navigate('/')
+                    setTimeout(() => {
+                      document.getElementById('contacts')?.scrollIntoView({ behavior: 'smooth' })
+                    }, 100)
+                  }}
+                >
+                  Посмотреть на карте →
+                </button>
+              </div>
+
+              <div className={styles.tempLocation}>
+                <h4>Реж</h4>
+                <p>ул. Трудовая 95/2, с понедельника по пятницу c 9:00-17:00</p>
+                <button
+                  className={styles.tempMapLink}
+                  onClick={() => {
+                    navigate('/')
+                    setTimeout(() => {
+                      document.getElementById('contacts')?.scrollIntoView({ behavior: 'smooth' })
+                    }, 100)
+                  }}
+                >
+                  Посмотреть на карте →
+                </button>
+              </div>
+
+              <div className={styles.tempContactBlock}>
+                <p className={styles.tempContactText}>Если вам нужна доставка — свяжитесь с нами:</p>
+                <div className={styles.tempSocials}>
+                  <a href="https://max.ru/u/..." target="_blank" rel="noopener noreferrer">
+                    <IconMax className={styles.tempSocialIcon} />
+                  </a>
+                  <a href="https://www.avito.ru/brands/i52916411" target="_blank" rel="noopener noreferrer">
+                    <IconAvito className={styles.tempSocialIcon} />
+                  </a>
+                  <a href="https://vk.ru/razbor_vykup" target="_blank" rel="noopener noreferrer">
+                    <IconVK className={styles.tempSocialIcon} />
+                  </a>
+                  <a href="https://t.me/razbor_vykup96" target="_blank" rel="noopener noreferrer">
+                    <IconTelegram className={styles.tempSocialIcon} />
+                  </a>
+                  <a href="https://baza.drom.ru/user/Nikitin1588/" target="_blank" rel="noopener noreferrer">
+                    <IconDrom className={styles.tempSocialIcon} />
+                  </a>
+                </div>
+                <a href="tel:+79826048040" className={styles.tempPhone}>
+                  <i className="bi bi-telephone-fill"></i> +7 (982) 604-80-40
+                </a>
+              </div>
             </div>
           </div>
         </div>

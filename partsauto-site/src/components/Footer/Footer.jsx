@@ -1,13 +1,41 @@
-import React from 'react'
-import { Link } from 'react-router-dom'
+import React, { useEffect, useRef } from 'react'
+import { Link, useNavigate, useLocation } from 'react-router-dom'
 import { FaPhone, FaMapMarkerAlt } from 'react-icons/fa'
 import { useTheme } from '../../context/ThemeContext'
 import styles from './Footer.module.css'
 
 const Footer = () => {
   const { theme } = useTheme()
+  const navigate = useNavigate()
+  const location = useLocation()
   const logoSrc = theme === 'dark' ? '/logo-orange.png' : '/logo-blue.png'
   const currentYear = new Date().getFullYear()
+
+  // Флаг для отслеживания, нужно ли скроллить после навигации
+  const shouldScroll = useRef(false)
+
+  // Слушаем изменение локации для скролла после перехода
+  useEffect(() => {
+    if (shouldScroll.current && location.pathname === '/') {
+      // Ждём рендера MainPage и появления элемента contacts
+      const timeout = setTimeout(() => {
+        document.getElementById('contacts')?.scrollIntoView({ behavior: 'smooth' })
+        shouldScroll.current = false
+      }, 300)
+      return () => clearTimeout(timeout)
+    }
+  }, [location.pathname])
+
+  const handleContactClick = () => {
+    if (location.pathname === '/') {
+      // Если на главной - просто скролл
+      document.getElementById('contacts')?.scrollIntoView({ behavior: 'smooth' })
+    } else {
+      // Если на другой странице - переход на главную + скролл
+      shouldScroll.current = true
+      navigate('/')
+    }
+  }
   
   return (
     <footer className={styles.footer}>
@@ -28,7 +56,7 @@ const Footer = () => {
               <li><Link to="/catalog">Каталог запчастей</Link></li>
               <li><Link to="/car-buyback">Выкуп авто</Link></li>
               <li><Link to="/news">Новости</Link></li>
-              <li><Link to="/contacts">Контакты</Link></li>
+              <li><button className={styles.linkButton} onClick={handleContactClick}>Контакты</button></li>
             </ul>
           </div>
           

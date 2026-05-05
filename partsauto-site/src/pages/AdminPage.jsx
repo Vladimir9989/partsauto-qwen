@@ -11,29 +11,29 @@ function AdminPage() {
   const [isAuthenticated, setIsAuthenticated] = useState(false)
   const [password, setPassword] = useState('')
   const [activeTab, setActiveTab] = useState('cars')
-  
+
   // Состояния для машин
   const [cars, setCars] = useState([])
   const [newCarTitle, setNewCarTitle] = useState('')
   const [newCarDescription, setNewCarDescription] = useState('')
-  const [newCarImage, setNewCarImage] = useState(null)
+  const [newCarImages, setNewCarImages] = useState([])
   const [uploading, setUploading] = useState(false)
   const [carsLoading, setCarsLoading] = useState(false)
-  
+
   // Состояния для редактирования машины
   const [editingCar, setEditingCar] = useState(null)
   const [editTitle, setEditTitle] = useState('')
   const [editDescription, setEditDescription] = useState('')
-  const [editImage, setEditImage] = useState(null)
-  const [editImagePreview, setEditImagePreview] = useState('')
+  const [editImages, setEditImages] = useState([])
+  const [editImagesPreview, setEditImagesPreview] = useState([])
   const [editingUploading, setEditingUploading] = useState(false)
-  
+
   // Состояния для новостей
   const [news, setNews] = useState([])
   const [newNewsTitle, setNewNewsTitle] = useState('')
   const [newNewsContent, setNewNewsContent] = useState('')
   const [newsLoading, setNewsLoading] = useState(false)
-  
+
   // Состояния для редактирования новостей
   const [editingNews, setEditingNews] = useState(null)
   const [editNewsTitle, setEditNewsTitle] = useState('')
@@ -92,13 +92,13 @@ function AdminPage() {
     input.setAttribute('type', 'file')
     input.setAttribute('accept', 'image/*')
     input.click()
-    
+
     input.onchange = async () => {
       const file = input.files[0]
       if (!file) return
-      
+
       toast.loading('Загрузка изображения...', { id: 'upload-image' })
-      
+
       try {
         const imageUrl = await uploadNewsImageToServer(file)
         editor?.chain().focus().setImage({ src: imageUrl }).run()
@@ -115,13 +115,13 @@ function AdminPage() {
     input.setAttribute('type', 'file')
     input.setAttribute('accept', 'image/*')
     input.click()
-    
+
     input.onchange = async () => {
       const file = input.files[0]
       if (!file) return
-      
+
       toast.loading('Загрузка изображения...', { id: 'upload-edit-image' })
-      
+
       try {
         const imageUrl = await uploadNewsImageToServer(file)
         editEditor?.chain().focus().setImage({ src: imageUrl }).run()
@@ -175,7 +175,7 @@ function AdminPage() {
   const uploadCarImage = async (file) => {
     const formData = new FormData()
     formData.append('image', file)
-    
+
     const res = await fetch('/api/upload-car-image', {
       method: 'POST',
       body: formData
@@ -185,11 +185,25 @@ function AdminPage() {
     throw new Error(data.error)
   }
 
+  // Загрузка нескольких изображений на сервер (машины)
+  const uploadCarImages = async (files) => {
+    const formData = new FormData()
+    files.forEach(file => formData.append('images', file))
+
+    const res = await fetch('/api/upload-car-images', {
+      method: 'POST',
+      body: formData
+    })
+    const data = await res.json()
+    if (data.success) return data.imageUrls
+    throw new Error(data.error)
+  }
+
   // Загрузка изображений для новостей
   const uploadNewsImageToServer = async (file) => {
     const formData = new FormData()
     formData.append('image', file)
-    
+
     const res = await fetch('/api/upload-news-image', {
       method: 'POST',
       body: formData
@@ -200,6 +214,11 @@ function AdminPage() {
   }
 
 
+  // Функция для удаления изображения из списка
+  const removeNewCarImage = (index) => {
+    setNewCarImages(prev => prev.filter((_, i) => i !== index))
+  }
+
   // Добавление машины
   const addCar = async (e) => {
     e.preventDefault()
@@ -207,12 +226,12 @@ function AdminPage() {
       toast.error('Введите заголовок')
       return
     }
-    
-    let imageUrl = null
-    if (newCarImage) {
+
+    let images = []
+    if (newCarImages.length > 0) {
       setUploading(true)
       try {
-        imageUrl = await uploadCarImage(newCarImage)
+        images = await uploadCarImages(newCarImages)
       } catch (error) {
         toast.error('Ошибка загрузки фото: ' + error.message)
         setUploading(false)
@@ -220,19 +239,19 @@ function AdminPage() {
       }
       setUploading(false)
     }
-    
+
     try {
       const res = await fetch('/api/cars', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ title: newCarTitle, imageUrl, description: newCarDescription })
+        body: JSON.stringify({ title: newCarTitle, images, description: newCarDescription })
       })
       const data = await res.json()
       if (data.success) {
         toast.success('Машина добавлена')
         setNewCarTitle('')
         setNewCarDescription('')
-        setNewCarImage(null)
+        setNewCarImages([])
         const fileInput = document.getElementById('carImageInput')
         if (fileInput) fileInput.value = ''
         loadCars()
@@ -261,13 +280,19 @@ function AdminPage() {
     }
   }
 
+  // Функция для удаления изображения из списка редактирования
+  const removeEditImage = (index) => {
+    setEditImages(prev => prev.filter((_, i) => i !== index))
+    setEditImagesPreview(prev => prev.filter((_, i) => i !== index))
+  }
+
   // Открытие модального окна редактирования
   const openEditModal = (car) => {
     setEditingCar(car)
     setEditTitle(car.title)
     setEditDescription(car.description || '')
-    setEditImagePreview(car.imageUrl || '')
-    setEditImage(null)
+    setEditImagesPreview(car.images || [])
+    setEditImages([])
   }
 
   // Закрытие модального окна редактирования
@@ -275,20 +300,17 @@ function AdminPage() {
     setEditingCar(null)
     setEditTitle('')
     setEditDescription('')
-    setEditImage(null)
-    setEditImagePreview('')
+    setEditImages([])
+    setEditImagesPreview([])
   }
 
-  // Обработка изменения изображения при редактировании
-  const handleEditImageChange = (e) => {
-    const file = e.target.files[0]
-    if (file) {
-      setEditImage(file)
-      const reader = new FileReader()
-      reader.onload = (event) => {
-        setEditImagePreview(event.target.result)
-      }
-      reader.readAsDataURL(file)
+  // Обработка изменения изображений при редактировании
+  const handleEditImagesChange = (e) => {
+    const files = Array.from(e.target.files)
+    if (files.length > 0) {
+      const previews = files.map(file => URL.createObjectURL(file))
+      setEditImages(files)
+      setEditImagesPreview(prev => [...prev, ...previews])
     }
   }
 
@@ -300,12 +322,13 @@ function AdminPage() {
     }
 
     setEditingUploading(true)
-    let imageUrl = editImagePreview
+    let images = editImagesPreview
 
-    // Если выбрано новое изображение, загружаем его
-    if (editImage) {
+    // Если выбраны новые изображения, загружаем их
+    if (editImages.length > 0) {
       try {
-        imageUrl = await uploadCarImage(editImage)
+        const newImageUrls = await uploadCarImages(editImages)
+        images = [...editImagesPreview, ...newImageUrls]
       } catch (error) {
         toast.error('Ошибка загрузки фото: ' + error.message)
         setEditingUploading(false)
@@ -320,7 +343,7 @@ function AdminPage() {
         body: JSON.stringify({
           title: editTitle,
           description: editDescription,
-          imageUrl: imageUrl
+          images: images
         })
       })
       const data = await res.json()
@@ -462,15 +485,15 @@ function AdminPage() {
     <div className={styles.adminPage}>
       <div className={styles.container}>
         <h1>Админ-панель</h1>
-        
+
         <div className={styles.tabs}>
-          <button 
+          <button
             className={`${styles.tab} ${activeTab === 'cars' ? styles.activeTab : ''}`}
             onClick={() => setActiveTab('cars')}
           >
             Машины в разборе
           </button>
-          <button 
+          <button
             className={`${styles.tab} ${activeTab === 'news' ? styles.activeTab : ''}`}
             onClick={() => setActiveTab('news')}
           >
@@ -501,9 +524,23 @@ function AdminPage() {
                   id="carImageInput"
                   type="file"
                   accept="image/*"
-                  onChange={(e) => setNewCarImage(e.target.files[0])}
+                  multiple
+                  onChange={(e) => {
+                    const newFiles = Array.from(e.target.files)
+                    setNewCarImages(prev => [...prev, ...newFiles])
+                  }}
                   className={styles.fileInput}
                 />
+                {newCarImages.length > 0 && (
+                  <div className={styles.imagePreviewList}>
+                    {newCarImages.map((file, idx) => (
+                      <div key={idx} className={styles.imagePreviewItem}>
+                        <img src={URL.createObjectURL(file)} alt={`preview-${idx}`} />
+                        <button type="button" onClick={() => removeNewCarImage(idx)} className={styles.removeImageBtn}>×</button>
+                      </div>
+                    ))}
+                  </div>
+                )}
                 {uploading && <div className={styles.uploading}>Загрузка фото...</div>}
                 <button type="submit" className={styles.submitBtn} disabled={uploading}>
                   {uploading ? 'Загрузка...' : 'Добавить'}
@@ -525,15 +562,18 @@ function AdminPage() {
                   {cars.map(car => (
                     <li key={car.id} className={styles.listItem}>
                       <div className={styles.itemContent}>
-                        {car.imageUrl && (
+                        {car.images && car.images.length > 0 && (
                           <img
-                            src={car.imageUrl}
+                            src={car.images[0]}
                             alt={car.title}
                             className={styles.itemImage}
                           />
                         )}
                         <span className={styles.itemTitle}>{car.title}</span>
                         <span className={styles.itemDate}>{car.date}</span>
+                        {car.images && car.images.length > 1 && (
+                          <span className={styles.imageCount}>+{car.images.length - 1} фото</span>
+                        )}
                         {car.description && (
                           <div className={styles.itemDescription}>
                             {car.description.length > 100
@@ -597,110 +637,118 @@ function AdminPage() {
                 <div className={styles.empty}>Нет добавленных новостей</div>
               ) : (
                 <ul className={styles.list}>
-                   {news.map(item => (
-                     <li key={item.id} className={styles.listItem}>
-                       <div className={styles.itemContent}>
-                         <span className={styles.itemTitle}>{item.title}</span>
-                         <span className={styles.itemDate}>{item.date}</span>
-                         {item.content && (
-                           <div className={styles.itemPreview}>
-                             {item.content.substring(0, 100)}...
-                           </div>
-                         )}
-                       </div>
-                       <div className={styles.itemActions}>
-                         <button onClick={() => openEditNewsModal(item)} className={styles.editBtn}>
-                           ✏️ Редактировать
-                         </button>
-                         <button onClick={() => deleteNews(item.id)} className={styles.deleteBtn}>
-                           Удалить
-                         </button>
-                       </div>
-                     </li>
-                   ))}
-                 </ul>
+                  {news.map(item => (
+                    <li key={item.id} className={styles.listItem}>
+                      <div className={styles.itemContent}>
+                        <span className={styles.itemTitle}>{item.title}</span>
+                        <span className={styles.itemDate}>{item.date}</span>
+                        {item.content && (
+                          <div className={styles.itemPreview}>
+                            {item.content.substring(0, 100)}...
+                          </div>
+                        )}
+                      </div>
+                      <div className={styles.itemActions}>
+                        <button onClick={() => openEditNewsModal(item)} className={styles.editBtn}>
+                          ✏️ Редактировать
+                        </button>
+                        <button onClick={() => deleteNews(item.id)} className={styles.deleteBtn}>
+                          Удалить
+                        </button>
+                      </div>
+                    </li>
+                  ))}
+                </ul>
               )}
             </div>
           </div>
         )}
 
-       {editingCar && (
-         <div className={styles.modalOverlay} onClick={closeEditModal}>
-           <div className={styles.modalContent} onClick={(e) => e.stopPropagation()}>
-             <h3>Редактировать машину</h3>
-             
-             <input
-               type="text"
-               placeholder="Заголовок"
-               value={editTitle}
-               onChange={(e) => setEditTitle(e.target.value)}
-               className={styles.input}
-             />
-             
-             <textarea
-               placeholder="Описание"
-               value={editDescription}
-               onChange={(e) => setEditDescription(e.target.value)}
-               className={styles.textarea}
-               rows={4}
-             />
-             
-             {editImagePreview && (
-               <img src={editImagePreview} alt="Превью" className={styles.editImagePreview} />
-             )}
-             
-             <input
-               type="file"
-               accept="image/*"
-               onChange={handleEditImageChange}
-               className={styles.fileInput}
-             />
-             
-             <div className={styles.modalActions}>
-               <button onClick={saveEditCar} disabled={editingUploading} className={styles.submitBtn}>
-                 {editingUploading ? 'Сохранение...' : 'Сохранить'}
-               </button>
-               <button onClick={closeEditModal} className={styles.cancelBtn}>Отмена</button>
-             </div>
-           </div>
-         </div>
-       )}
+        {editingCar && (
+          <div className={styles.modalOverlay} onClick={closeEditModal}>
+            <div className={styles.modalContent} onClick={(e) => e.stopPropagation()}>
+              <h3>Редактировать машину</h3>
 
-       {editingNews && (
-         <div className={styles.modalOverlay} onClick={closeEditNewsModal}>
-           <div className={styles.modalContent} onClick={(e) => e.stopPropagation()}>
-             <h3>Редактировать новость</h3>
-             
-             <input
-               type="text"
-               placeholder="Заголовок новости"
-               value={editNewsTitle}
-               onChange={(e) => setEditNewsTitle(e.target.value)}
-               className={styles.input}
-             />
-             
-             <div className={styles.editorWrapper}>
-               <div className={styles.toolbar}>
-                 <button type="button" onClick={() => editEditor?.chain().focus().toggleBold().run()} className={editEditor?.isActive('bold') ? styles.activeTool : ''}>B</button>
-                 <button type="button" onClick={() => editEditor?.chain().focus().toggleItalic().run()} className={editEditor?.isActive('italic') ? styles.activeTool : ''}>I</button>
-                 <button type="button" onClick={() => editEditor?.chain().focus().toggleHeading({ level: 2 }).run()} className={editEditor?.isActive('heading', { level: 2 }) ? styles.activeTool : ''}>H2</button>
-                 <button type="button" onClick={() => editEditor?.chain().focus().toggleHeading({ level: 3 }).run()} className={editEditor?.isActive('heading', { level: 3 }) ? styles.activeTool : ''}>H3</button>
-                 <button type="button" onClick={() => editEditor?.chain().focus().toggleBulletList().run()} className={editEditor?.isActive('bulletList') ? styles.activeTool : ''}>• Список</button>
-                 <button type="button" onClick={() => editEditor?.chain().focus().toggleOrderedList().run()} className={editEditor?.isActive('orderedList') ? styles.activeTool : ''}>1. Список</button>
-                 <button type="button" onClick={addEditImage}>📷 Изображение</button>
-               </div>
-               <EditorContent editor={editEditor} className={styles.tiptapEditor} />
-             </div>
-             
-             <div className={styles.modalActions}>
-               <button onClick={saveEditNews} disabled={editingNewsSubmit} className={styles.submitBtn}>
-                 {editingNewsSubmit ? 'Сохранение...' : 'Сохранить'}
-               </button>
-               <button onClick={closeEditNewsModal} className={styles.cancelBtn}>Отмена</button>
-             </div>
-           </div>
-         </div>
-       )}
+              <input
+                type="text"
+                placeholder="Заголовок"
+                value={editTitle}
+                onChange={(e) => setEditTitle(e.target.value)}
+                className={styles.input}
+              />
+
+              <textarea
+                placeholder="Описание"
+                value={editDescription}
+                onChange={(e) => setEditDescription(e.target.value)}
+                className={styles.textarea}
+                rows={4}
+              />
+
+              {editImagesPreview.length > 0 && (
+                <div className={styles.imagePreviewList}>
+                  {editImagesPreview.map((imgUrl, idx) => (
+                    <div key={idx} className={styles.imagePreviewItem}>
+                      <img src={imgUrl} alt={`preview-${idx}`} />
+                      <button type="button" onClick={() => removeEditImage(idx)} className={styles.removeImageBtn}>×</button>
+                    </div>
+                  ))}
+                </div>
+              )}
+
+              <input
+                type="file"
+                accept="image/*"
+                multiple
+                onChange={handleEditImagesChange}
+                className={styles.fileInput}
+              />
+
+              <div className={styles.modalActions}>
+                <button onClick={saveEditCar} disabled={editingUploading} className={styles.submitBtn}>
+                  {editingUploading ? 'Сохранение...' : 'Сохранить'}
+                </button>
+                <button onClick={closeEditModal} className={styles.cancelBtn}>Отмена</button>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {editingNews && (
+          <div className={styles.modalOverlay} onClick={closeEditNewsModal}>
+            <div className={styles.modalContent} onClick={(e) => e.stopPropagation()}>
+              <h3>Редактировать новость</h3>
+
+              <input
+                type="text"
+                placeholder="Заголовок новости"
+                value={editNewsTitle}
+                onChange={(e) => setEditNewsTitle(e.target.value)}
+                className={styles.input}
+              />
+
+              <div className={styles.editorWrapper}>
+                <div className={styles.toolbar}>
+                  <button type="button" onClick={() => editEditor?.chain().focus().toggleBold().run()} className={editEditor?.isActive('bold') ? styles.activeTool : ''}>B</button>
+                  <button type="button" onClick={() => editEditor?.chain().focus().toggleItalic().run()} className={editEditor?.isActive('italic') ? styles.activeTool : ''}>I</button>
+                  <button type="button" onClick={() => editEditor?.chain().focus().toggleHeading({ level: 2 }).run()} className={editEditor?.isActive('heading', { level: 2 }) ? styles.activeTool : ''}>H2</button>
+                  <button type="button" onClick={() => editEditor?.chain().focus().toggleHeading({ level: 3 }).run()} className={editEditor?.isActive('heading', { level: 3 }) ? styles.activeTool : ''}>H3</button>
+                  <button type="button" onClick={() => editEditor?.chain().focus().toggleBulletList().run()} className={editEditor?.isActive('bulletList') ? styles.activeTool : ''}>• Список</button>
+                  <button type="button" onClick={() => editEditor?.chain().focus().toggleOrderedList().run()} className={editEditor?.isActive('orderedList') ? styles.activeTool : ''}>1. Список</button>
+                  <button type="button" onClick={addEditImage}>📷 Изображение</button>
+                </div>
+                <EditorContent editor={editEditor} className={styles.tiptapEditor} />
+              </div>
+
+              <div className={styles.modalActions}>
+                <button onClick={saveEditNews} disabled={editingNewsSubmit} className={styles.submitBtn}>
+                  {editingNewsSubmit ? 'Сохранение...' : 'Сохранить'}
+                </button>
+                <button onClick={closeEditNewsModal} className={styles.cancelBtn}>Отмена</button>
+              </div>
+            </div>
+          </div>
+        )}
       </div>
     </div>
   )

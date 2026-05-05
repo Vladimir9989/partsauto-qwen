@@ -265,7 +265,7 @@ app.get('/api/cars', (req, res) => {
 });
 
 app.post('/api/cars', express.json(), (req, res) => {
-  const { title, date, link, imageUrl, description } = req.body;
+  const { title, date, link, images, description } = req.body;
   if (!title) return res.status(400).json({ success: false, error: 'Не указан заголовок' });
   
   const cars = getCarsList();
@@ -274,7 +274,7 @@ app.post('/api/cars', express.json(), (req, res) => {
     title,
     date: date || new Date().toLocaleDateString('ru-RU'),
     link: link || '#',
-    imageUrl: imageUrl || null,
+    images: images || [],
     description: description || '',
     createdAt: new Date().toISOString()
   };
@@ -285,7 +285,7 @@ app.post('/api/cars', express.json(), (req, res) => {
 
 app.put('/api/cars/:id', express.json(), (req, res) => {
   const id = parseInt(req.params.id);
-  const { title, description, imageUrl } = req.body;
+  const { title, description, images } = req.body;
   const cars = getCarsList();
   const index = cars.findIndex(car => car.id === id);
   
@@ -297,7 +297,7 @@ app.put('/api/cars/:id', express.json(), (req, res) => {
     ...cars[index],
     title: title || cars[index].title,
     description: description !== undefined ? description : cars[index].description,
-    imageUrl: imageUrl !== undefined ? imageUrl : cars[index].imageUrl,
+    images: images !== undefined ? images : cars[index].images || [],
     updatedAt: new Date().toISOString()
   };
   
@@ -375,6 +375,20 @@ app.post('/api/upload-car-image', upload.single('image'), (req, res) => {
   } catch (error) {
     console.error('Ошибка загрузки:', error);
     res.status(500).json({ success: false, error: 'Ошибка загрузки файла' });
+  }
+});
+
+// Эндпоинт для загрузки нескольких изображений машины
+app.post('/api/upload-car-images', upload.array('images', 10), (req, res) => {
+  try {
+    if (!req.files || req.files.length === 0) {
+      return res.status(400).json({ success: false, error: 'Файлы не загружены' });
+    }
+    const imageUrls = req.files.map(file => `/uploads/cars/${file.filename}`);
+    res.json({ success: true, imageUrls });
+  } catch (error) {
+    console.error('Ошибка загрузки:', error);
+    res.status(500).json({ success: false, error: 'Ошибка загрузки файлов' });
   }
 });
 

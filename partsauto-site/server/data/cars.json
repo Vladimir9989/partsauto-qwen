@@ -1,29 +1,26 @@
 [
   {
-    "id": 1777984300731,
-    "title": "Peugeot 307 2005 год АКПП 1.6",
+    "id": 1777987576725,
+    "title": "asdasd",
     "date": "05.05.2026",
     "link": "#",
-    "imageUrl": "/uploads/cars/1777984300636-756178624.jpg",
+    "images": [
+      "/uploads/cars/1777987576713-737087334.jpg",
+      "/uploads/cars/1777988124275-643422958.jpg"
+    ],
     "description": "",
-    "createdAt": "2026-05-05T12:31:40.743Z"
+    "createdAt": "2026-05-05T13:26:16.725Z",
+    "updatedAt": "2026-05-05T13:36:24.275Z"
   },
   {
-    "id": 1777486330583,
-    "title": "Поступил в разбор Lada Vesta 2020г 1.6л МКПП двс 211",
-    "date": "29.04.2026",
+    "id": 1777987090553,
+    "title": "asd",
+    "date": "05.05.2026",
     "link": "#",
-    "imageUrl": "/uploads/cars/1777487711946-132916586.jpg",
-    "description": "Поступил в разбор Lada ",
-    "createdAt": "2026-04-29T18:12:10.583Z",
-    "updatedAt": "2026-04-29T18:35:11.960Z"
-  },
-  {
-    "id": 1776768093771,
-    "title": "Поступил в разбор Lada Vesta 2020г 1.6л МКПП двс 21129",
-    "date": "21.04.2026",
-    "link": "#",
-    "imageUrl": "/uploads/cars/1776768093450-471044442.jpg",
-    "createdAt": "2026-04-21T10:41:33.771Z"
+    "images": [
+      "/uploads/cars/1777987090536-694887779.jpg"
+    ],
+    "description": "",
+    "createdAt": "2026-05-05T13:18:10.571Z"
   }
 ]

@@ -6,6 +6,54 @@ import 'swiper/css/navigation'
 import 'swiper/css/pagination'
 import styles from './CarsScroller.module.css'
 
+// Компонент слайдера изображений для карточки
+const ImageSlider = ({ images, title }) => {
+  const [currentIndex, setCurrentIndex] = useState(0)
+  
+  useEffect(() => {
+    if (images.length <= 1) return
+    const timer = setInterval(() => {
+      setCurrentIndex(prev => (prev + 1) % images.length)
+    }, 113000)
+    return () => clearInterval(timer)
+  }, [images.length])
+  
+  const goToPrev = (e) => {
+    e.stopPropagation()
+    setCurrentIndex(prev => prev === 0 ? images.length - 1 : prev - 1)
+  }
+  
+  const goToNext = (e) => {
+    e.stopPropagation()
+    setCurrentIndex(prev => (prev + 1) % images.length)
+  }
+  
+  return (
+    <div className={styles.sliderContainer}>
+      <img src={images[currentIndex]} alt={title} className={styles.carImage} />
+      {images.length > 1 && (
+        <>
+          <button className={styles.sliderPrev} onClick={goToPrev} aria-label="Предыдущее фото">‹</button>
+          <button className={styles.sliderNext} onClick={goToNext} aria-label="Следующее фото">›</button>
+          <div className={styles.sliderDots}>
+            {images.map((_, idx) => (
+              <span
+                key={idx}
+                className={`${styles.dot} ${idx === currentIndex ? styles.activeDot : ''}`}
+                onClick={(e) => {
+                  e.stopPropagation()
+                  setCurrentIndex(idx)
+                }}
+                aria-label={`Фото ${idx + 1}`}
+              />
+            ))}
+          </div>
+        </>
+      )}
+    </div>
+  )
+}
+
 // Статические данные (fallback)
 const staticCards = [
   {
@@ -13,56 +61,56 @@ const staticCards = [
     title: "Поступил в разбор Lada Vesta 2020г 1.6л МКПП двс 21129",
     date: "29 января 2026",
     link: "/news/1014",
-    imageUrl: null
+    images: []
   },
   {
     id: 1013,
     title: "Поступил в разбор Kia RIO 2013г 1.6л МКПП двс G4FC",
     date: "29 января 2026",
     link: "/news/1013",
-    imageUrl: null
+    images: []
   },
   {
     id: 1012,
     title: "Поступил в разбор Kia Spectra 2008г 1.6л МКПП двс S6D",
     date: "29 января 2026",
     link: "/news/1012",
-    imageUrl: null
+    images: []
   },
   {
     id: 1009,
     title: "Поступил в разбор Renault Logan 2008г 1.4л двс K7JA710",
     date: "6 октября 2025",
     link: "/news/1009",
-    imageUrl: null
+    images: []
   },
   {
     id: 1008,
     title: "Поступил в разбор Mitsubishi Colt 2005г 1.3л",
     date: "6 октября 2025",
     link: "/news/1008",
-    imageUrl: null
+    images: []
   },
   {
     id: 1006,
     title: "Поступил в разбор Chevrolet Lacetti 2008г 1.6л 109 л.с двс F16D3",
     date: "11 июля 2025",
     link: "/news/1006",
-    imageUrl: null
+    images: []
   },
   {
     id: 1005,
     title: "Поступил в разбор Opel Corsa D 2008г 1.2л 80 л.с двс Z12XER",
     date: "10 июля 2025",
     link: "/news/1005",
-    imageUrl: null
+    images: []
   },
   {
     id: 1004,
     title: "Поступил в разбор Mitsubishi Lancer 9 2005г STW 1.6л 98 л.с двс 4G18",
     date: "10 июля 2025",
     link: "/news/1004",
-    imageUrl: null
+    images: []
   }
 ]
 
@@ -154,27 +202,26 @@ const CarsScroller = () => {
                 <SwiperSlide key={card.id}>
                   <div className={styles.card}>
                     <div
+                      className={styles.imagePlaceholder}
                       onClick={() => handleCardClick(card)}
                       style={{ cursor: 'pointer' }}
                     >
-                      <div className={styles.imagePlaceholder}>
-                        {card.imageUrl ? (
-                          <img
-                            src={card.imageUrl}
-                            alt={card.title}
-                            className={styles.carImage}
-                          />
-                        ) : (
-                          <div className={styles.placeholderContent}>
-                            {getCarIcon(card.title)}
-                          </div>
-                        )}
-                      </div>
-                      <time className={styles.date}>{card.date}</time>
-                      <a href={card.link} className={styles.cardTitle}>
-                        {card.title}
-                      </a>
+                      {card.images && card.images.length > 0 ? (
+                        <ImageSlider images={card.images} title={card.title} />
+                      ) : (
+                        <div className={styles.placeholderContent}>
+                          {getCarIcon(card.title)}
+                        </div>
+                      )}
                     </div>
+                    <time className={styles.date}>{card.date}</time>
+                    <a
+                      className={styles.cardTitle}
+                      onClick={() => handleCardClick(card)}
+                      style={{ cursor: 'pointer' }}
+                    >
+                      {card.title}
+                    </a>
                   </div>
                 </SwiperSlide>
               ))}
@@ -189,8 +236,8 @@ const CarsScroller = () => {
             <button className={styles.modalClose} onClick={handleCloseModal}>×</button>
             
             <div className={styles.modalImage}>
-              {selectedCard.imageUrl ? (
-                <img src={selectedCard.imageUrl} alt={selectedCard.title} />
+              {selectedCard.images && selectedCard.images.length > 0 ? (
+                <img src={selectedCard.images[0]} alt={selectedCard.title} />
               ) : (
                 <div className={styles.modalNoImage}>
                   {getCarIcon(selectedCard.title)}

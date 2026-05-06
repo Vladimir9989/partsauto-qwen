@@ -25,7 +25,7 @@ const ContactsSection = () => {
                 
                 <div className={styles.contactItem}>
                   <i className="bi bi-envelope"></i>
-                  <a href="mailto:info@partsauto.ru">info@partsauto.ru</a>
+                  <a href="mailto:razbor.vykup@mail.ru">razbor.vykup@mail.ru</a>
                 </div>
                 
                 <div className={styles.contactItem}>
@@ -64,7 +64,7 @@ const ContactsSection = () => {
                 
                 <div className={styles.contactItem}>
                   <i className="bi bi-envelope"></i>
-                  <a href="mailto:info@partsauto.ru">info@partsauto.ru</a>
+                  <a href="mailto:razbor.vykup@mail.ru">razbor.vykup@mail.ru</a>
                 </div>
                 
                 <div className={styles.contactItem}>

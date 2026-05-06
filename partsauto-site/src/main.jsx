@@ -4,24 +4,18 @@ import App from './App.jsx'
 import './index.css'
 
 // Инициализация темы при загрузке приложения
+// Используем тот же ключ localStorage, что и ThemeContext
 const initTheme = () => {
-  const savedTheme = localStorage.getItem('partsauto-theme')
+  const savedTheme = localStorage.getItem('theme')
   if (savedTheme) {
     try {
-      const { state } = JSON.parse(savedTheme)
-      const theme = state?.theme || 'light'
-      
-      if (theme === 'auto') {
-        const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches
-        document.documentElement.setAttribute('data-theme', prefersDark ? 'dark' : 'light')
-      } else {
-        document.documentElement.setAttribute('data-theme', theme)
-      }
+      const theme = savedTheme || 'dark'
+      document.documentElement.setAttribute('data-theme', theme)
     } catch (e) {
-      document.documentElement.setAttribute('data-theme', 'light')
+      document.documentElement.setAttribute('data-theme', 'dark')
     }
   } else {
-    document.documentElement.setAttribute('data-theme', 'light')
+    document.documentElement.setAttribute('data-theme', 'dark')
   }
 }
 

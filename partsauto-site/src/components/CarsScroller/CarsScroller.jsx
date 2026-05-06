@@ -79,7 +79,7 @@ const ModalImageSlider = ({ images, title, onImageClick }) => {
   const handleImageClick = (e) => {
     e.stopPropagation()
     if (onImageClick) {
-      onImageClick(images[currentIndex])
+      onImageClick(images, currentIndex)
     }
   }
   
@@ -115,6 +115,59 @@ const ModalImageSlider = ({ images, title, onImageClick }) => {
   )
 }
 
+// Компонент лайтбокса со слайдером
+const LightboxSlider = ({ images, title, initialIndex, onClose }) => {
+  const [currentIndex, setCurrentIndex] = useState(initialIndex)
+  
+  useEffect(() => {
+    const handleKeyDown = (e) => {
+      if (e.key === 'Escape') onClose()
+      if (e.key === 'ArrowLeft') goToPrev(e)
+      if (e.key === 'ArrowRight') goToNext(e)
+    }
+    window.addEventListener('keydown', handleKeyDown)
+    return () => window.removeEventListener('keydown', handleKeyDown)
+  }, [images.length])
+  
+  const goToPrev = (e) => {
+    e?.stopPropagation()
+    setCurrentIndex(prev => prev === 0 ? images.length - 1 : prev - 1)
+  }
+  
+  const goToNext = (e) => {
+    e?.stopPropagation()
+    setCurrentIndex(prev => (prev + 1) % images.length)
+  }
+  
+  return (
+    <div className={styles.lightboxOverlay} onClick={onClose}>
+      <button className={styles.lightboxClose} onClick={onClose}>×</button>
+      <div className={styles.lightboxContainer} onClick={(e) => e.stopPropagation()}>
+        <img 
+          src={images[currentIndex]} 
+          alt={title} 
+          className={styles.lightboxImage} 
+        />
+        {images.length > 1 && (
+          <>
+            <button className={styles.lightboxPrev} onClick={goToPrev}>‹</button>
+            <button className={styles.lightboxNext} onClick={goToNext}>›</button>
+            <div className={styles.lightboxDots}>
+              {images.map((_, idx) => (
+                <span
+                  key={idx}
+                  className={`${styles.lightboxDot} ${idx === currentIndex ? styles.lightboxDotActive : ''}`}
+                  onClick={() => setCurrentIndex(idx)}
+                />
+              ))}
+            </div>
+          </>
+        )}
+      </div>
+    </div>
+  )
+}
+
 // Статические данные (fallback)
 const staticCards = [
   {
@@ -134,7 +187,7 @@ const staticCards = [
   {
     id: 1012,
     title: "Поступил в разбор Kia Spectra 2008г 1.6л МКПП двс S6D",
-    date: "29 января 2026",
+    date: "6 октября 2025",
     link: "/news/1012",
     images: []
   },
@@ -179,7 +232,8 @@ const CarsScroller = () => {
   const [cards, setCards] = useState([])
   const [loading, setLoading] = useState(true)
   const [selectedCard, setSelectedCard] = useState(null)
-  const [lightboxImage, setLightboxImage] = useState(null)
+  const [lightboxImages, setLightboxImages] = useState(null)
+  const [lightboxIndex, setLightboxIndex] = useState(0)
 
   const handleCardClick = (card) => {
     setSelectedCard(card)
@@ -189,12 +243,13 @@ const CarsScroller = () => {
     setSelectedCard(null)
   }
 
-  const handleImageClick = (imageUrl) => {
-    setLightboxImage(imageUrl)
+  const handleImageClick = (images, index) => {
+    setLightboxImages(images)
+    setLightboxIndex(index)
   }
 
   const handleCloseLightbox = () => {
-    setLightboxImage(null)
+    setLightboxImages(null)
   }
 
   useEffect(() => {
@@ -330,12 +385,14 @@ const CarsScroller = () => {
         </div>
       )}
       
-      {/* Lightbox для увеличенного просмотра изображения */}
-      {lightboxImage && (
-        <div className={styles.lightboxOverlay} onClick={handleCloseLightbox}>
-          <button className={styles.lightboxClose} onClick={handleCloseLightbox}>×</button>
-          <img src={lightboxImage} alt="Увеличенное изображение" className={styles.lightboxImage} />
-        </div>
+      {/* Lightbox со слайдером для увеличенного просмотра изображений */}
+      {lightboxImages && (
+        <LightboxSlider
+          images={lightboxImages}
+          title={selectedCard?.title || ''}
+          initialIndex={lightboxIndex}
+          onClose={handleCloseLightbox}
+        />
       )}
     </>
   )

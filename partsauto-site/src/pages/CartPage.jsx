@@ -167,7 +167,6 @@ function CartPage() {
           </Link>
           <div className={styles.header}>
             <h1>Оформление заказа</h1>
-            <p className={styles.subtitle}>Проверьте товары и заполните данные для доставки</p>
           </div>
 
           <div className={styles.content}>
@@ -343,7 +342,7 @@ function CartPage() {
               
               <div className={styles.tempLocation}>
                 <h4>Екатеринбург</h4>
-                <p>осуществляется доставка по адресу ул. Блюхера 32 (возле тц Современник) машина приезжает около 15:15 на пол часа +- (предварительно свяжитесь с нами)</p>
+                <p>Осуществляется доставка по адресу ул. Блюхера 32 (возле тц Современник) машина приезжает в 15:00 (предварительно свяжитесь с нами)</p>
                 <button
                   className={styles.tempMapLink}
                   onClick={() => {
@@ -374,7 +373,7 @@ function CartPage() {
               </div>
 
               <div className={styles.tempContactBlock}>
-                <p className={styles.tempContactText}>Если вам нужна доставка — свяжитесь с нами:</p>
+                <p className={styles.tempContactText}>Если вам нужна доставка — свяжитесь с нами: - по всем вопросам</p>
                 <div className={styles.tempSocials}>
                   <a href="https://max.ru/u/..." target="_blank" rel="noopener noreferrer">
                     <IconMax className={styles.tempSocialIcon} />

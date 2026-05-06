@@ -6,7 +6,7 @@ import styles from './Header.module.css';
 
 function HeaderBottom({ isMobileMenuOpen, setIsMobileMenuOpen, onCartClick, onContactsClick, cartItemsCount = 0 }) {
   const { theme } = useTheme();
-  const logoSrc = theme === 'dark' ? '/logo-orange.png' : '/logo-blue.png';
+  const logoSrc = theme === 'dark' ? '/logo-white.png' : '/logo-blue.png';
   
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
 

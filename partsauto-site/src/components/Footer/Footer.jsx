@@ -8,7 +8,7 @@ const Footer = () => {
   const { theme } = useTheme()
   const navigate = useNavigate()
   const location = useLocation()
-  const logoSrc = theme === 'dark' ? '/logo-orange.png' : '/logo-blue.png'
+  const logoSrc = theme === 'dark' ? '/logo-white.png' : '/logo-blue.png'
   const currentYear = new Date().getFullYear()
 
   // Флаг для отслеживания, нужно ли скроллить после навигации

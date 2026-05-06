@@ -43,7 +43,7 @@ const Footer = () => {
         <div className={styles.content}>
           <div className={styles.column}>
             <Link to="/" className={styles.logoLink}>
-              <img src={logoSrc} alt="PartsAuto" className={styles.logoImage} />
+              <img src={logoSrc} alt="Разбор Выкуп" className={styles.logoImage} />
             </Link>
             <p className={styles.description}>
               Оригинальные автозапчасти для вашего автомобиля

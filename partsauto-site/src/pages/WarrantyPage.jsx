@@ -5,7 +5,7 @@ function WarrantyPage() {
   return (
     <>
       <Helmet>
-        <title>Гарантия и возврат - PartsAuto</title>
+        <title>Гарантия и возврат - Разбор Выкуп</title>
         <meta name="description" content="Условия гарантии и возврата автозапчастей. Правила обмена и возврата товара." />
       </Helmet>
 

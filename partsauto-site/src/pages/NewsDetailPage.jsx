@@ -49,7 +49,7 @@ function NewsDetailPage() {
   return (
     <>
       <Helmet>
-        <title>{news.title} - PartsAuto</title>
+        <title>{news.title} - Разбор Выкуп</title>
         <meta name="description" content={news.content?.replace(/<[^>]*>/g, '').substring(0, 200)} />
         {ogImage && <meta property="og:image" content={ogImage} />}
       </Helmet>

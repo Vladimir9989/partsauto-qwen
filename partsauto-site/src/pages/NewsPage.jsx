@@ -33,8 +33,8 @@ function NewsPage() {
   return (
     <>
       <Helmet>
-        <title>Новости о нас - PartsAuto</title>
-        <meta name="description" content="Новости компании PartsAuto" />
+        <title>Новости о нас - Разбор Выкуп</title>
+        <meta name="description" content="Новости компании Разбор Выкуп" />
       </Helmet>
 
       <div className={styles.newsPage}>

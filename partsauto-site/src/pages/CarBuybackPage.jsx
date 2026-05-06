@@ -5,7 +5,7 @@ function CarBuybackPage() {
   return (
     <>
       <Helmet>
-        <title>Выкуп авто - PartsAuto</title>
+        <title>Выкуп авто - Разбор Выкуп</title>
         <meta name="description" content="Выкуп автомобилей в любом состоянии. Деньги сразу от 10 000 рублей." />
       </Helmet>
 

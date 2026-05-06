@@ -5,7 +5,7 @@ function DeliveryPage() {
   return (
     <>
       <Helmet>
-        <title>Оплата и доставка - PartsAuto</title>
+        <title>Оплата и доставка - Разбор Выкуп</title>
         <meta name="description" content="Способы оплаты и доставки автозапчастей по Екатеринбургу и всей России" />
       </Helmet>
 

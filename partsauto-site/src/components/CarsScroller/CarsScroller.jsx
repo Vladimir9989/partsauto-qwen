@@ -297,7 +297,7 @@ const CarsScroller = () => {
     return (
       <section className={styles.section}>
         <div className={styles.container}>
-          <h2 className={styles.title}>Машины в разборе</h2>
+          <h2 className={styles.title}>Последние поступления автомобилей в разбор</h2>
           <div className={styles.loader}>Загрузка...</div>
         </div>
       </section>
@@ -308,7 +308,7 @@ const CarsScroller = () => {
     <>
       <section className={styles.section}>
         <div className={styles.container}>
-          <h2 className={styles.title}>Машины в разборе</h2>
+          <h2 className={styles.title}>Последние поступления автомобилей в разбор</h2>
           
           <div className={styles.swiperWrapper}>
             <Swiper

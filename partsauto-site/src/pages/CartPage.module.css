@@ -91,6 +91,21 @@
   color: var(--header-text-muted);
 }
 
+.contactLink {
+  display: inline-block;
+  margin-top: 16px;
+  padding: 10px 20px;
+  /* background-color: var(--header-accent); */
+  color: white;
+  border-radius: 8px;
+  text-decoration: none;
+  transition: background-color 0.2s;
+}
+
+.contactLink:hover {
+  background-color: var(--header-text);
+}
+
 .emptyCart i {
   font-size: 64px;
   margin-bottom: 16px;

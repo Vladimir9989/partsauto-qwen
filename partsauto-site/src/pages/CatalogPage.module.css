@@ -95,6 +95,23 @@
   color: var(--header-text-muted);
 }
 
+.contactLink {
+  display: inline-block;
+  margin-top: 16px;
+  padding: 10px 20px;
+  background: transparent;
+  border: none;
+  color: var(--header-accent);
+  font-size: 16px;
+  text-decoration: none;
+  transition: background-color 0.2s;
+}
+
+.contactLink:hover {
+  color: var(--header-accent);
+  transform: scale(1.05);
+}
+
 /* Компактные фильтры */
 .compactFiltersWrapper {
   display: none;

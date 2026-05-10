@@ -43,6 +43,16 @@ function CatalogPage() {
 
   const abortControllerRef = useRef(null)
 
+  const handleContactClick = () => {
+    navigate('/')
+    setTimeout(() => {
+      const contactsSection = document.getElementById('contacts')
+      if (contactsSection) {
+        contactsSection.scrollIntoView({ behavior: 'smooth' })
+      }
+    }, 300)
+  }
+
   // Debounce для поиска
   useEffect(() => {
     const timer = setTimeout(() => {
@@ -77,7 +87,7 @@ function CatalogPage() {
         const response = await fetch(`${API_URL}?${params}`, {
           signal: abortControllerRef.current.signal
         })
-        
+
         if (!response.ok) throw new Error('Ошибка загрузки')
 
         let data = await response.json()
@@ -354,8 +364,12 @@ function CatalogPage() {
               ) : products.length === 0 ? (
                 <div className={styles.emptyState}>
                   <div className={styles.emptyIcon}>🔍</div>
-                  <h3 className={styles.emptyTitle}>Ничего не найдено</h3>
-                  <p className={styles.emptyText}>Попробуйте изменить параметры поиска</p>
+                  <h3 className={styles.emptyTitle}>Каталог автозапчастей</h3>
+                  <p className={styles.emptyText}>В нашем ассортименте более 200 000 оригинальных запчастей для иномарок.</p>
+                  <p className={styles.emptyText}>Воспользуйтесь поиском или фильтрами, чтобы найти нужную деталь.</p>
+                  <button onClick={handleContactClick} className={styles.contactLink}>
+                    Не нашли нужную запчасть? Свяжитесь с нами →
+                  </button>
                 </div>
               ) : (
                 <>

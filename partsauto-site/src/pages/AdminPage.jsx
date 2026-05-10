@@ -283,7 +283,8 @@ function AdminPage() {
 
   // Функция для удаления изображения из списка редактирования
   const removeEditImage = (index) => {
-    setEditImages(prev => prev.filter((_, i) => i !== index))
+    // Удаляем из existingImages и editImagesPreview
+    setExistingImages(prev => prev.filter((_, i) => i !== index))
     setEditImagesPreview(prev => prev.filter((_, i) => i !== index))
   }
 

@@ -26,6 +26,7 @@ function AdminPage() {
   const [editDescription, setEditDescription] = useState('')
   const [editImages, setEditImages] = useState([])
   const [editImagesPreview, setEditImagesPreview] = useState([])
+  const [existingImages, setExistingImages] = useState([])
   const [editingUploading, setEditingUploading] = useState(false)
 
   // Состояния для новостей
@@ -291,6 +292,7 @@ function AdminPage() {
     setEditingCar(car)
     setEditTitle(car.title)
     setEditDescription(car.description || '')
+    setExistingImages(car.images || [])
     setEditImagesPreview(car.images || [])
     setEditImages([])
   }
@@ -322,13 +324,13 @@ function AdminPage() {
     }
 
     setEditingUploading(true)
-    let images = editImagesPreview
+    let images = existingImages
 
     // Если выбраны новые изображения, загружаем их
     if (editImages.length > 0) {
       try {
         const newImageUrls = await uploadCarImages(editImages)
-        images = [...editImagesPreview, ...newImageUrls]
+        images = [...existingImages, ...newImageUrls]
       } catch (error) {
         toast.error('Ошибка загрузки фото: ' + error.message)
         setEditingUploading(false)

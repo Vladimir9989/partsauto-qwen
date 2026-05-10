@@ -293,11 +293,42 @@ app.put('/api/cars/:id', express.json(), (req, res) => {
     return res.status(404).json({ success: false, error: 'Карточка не найдена' });
   }
   
+  const oldImages = cars[index].images || [];
+  const newImages = images !== undefined ? images : oldImages;
+  
+  // Удаляем физические файлы, которые были удалены из массива images
+  if (images !== undefined) {
+    const uploadsDir = path.join(__dirname, '../public/uploads/cars');
+    const removedImages = oldImages.filter(img => !newImages.includes(img));
+    
+    removedImages.forEach(imageUrl => {
+      try {
+        // Проверяем, что это локальный путь (начинается с /uploads/cars/)
+        if (imageUrl && imageUrl.startsWith('/uploads/cars/')) {
+          // Извлекаем имя файла из пути /uploads/cars/filename.jpg
+          const filename = imageUrl.replace('/uploads/cars/', '');
+          const filePath = path.join(uploadsDir, filename);
+          
+          // Удаляем файл, если он существует
+          if (fs.existsSync(filePath)) {
+            fs.unlinkSync(filePath);
+            console.log(`Файл удалён: ${filePath}`);
+          } else {
+            console.log(`Файл не найден для удаления: ${filePath}`);
+          }
+        }
+      } catch (error) {
+        console.error(`Ошибка при удалении файла ${imageUrl}:`, error.message);
+        // Продолжаем удаление других файлов даже при ошибке
+      }
+    });
+  }
+  
   cars[index] = {
     ...cars[index],
     title: title || cars[index].title,
     description: description !== undefined ? description : cars[index].description,
-    images: images !== undefined ? images : cars[index].images || [],
+    images: newImages,
     updatedAt: new Date().toISOString()
   };
   

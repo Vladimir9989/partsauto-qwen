@@ -308,8 +308,43 @@ app.put('/api/cars/:id', express.json(), (req, res) => {
 app.delete('/api/cars/:id', (req, res) => {
   const id = parseInt(req.params.id);
   const cars = getCarsList();
+  const carIndex = cars.findIndex(car => car.id === id);
+  
+  if (carIndex === -1) {
+    return res.status(404).json({ success: false, error: 'Карточка не найдена' });
+  }
+  
+  const car = cars[carIndex];
+  
+  // Удаляем физические файлы изображений
+  if (car.images && Array.isArray(car.images)) {
+    const uploadsDir = path.join(__dirname, '../public/uploads/cars');
+    
+    car.images.forEach(imageUrl => {
+      try {
+        // Проверяем, что это локальный путь (начинается с /uploads/cars/)
+        if (imageUrl && imageUrl.startsWith('/uploads/cars/')) {
+          // Извлекаем имя файла из пути /uploads/cars/filename.jpg
+          const filename = imageUrl.replace('/uploads/cars/', '');
+          const filePath = path.join(uploadsDir, filename);
+          
+          // Удаляем файл, если он существует
+          if (fs.existsSync(filePath)) {
+            fs.unlinkSync(filePath);
+            console.log(`Файл удалён: ${filePath}`);
+          } else {
+            console.log(`Файл не найден для удаления: ${filePath}`);
+          }
+        }
+      } catch (error) {
+        console.error(`Ошибка при удалении файла ${imageUrl}:`, error.message);
+        // Продолжаем удаление других файлов даже при ошибке
+      }
+    });
+  }
+  
+  // Удаляем запись из cars.json
   const filtered = cars.filter(car => car.id !== id);
-  if (cars.length === filtered.length) return res.status(404).json({ success: false, error: 'Не найдено' });
   saveCarsList(filtered);
   res.json({ success: true });
 });

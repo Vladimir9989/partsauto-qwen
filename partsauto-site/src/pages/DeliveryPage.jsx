@@ -1,13 +1,14 @@
-import { Helmet } from 'react-helmet-async'
+import SEO from '../components/SEO'
 import styles from './DeliveryPage.module.css'
 
 function DeliveryPage() {
   return (
     <>
-      <Helmet>
-        <title>Оплата и доставка - Разбор Выкуп</title>
-        <meta name="description" content="Способы оплаты и доставки автозапчастей по Екатеринбургу и всей России" />
-      </Helmet>
+      <SEO
+        title="Оплата и доставка"
+        description="Способы оплаты и доставки автозапчастей. Доставка по Екатеринбургу и всей России через ТК. Самовывоз в Реже и Екатеринбурге."
+        keywords="доставка автозапчастей, оплата, самовывоз, доставка по России"
+      />
 
       <div className={styles.deliveryPage}>
         <div className={styles.container}>

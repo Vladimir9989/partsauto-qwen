@@ -1,4 +1,3 @@
-import { Helmet } from 'react-helmet-async'
 import { Link } from 'react-router-dom'
 import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
@@ -8,6 +7,8 @@ import CarSearch from '../components/CarSearch/CarSearch'
 import ContactsSection from '../components/ContactsSection/ContactsSection'
 import { useTheme } from '../context/ThemeContext'
 import { IconMax, IconAvito, IconVK, IconTelegram, IconDrom } from '../components/Icons'
+import SEO from '../components/SEO'
+import StructuredData from '../components/StructuredData'
 
 function MainPage() {
   const { theme } = useTheme()
@@ -35,12 +36,50 @@ function MainPage() {
     return () => clearInterval(interval)
   }, [theme, images.length])
 
+  const organizationSchema = {
+    "@context": "https://schema.org",
+    "@type": "AutoPartsStore",
+    "name": "Разбор Выкуп",
+    "url": "https://razbor-vykup.ru",
+    "logo": "https://razbor-vykup.ru/logo-white.png",
+    "description": "Автозапчасти б/у, выкуп авто в любом состоянии. Деньги сразу.",
+    "address": {
+      "@type": "PostalAddress",
+      "streetAddress": "ул. Трудовая 95/2",
+      "addressLocality": "Реж",
+      "addressRegion": "Свердловская область",
+      "postalCode": "623750",
+      "addressCountry": "RU"
+    },
+    "telephone": "+7 (982) 604-80-40",
+    "email": "razbor.vykup@mail.ru",
+    "priceRange": "₽₽",
+    "openingHoursSpecification": [
+      {
+        "@type": "OpeningHoursSpecification",
+        "dayOfWeek": ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"],
+        "opens": "09:00",
+        "closes": "17:00"
+      },
+      {
+        "@type": "OpeningHoursSpecification",
+        "dayOfWeek": ["Saturday", "Sunday"],
+        "opens": "00:00",
+        "closes": "00:00",
+        "description": "Выходной"
+      }
+    ],
+    "hasMap": "https://yandex.ru/maps/10788/rezh/house/ulitsa_trudovaya_95_2/"
+  }
+
   return (
     <>
-      <Helmet>
-        <title>Разбор Выкуп - Выкуп авто</title>
-        <meta name="description" content="Выкуп авто в любом состоянии деньги сразу" />
-      </Helmet>
+      <SEO
+        title="Главная"
+        description="Автозапчасти б/у. Выкуп авто в любом состоянии. Деньги сразу. Работаем в Екатеринбурге и Реже. Более 200 000 запчастей в наличии."
+        keywords="автозапчасти, выкуп авто, разборка, Реж, Екатеринбург, б/у запчасти"
+      />
+      <StructuredData data={organizationSchema} />
       <div className={styles.jumbotron} style={{ cursor: 'pointer', backgroundImage }}>
         <div className={styles.content}>
           <Link to="/car-buyback" style={{ textDecoration: 'none' }}>

@@ -1,13 +1,14 @@
-import { Helmet } from 'react-helmet-async'
+import SEO from '../components/SEO'
 import styles from './CarBuybackPage.module.css'
 
 function CarBuybackPage() {
   return (
     <>
-      <Helmet>
-        <title>Выкуп авто - Разбор Выкуп</title>
-        <meta name="description" content="Выкуп автомобилей в любом состоянии. Деньги сразу от 10 000 рублей." />
-      </Helmet>
+      <SEO
+        title="Выкуп авто"
+        description="Срочный выкуп авто в любом состоянии. Деньги сразу от 10 000 рублей. Выкупаем целые, битые, кредитные, сгоревшие автомобили. Бесплатный выезд и оценка."
+        keywords="выкуп авто, выкуп автомобиля, срочный выкуп, выкуп битых авто, Реж, Екатеринбург"
+      />
 
       <div className={styles.buybackPage}>
         <div className={styles.container}>

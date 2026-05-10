@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react'
 import { Link } from 'react-router-dom'
-import { Helmet } from 'react-helmet-async'
+import SEO from '../components/SEO'
 import styles from './NewsPage.module.css'
 
 function NewsPage() {
@@ -32,10 +32,11 @@ function NewsPage() {
 
   return (
     <>
-      <Helmet>
-        <title>Новости о нас - Разбор Выкуп</title>
-        <meta name="description" content="Новости компании Разбор Выкуп" />
-      </Helmet>
+      <SEO
+        title="Новости"
+        description="Новости компании Разбор Выкуп. Обновления ассортимента, акции и важные объявления."
+        keywords="новости, акции, обновления"
+      />
 
       <div className={styles.newsPage}>
         <div className={styles.container}>

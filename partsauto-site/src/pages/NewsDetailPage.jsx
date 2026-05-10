@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react'
 import { useParams, Link } from 'react-router-dom'
-import { Helmet } from 'react-helmet-async'
+import SEO from '../components/SEO'
 import styles from './NewsDetailPage.module.css'
 
 function NewsDetailPage() {
@@ -45,14 +45,15 @@ function NewsDetailPage() {
   // Извлекаем первую картинку из контента для мета-тега
   const imgMatch = news.content?.match(/<img[^>]+src="([^">]+)"/)
   const ogImage = imgMatch ? imgMatch[1] : null
+  const description = news.content?.replace(/<[^>]*>/g, '').substring(0, 200)
 
   return (
     <>
-      <Helmet>
-        <title>{news.title} - Разбор Выкуп</title>
-        <meta name="description" content={news.content?.replace(/<[^>]*>/g, '').substring(0, 200)} />
-        {ogImage && <meta property="og:image" content={ogImage} />}
-      </Helmet>
+      <SEO
+        title={news.title}
+        description={description}
+        ogImage={ogImage}
+      />
 
       <div className={styles.newsDetailPage}>
         <div className={styles.container}>

@@ -1,9 +1,9 @@
 import { useState, useCallback, useMemo } from 'react'
 import { useCartStore } from '../store/useCartStore'
-import { Helmet } from 'react-helmet-async'
 import { Link, useNavigate } from 'react-router-dom'
 import toast from 'react-hot-toast'
 import { IconMax, IconAvito, IconVK, IconTelegram, IconDrom } from '../components/Icons'
+import SEO from '../components/SEO'
 import styles from './CartPage.module.css'
 
 function CartPage() {
@@ -155,10 +155,11 @@ function CartPage() {
 
   return (
     <>
-      <Helmet>
-        <title>Корзина - Разбор Выкуп</title>
-        <meta name="description" content="Оформление заказа" />
-      </Helmet>
+      <SEO
+        title="Корзина"
+        description="Оформление заказа автозапчастей. Самовывоз в Реже и Екатеринбурге."
+        noindex={true}
+      />
 
       <div className={styles.pageWrapper}>
         <div className={styles.container}>

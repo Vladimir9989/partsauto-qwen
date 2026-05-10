@@ -1,0 +1,17 @@
+User-agent: *
+Allow: /
+
+# Разрешаем индексацию основных страниц
+Allow: /catalog
+Allow: /car-buyback
+Allow: /delivery
+Allow: /warranty
+Allow: /news
+
+# Запрещаем индексацию служебных страниц
+Disallow: /cart
+Disallow: /admin
+Disallow: /api/
+
+# Ссылка на sitemap
+Sitemap: https://razbor-vykup.ru/sitemap.xml

@@ -1,6 +1,5 @@
 import { useState, useEffect, useRef, useCallback, useMemo } from 'react'
 import { useNavigate, useLocation, useSearchParams } from 'react-router-dom'
-import { Helmet } from 'react-helmet-async'
 import { AnimatePresence } from 'framer-motion'
 import toast from 'react-hot-toast'
 import ProductModal from '../components/ProductModal'
@@ -8,6 +7,7 @@ import ProductCard from '../components/ProductCard'
 import FiltersPanel from '../components/FiltersPanel'
 import Pagination from '../components/Pagination'
 import SkeletonCard from '../components/SkeletonCard'
+import SEO from '../components/SEO'
 import { API_URL, ITEMS_PER_PAGE, SEARCH_DEBOUNCE_DELAY } from '../config'
 import styles from './CatalogPage.module.css'
 
@@ -239,13 +239,11 @@ function CatalogPage() {
 
   return (
     <>
-      <Helmet>
-        <title>Разбор Выкуп - Каталог автозапчастей</title>
-        <meta name="description" content="Каталог автозапчастей Разбор Выкуп. Найдите нужные запчасти для вашего автомобиля по выгодным ценам." />
-        <meta property="og:title" content="Разбор Выкуп - Каталог автозапчастей" />
-        <meta property="og:description" content="Каталог автозапчастей Разбор Выкуп" />
-        <meta property="og:type" content="website" />
-      </Helmet>
+      <SEO
+        title="Каталог автозапчастей"
+        description="Каталог автозапчастей б/у. Более 200 000 запчастей в наличии. Найдите нужные детали для вашего автомобиля по выгодным ценам в Екатеринбурге и Реже."
+        keywords="каталог автозапчастей, запчасти б/у, автодетали, разборка авто"
+      />
 
       <div className={styles.catalogPage}>
         <div className={styles.catalogContainer}>

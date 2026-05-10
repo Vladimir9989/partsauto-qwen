@@ -1,13 +1,14 @@
-import { Helmet } from 'react-helmet-async'
+import SEO from '../components/SEO'
 import styles from './WarrantyPage.module.css'
 
 function WarrantyPage() {
   return (
     <>
-      <Helmet>
-        <title>Гарантия и возврат - Разбор Выкуп</title>
-        <meta name="description" content="Условия гарантии и возврата автозапчастей. Правила обмена и возврата товара." />
-      </Helmet>
+      <SEO
+        title="Гарантия и возврат"
+        description="Условия гарантии и возврата автозапчастей б/у. Правила обмена и возврата товара. Гарантия на двигатели и трансмиссию 14 дней."
+        keywords="гарантия на запчасти, возврат автозапчастей, обмен запчастей"
+      />
 
       <div className={styles.warrantyPage}>
         <div className={styles.container}>

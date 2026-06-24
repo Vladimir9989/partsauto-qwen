@@ -43,7 +43,7 @@ function Header({ cartItemsCount = 0 }) {
     { to: '/catalog', label: 'Каталог запчастей' },
     { to: '/delivery', label: 'Оплата и доставка' },
     { to: '/contacts', label: 'Контакты', onClick: handleContactsClick },
-    { to: '/news', label: 'Новости о нас' },
+    { to: '/news', label: 'Новости' },
     { to: '/warranty', label: 'Гарантия и возврат' },
   ];
 

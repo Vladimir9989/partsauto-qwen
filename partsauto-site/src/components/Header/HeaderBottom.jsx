@@ -24,7 +24,7 @@ function HeaderBottom({ isMobileMenuOpen, setIsMobileMenuOpen, onCartClick, onCo
             <Link to="/car-buyback">Выкуп авто</Link>
             <Link to="/delivery">Оплата и доставка</Link>
             <a href="#contacts" onClick={onContactsClick}>Контакты</a>
-            <Link to="/news">Новости о нас</Link>
+            <Link to="/news">Новости</Link>
             <Link to="/warranty">Гарантия и возврат</Link>
           </nav>
 
@@ -43,7 +43,7 @@ function HeaderBottom({ isMobileMenuOpen, setIsMobileMenuOpen, onCartClick, onCo
                   <Link to="/delivery">Оплата и доставка</Link>
                   <Link to="/car-buyback">Выкуп авто</Link>
                   <a href="#contacts" onClick={onContactsClick}>Контакты</a>
-                  <Link to="/news">Новости о нас</Link>
+                  <Link to="/news">Новости</Link>
                   <Link to="/warranty">Гарантия и возврат</Link>
                 </div>
               )}

@@ -19,17 +19,25 @@ npm run dev      # Vite dev-сервер на порту 5176 (проксиру�
 
 ```bash
 npm run build    # Vite build → dist/
-npm run deploy   # build + scp dist/* на сервер 217.198.13.45:/var/www/partsauto/
 npm start        # запуск Express в продакшене (обслуживает dist/ как статику)
 ```
 
-В продакшене Express управляется PM2 через `ecosystem.config.js` (процесс `partsauto-server`, порт 3001, 1 экземпляр).
+В продакшене Express управляется PM2 (процесс `razbor-vykup`, порт 3001). На сервере также крутится отдельный процесс `razbor-admin-api`.
 
-**Важно:** `npm run deploy` копирует только `dist/*` (фронтенд). Серверный код `server/index.js` деплоится отдельно:
+**Деплой на сервер** (запускать вручную в терминале с SSH-доступом):
 ```bash
-scp server/index.js root@217.198.13.45:/var/www/partsauto/server/index.js
-ssh root@217.198.13.45 "pm2 restart partsauto-server"
+# Фронтенд
+npm run build
+scp -r dist/* root@razbor-vykup.ru:/var/www/razbor-vykup/dist/
+
+# Если менялся бэкенд (server/index.js)
+scp server/index.js root@razbor-vykup.ru:/var/www/razbor-vykup/server/
+
+# Перезапустить Node.js сервер
+ssh root@razbor-vykup.ru "pm2 restart razbor-vykup"
 ```
+
+Примечание: скрипт `npm run deploy` в `package.json` устарел (старый IP `217.198.13.45` и путь `/var/www/partsauto/`) — **не использовать**, деплоить командами выше.
 
 ## Архитектура
 
@@ -55,6 +63,13 @@ ssh root@217.198.13.45 "pm2 restart partsauto-server"
 URL задаётся через `XML_URL` в `.env`. При `price = 0` товар отображается как «Цена по запросу».
 
 **Переход на CRM-фид:** поменять `XML_URL` в `.env`. Если фид в windows-1251 — установить `XML_ENCODING=windows-1251`, по умолчанию `utf-8`. После перехода проверить фильтр по поколению (в нашем CRM поколение вшито в строку `<Model>`, не в отдельный тег).
+
+⚠️ **`.env` живёт только на сервере** (`/var/www/razbor-vykup/.env`) и НЕ деплоится через scp. При смене `XML_URL`/`XML_ENCODING` правь его прямо на сервере по SSH и перезапускай процесс с `--update-env`:
+```bash
+ssh root@razbor-vykup.ru "sed -i 's#drom_feeds#avito_feeds#' /var/www/razbor-vykup/.env"
+ssh root@razbor-vykup.ru "pm2 restart razbor-vykup --update-env"
+```
+Кэш товаров ленивый — грузится при первом запросе к `/api/products` (фид ~20 МБ, первый ответ медленный).
 
 ### API эндпоинты (все в `server/index.js`)
 

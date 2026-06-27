@@ -11,6 +11,24 @@ import SEO from '../components/SEO'
 import { API_URL, ITEMS_PER_PAGE, SEARCH_DEBOUNCE_DELAY } from '../config'
 import styles from './CatalogPage.module.css'
 
+const allKeywords = [
+  "автозапчасти", "выкуп авто", "разборка", "Реж", "Екатеринбург", "б/у запчасти",
+  "запчасти бу", "купить запчасти",
+  "купить двигатель", "купить МКПП", "купить Акпп", "купить фару", "купить бампер",
+  "купить рулевую рейку", "купить тормозной суппорт", "купить дверь", "купить стекло",
+  "купить кузов", "купить капот", "купить крыло", "купить порог", "купить крышу", "купить стойку",
+  "купить запчасти Daewoo Nexia", "купить запчасти Daewoo Matiz",
+  "купить запчасти Chevrolet Aveo", "купить запчасти Chevrolet Lanos", "купить запчасти Chevrolet Lacetti",
+  "купить запчасти Kia Rio", "купить запчасти Kia Spectra",
+  "купить запчасти Renault Duster", "купить запчасти Renault Logan", "купить запчасти Renault Megan",
+  "купить запчасти Skoda Octavia", "купить запчасти Volkswagen Polo",
+  "купить запчасти Toyota Corolla",
+  "купить запчасти Hyundai Accent", "купить запчасти Hyundai Solaris",
+  "купить запчасти Nissan Almera Classic",
+  "купить запчасти Mazda 3", "купить запчасти Mazda 6",
+  "купить запчасти Citroen"
+];
+
 function CatalogPage() {
   const navigate = useNavigate()
   const location = useLocation()
@@ -119,41 +137,51 @@ function CatalogPage() {
     }
   }, [debouncedSearch, filters.brand, filters.category, filters.carModel, filters.generation, currentPage])
 
-  // Загрузка списка брендов, категорий, моделей и поколений
+  // Загрузка списка брендов
   useEffect(() => {
-    const loadMeta = async () => {
+    const loadBrands = async () => {
       try {
         const response = await fetch(`${API_URL}?page=1&limit=1`)
         if (!response.ok) throw new Error('Ошибка')
         const data = await response.json()
 
-        if (brands.length === 0 && data.products.length > 0) {
+        if (data.products.length > 0) {
           const allRes = await fetch(`${API_URL}?page=1&limit=1000`)
           const allData = await allRes.json()
 
           const brandsSet = new Set()
-          const categoriesSet = new Set()
-          allData.products.forEach(p => {
-            if (p.brand) brandsSet.add(p.brand)
-            if (p.category) categoriesSet.add(p.category)
-          })
+          allData.products.forEach(p => { if (p.brand) brandsSet.add(p.brand) })
           const sortedBrands = [...brandsSet].sort()
-          // Переместить "Разное" в конец
           const miscIndex = sortedBrands.indexOf('Разное')
           if (miscIndex > -1) {
             sortedBrands.splice(miscIndex, 1)
             sortedBrands.push('Разное')
           }
           setBrands(sortedBrands)
-          setCategories([...categoriesSet].sort())
         }
       } catch (error) {
-        console.error('Ошибка загрузки метаданных:', error)
+        console.error('Ошибка загрузки брендов:', error)
       }
     }
 
-    if (brands.length === 0) loadMeta()
+    if (brands.length === 0) loadBrands()
   }, [brands.length])
+
+  // Загрузка списка категорий запчастей из dedicated endpoint
+  useEffect(() => {
+    const loadCategories = async () => {
+      try {
+        const res = await fetch('/api/categories')
+        if (!res.ok) throw new Error('Ошибка')
+        const data = await res.json()
+        setCategories(data.categories || [])
+      } catch (error) {
+        console.error('Ошибка загрузки категорий:', error)
+      }
+    }
+
+    if (categories.length === 0) loadCategories()
+  }, [categories.length])
 
   // Загрузка моделей при выборе бренда
   useEffect(() => {
@@ -252,7 +280,7 @@ function CatalogPage() {
       <SEO
         title="Каталог автозапчастей"
         description="Каталог автозапчастей б/у. Более 200 000 запчастей в наличии. Найдите нужные детали для вашего автомобиля по выгодным ценам в Екатеринбурге и Реже."
-        keywords="каталог автозапчастей, запчасти б/у, автодетали, разборка авто"
+        keywords={allKeywords.join(", ")}
       />
 
       <div className={styles.catalogPage}>
@@ -282,6 +310,18 @@ function CatalogPage() {
                       value={filters.search}
                       onChange={(e) => handleFilterChange('search', e.target.value)}
                     />
+                  </div>
+                  <div className={styles.compactFilterGroup}>
+                    <label>Категория</label>
+                    <select
+                      value={filters.category}
+                      onChange={(e) => handleFilterChange('category', e.target.value)}
+                    >
+                      <option value="">Все категории</option>
+                      {categories.map((cat, index) => (
+                        <option key={`cat-${cat}-${index}`} value={cat}>{cat}</option>
+                      ))}
+                    </select>
                   </div>
                   <div className={styles.compactFilterGroup}>
                     <label>Бренд</label>

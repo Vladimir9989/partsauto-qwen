@@ -112,7 +112,8 @@ transporter.verify((error, success) => {
   }
 });
 
-const XML_URL = process.env.XML_URL || 'https://ycf.partsauto.market/partsauto-feeds/drom_feeds/cb9901e562a4f410bd4f9bf80c21d094.xml';
+const XML_URL = process.env.XML_URL || 'https://ycf.partsauto.market/partsauto-feeds/avito_feeds/cb9901e562a4f410bd4f9bf80c21d094.xml';
+const XML_ENCODING = process.env.XML_ENCODING || 'utf-8';
 
 let cachedProducts = [];
 let lastFetch = null;
@@ -123,85 +124,82 @@ const parser = new XMLParser({
   attributeNamePrefix: '@_',
   parseAttributeValue: true,
   trimValues: true,
+  isArray: (name) => ['Ad', 'Image', 'CompatibleCar'].includes(name),
 });
 
 async function fetchAndParseXML() {
-   console.log('Загрузка XML...');
-   const response = await fetch(XML_URL);
-   const xmlText = await response.text();
-   const result = parser.parse(xmlText);
-   const offers = result.offers?.offer || [];
-   console.log(`Найдено объявлений: ${offers.length}`);
-   
-   const products = offers.map(offer => {
-     // Парсинг изображений из строки, разделённой запятыми
-     let images = [];
-     if (offer.picture) {
-       const pictureStr = typeof offer.picture === 'string' ? offer.picture : '';
-       if (pictureStr.trim()) {
-         images = pictureStr
-           .split(',')
-           .map(url => url.trim())
-           .filter(url => url && url.length > 0);
-       }
-     }
+  console.log('Загрузка XML...');
+  const response = await fetch(XML_URL);
+  const enc = XML_ENCODING.toLowerCase().replace(/[-_]/g, '');
+  let xmlText;
+  if (enc === 'utf8') {
+    xmlText = await response.text();
+  } else {
+    const buffer = await response.arrayBuffer();
+    xmlText = new TextDecoder(XML_ENCODING).decode(buffer);
+  }
+  const result = parser.parse(xmlText);
+  const ads = result.Ads?.Ad || [];
+  console.log(`Найдено объявлений: ${ads.length}`);
 
-     // Парсинг модели автомобиля (может быть "Daewoo Matiz, I")
-     let carMake = offer.brandcars || 'Разное';
-     let carModel = offer.modelcars || '';
-     let generation = '';
-     
-     // Если в modelcars есть поколение, извлекаем его
-     if (carModel && typeof carModel === 'string') {
-       const modelParts = carModel.split(',').map(p => p.trim());
-       if (modelParts.length > 1) {
-         carModel = modelParts[0];
-         generation = modelParts.slice(1).join(', ');
-       }
-     } else if (carModel && typeof carModel !== 'string') {
-       carModel = String(carModel);
-     }
+  const products = ads.map(ad => {
+    // Изображения из <Images><Image url="..."/></Images>
+    const images = [];
+    if (ad.Images) {
+      const imageList = Array.isArray(ad.Images.Image) ? ad.Images.Image
+                      : ad.Images.Image ? [ad.Images.Image] : [];
+      imageList.forEach(img => {
+        if (img && img['@_url']) images.push(img['@_url']);
+      });
+    }
 
-     // Определяем категорию по расположению детали
-     let category = '';
-     if (offer.lr || offer.fr) {
-       const parts = [];
-       if (offer.lr) parts.push(offer.lr);
-       if (offer.fr) parts.push(offer.fr);
-       category = parts.join(' ');
-     }
+    // Марка и модель
+    const carMake = ad.Make || ad.Brand || 'Разное';
+    let carModel = ad.Model ? String(ad.Model) : '';
 
-     // Преобразуем цену 0 в пустую строку для отображения "Цена по запросу"
-     let price = offer.price || '';
-     if (price === '0' || price === 0) {
-       price = '';
-     }
+    // Поколение: берём тег <Generation>, если нет — пробуем извлечь из <Model>
+    // (для фидов CRM, где поколение вшито в название модели через запятую)
+    let generation = ad.Generation ? String(ad.Generation) : '';
+    if (!generation && carModel) {
+      const modelParts = carModel.split(',').map(p => p.trim());
+      if (modelParts.length > 1) {
+        carModel = modelParts[0];
+        generation = modelParts.slice(1).join(', ');
+      }
+    }
 
-     return {
-       id: offer['@_id'] || '',
-       title: offer.name || '',
-       description: offer.description || '',
-       price: price,
-       brand: carMake,
-       condition: offer.condition || 'Б/у',
-       originality: '',
-       originalVendor: '',
-       carMake: carMake,
-       carModel: carModel,
-       generation: generation,
-       category: category,
-       installationLocation: `${offer.lr || ''} ${offer.fr || ''}`.trim(),
-       address: '',
-       phone: '',
-       dateStart: '',
-       dateEnd: '',
-       images: images,
-       year: offer.year || '',
-     };
-   });
+    // SparePartType → category (основной фильтр)
+    const category = ad.SparePartType ? String(ad.SparePartType) : '';
 
-   return products;
- }
+    // Цена: 0 и 0.00 → «Цена по запросу»
+    let price = (ad.Price !== undefined && ad.Price !== null) ? String(ad.Price) : '';
+    if (price === '0' || price === '0.0' || price === '0.00') price = '';
+
+    return {
+      id: ad.Id ? String(ad.Id) : '',
+      title: ad.Title ? String(ad.Title) : '',
+      description: ad.Description ? String(ad.Description) : '',
+      price,
+      brand: carMake,
+      condition: ad.Condition || 'Б/у',
+      originality: '',
+      originalVendor: ad.OriginalVendor || ad.OEM || '',
+      carMake,
+      carModel,
+      generation,
+      category,
+      installationLocation: '',
+      address: '',
+      phone: '',
+      dateStart: '',
+      dateEnd: '',
+      images,
+      year: '',
+    };
+  });
+
+  return products;
+}
 
 // ===== ВСЕ API МАРШРУТЫ =====
 app.get('/api/products', async (req, res) => {
@@ -245,6 +243,21 @@ app.get('/api/products', async (req, res) => {
     res.json({ products: items, total, page: pageNum, totalPages: Math.ceil(total / limitNum) });
   } catch (error) {
     console.error('Ошибка загрузки:', error.message);
+    res.status(500).json({ error: error.message });
+  }
+});
+
+app.get('/api/categories', async (req, res) => {
+  try {
+    const now = Date.now();
+    if (!lastFetch || (now - lastFetch) > CACHE_DURATION || cachedProducts.length === 0) {
+      cachedProducts = await fetchAndParseXML();
+      lastFetch = now;
+    }
+    const seen = new Set();
+    cachedProducts.forEach(p => { if (p.category) seen.add(p.category); });
+    res.json({ categories: [...seen].sort() });
+  } catch (error) {
     res.status(500).json({ error: error.message });
   }
 });

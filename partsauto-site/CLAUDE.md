@@ -25,6 +25,12 @@ npm start        # запуск Express в продакшене (обслужи�
 
 В продакшене Express управляется PM2 через `ecosystem.config.js` (процесс `partsauto-server`, порт 3001, 1 экземпляр).
 
+**Важно:** `npm run deploy` копирует только `dist/*` (фронтенд). Серверный код `server/index.js` деплоится отдельно:
+```bash
+scp server/index.js root@217.198.13.45:/var/www/partsauto/server/index.js
+ssh root@217.198.13.45 "pm2 restart partsauto-server"
+```
+
 ## Архитектура
 
 ### Два режима работы
@@ -37,17 +43,24 @@ npm start        # запуск Express в продакшене (обслужи�
 
 | Данные | Хранение |
 |--------|----------|
-| Запчасти (товары) | Внешний XML-фид, кэш в памяти 5 мин (`CACHE_DURATION`) |
+| Запчасти (товары) | Avito XML-фид, кэш в памяти 5 мин (`CACHE_DURATION`) |
 | Автомобили на витрине | `server/data/cars.json` (плоский JSON) |
 | Новости | `server/data/news.json` (плоский JSON) |
 | Корзина | `localStorage` через Zustand persist (`partsauto-cart`) |
 
-URL XML-фида задаётся через `XML_URL` в `.env`. При `price = 0` товар отображается как «Цена по запросу».
+Фид запчастей — формат **Avito XML** (`<Ads>/<Ad>`). Ключевые поля: `<Title>`, `<Make>`, `<Model>`, `<Generation>`, `<SparePartType>` (категория для фильтра), `<Price>`, `<Images>/<Image url="...">`.
+
+Текущий фид (partsauto.market): `https://ycf.partsauto.market/partsauto-feeds/avito_feeds/cb9901e562a4f410bd4f9bf80c21d094.xml`
+
+URL задаётся через `XML_URL` в `.env`. При `price = 0` товар отображается как «Цена по запросу».
+
+**Переход на CRM-фид:** поменять `XML_URL` в `.env`. Если фид в windows-1251 — установить `XML_ENCODING=windows-1251`, по умолчанию `utf-8`. После перехода проверить фильтр по поколению (в нашем CRM поколение вшито в строку `<Model>`, не в отдельный тег).
 
 ### API эндпоинты (все в `server/index.js`)
 
 ```
 GET  /api/products          # товары из XML с фильтрацией и пагинацией
+GET  /api/categories        # уникальные SparePartType из кэша (для фильтра)
 GET  /api/health            # состояние сервера и кэша
 GET/POST/PUT/DELETE /api/cars/:id   # карточки автомобилей
 GET/POST/PUT/DELETE /api/news/:id   # новости
@@ -93,7 +106,7 @@ CSS Modules (`.module.css`) для каждого компонента/стра�
 
 - Пароль админки захардкожен в `src/pages/AdminPage.jsx` как `ADMIN_PASSWORD = 'admin123'`
 - Редактор новостей в админке — TipTap (не react-quill, хотя quill тоже в зависимостях)
-- `CatalogPage` синхронизирует фильтры с URL query params через `useSearchParams`
+- `CatalogPage` синхронизирует фильтры бренд/модель/поколение с URL query params; фильтр категории в URL не сохраняется
 - При удалении карточки автомобиля физические файлы изображений удаляются с диска (`server/index.js`)
 - `dist/` в `.gitignore` — перед деплоем нужно собирать
 - Файл `src/config.js` содержит настройки пагинации и debounce
@@ -107,6 +120,7 @@ CSS Modules (`.module.css`) для каждого компонента/стра�
 **Попадает на сервер:** только собранный фронтенд — HTML, JS, CSS, картинки из `src/assets/`.
 
 **НЕ попадает на сервер:**
+- `server/index.js` — деплоится отдельно через scp (см. выше)
 - `server/data/news.json` — новости хранятся на сервере и управляются только через админку
 - `server/data/cars.json` — то же самое для автомобилей
 - `public/uploads/` — загруженные через админку изображения хранятся на сервере отдельно
@@ -142,7 +156,8 @@ curl -X POST https://razbor-vykup.ru/api/upload-car-image -F "image=@/path/to/fi
 
 ```
 PORT=3001
-XML_URL=<url xml-фида с запчастями>
+XML_URL=<url avito xml-фида с запчастями>
+XML_ENCODING=utf-8          # кодировка фида; windows-1251 для cp1251-фидов
 CACHE_DURATION=300000       # мс, время кэша товаров
 SMTP_HOST=
 SMTP_PORT=587

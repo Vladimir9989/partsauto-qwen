@@ -24,20 +24,23 @@ npm start        # запуск Express в продакшене (обслужи�
 
 В продакшене Express управляется PM2 (процесс `razbor-vykup`, порт 3001). На сервере также крутится отдельный процесс `razbor-admin-api`.
 
-**Деплой на сервер** (запускать вручную в терминале с SSH-доступом):
+**Быстрый деплой одной командой** (рекомендуется):
 ```bash
-# Фронтенд
+npm run deploy:fast    # = bash deploy.sh
+```
+Скрипт `deploy.sh`: `vite build` → пакует `dist/` + `server/index.js` в один `tar.gz` → `scp` архива → распаковка на сервере + `pm2 restart razbor-vykup`. Один сжатый архив вместо россыпи scp-файлов = заметно быстрее.
+
+⚠️ Деплоятся **только** `dist/` и `server/index.js`. Скрипт НЕ трогает на сервере `server/data/*.json`, `public/uploads/`, `server/.env` — поэтому нельзя тарить весь проект (затрёшь прод-новости, машины, фото). При новых npm-зависимостях сервера — доустановить отдельно (см. комментарии в `deploy.sh`).
+
+**Деплой вручную по шагам** (если нужно):
+```bash
 npm run build
 scp -r dist/* root@razbor-vykup.ru:/var/www/razbor-vykup/dist/
-
-# Если менялся бэкенд (server/index.js)
-scp server/index.js root@razbor-vykup.ru:/var/www/razbor-vykup/server/
-
-# Перезапустить Node.js сервер
+scp server/index.js root@razbor-vykup.ru:/var/www/razbor-vykup/server/   # если менялся бэкенд
 ssh root@razbor-vykup.ru "pm2 restart razbor-vykup"
 ```
 
-Примечание: скрипт `npm run deploy` в `package.json` устарел (старый IP `217.198.13.45` и путь `/var/www/partsauto/`) — **не использовать**, деплоить командами выше.
+Примечание: скрипт `npm run deploy` в `package.json` устарел (старый IP `217.198.13.45` и путь `/var/www/partsauto/`) — **не использовать**.
 
 ## Архитектура
 

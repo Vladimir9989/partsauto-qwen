@@ -6,6 +6,7 @@ const FiltersPanel = ({
   filters,
   brands,
   categories,
+  subcategories,
   models,
   generations,
   totalResults,
@@ -14,9 +15,14 @@ const FiltersPanel = ({
   mobileMenuOpen,
   onCloseMobileMenu
 }) => {
-  
+
   const handleFilterChange = useCallback((key, value) => {
     onFilterChange(key, value)
+  }, [onFilterChange])
+
+  const handleCategoryChange = useCallback((value) => {
+    onFilterChange('category', value)
+    onFilterChange('subcategory', '')
   }, [onFilterChange])
 
   const handleBrandChange = useCallback((value) => {
@@ -50,11 +56,26 @@ const FiltersPanel = ({
         <select
           className={styles.select}
           value={filters.category}
-          onChange={(e) => handleFilterChange('category', e.target.value)}
+          onChange={(e) => handleCategoryChange(e.target.value)}
         >
           <option value="">Все категории</option>
           {categories.map((cat, index) => (
             <option key={`cat-${cat}-${index}`} value={cat}>{cat}</option>
+          ))}
+        </select>
+      </div>
+
+      <div className={styles.formGroup}>
+        <label className={styles.label}>Подкатегория</label>
+        <select
+          className={styles.select}
+          value={filters.subcategory}
+          onChange={(e) => handleFilterChange('subcategory', e.target.value)}
+          disabled={!filters.category || subcategories.length === 0}
+        >
+          <option value="">Все подкатегории</option>
+          {subcategories.map((sub, index) => (
+            <option key={`sub-${sub}-${index}`} value={sub}>{sub}</option>
           ))}
         </select>
       </div>

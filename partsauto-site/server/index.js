@@ -127,6 +127,132 @@ const parser = new XMLParser({
   isArray: (name) => ['Ad', 'Image', 'CompatibleCar'].includes(name),
 });
 
+// ===== ПОДКАТЕГОРИИ ЗАПЧАСТЕЙ =====
+// В Avito-фиде родной тег подкатегории есть только у части категорий
+// (Кузов, Двигатель, Трансмиссия). Для остальных подкатегория определяется
+// по ключевым словам в названии товара: правила перебираются по порядку,
+// первое совпадение побеждает, без совпадений — «Прочее».
+const NATIVE_SUBCATEGORY_TAGS = [
+  'BodySparePartType',
+  'TransmissionSparePartType',
+  'EngineSparePartType',
+  'TechnicSparePartType',
+];
+
+const OTHER_SUBCATEGORY = 'Прочее';
+
+const SUBCATEGORY_RULES = {
+  'Электрооборудование': [
+    { name: 'Стеклоподъёмники', kw: ['стеклоподъ'] },
+    { name: 'Блоки управления', kw: ['блок управления', 'блок комфорта', 'блок abs', 'блок srs', 'электронный блок', 'блок розжига', 'блок предохранителей', 'блок '] },
+    { name: 'Щитки приборов', kw: ['щиток приборов', 'панель приборов', 'приборная панель', 'спидометр'] },
+    { name: 'Моторчики и вентиляторы', kw: ['моторчик', 'мотор отопителя', 'мотор охлаждения', 'мотор печки', 'вентилятор'] },
+    { name: 'Проводка', kw: ['проводка', 'жгут'] },
+    { name: 'Генераторы и стартеры', kw: ['генератор', 'стартер'] },
+    { name: 'Катушки зажигания', kw: ['катушка'] },
+    { name: 'Замки и активаторы', kw: ['замок зажигания', 'активатор', 'центральный замок'] },
+    { name: 'Датчики', kw: ['датчик', 'лямбда', 'указатель уровня'] },
+    { name: 'Реле', kw: ['реле'] },
+    { name: 'Звуковые сигналы', kw: ['звуковой сигнал', 'клаксон'] },
+    { name: 'Трапеции и дворники', kw: ['трапеция', 'дворник'] },
+    { name: 'Омыватели', kw: ['омывател'] },
+    { name: 'Аудио и мультимедиа', kw: ['магнитол', 'динамик', 'антенн'] },
+    { name: 'Кнопки и переключатели', kw: ['кнопк', 'переключател', 'подрулево'] },
+  ],
+  'Стекла': [
+    { name: 'Стёкла дверей', kw: ['стекло двер'] },
+    { name: 'Форточки', kw: ['форточка', 'форточки'] },
+    { name: 'Лобовое стекло', kw: ['лобовое'] },
+    { name: 'Заднее стекло', kw: ['заднее стекло', 'стекло заднее'] },
+    { name: 'Стёкла кузова', kw: ['стекло кузова', 'кузовные стекла', 'собачника', 'глухое'] },
+    { name: 'Дворники', kw: ['дворник'] },
+    { name: 'Люки', kw: ['люк'] },
+  ],
+  'Автосвет': [
+    { name: 'Противотуманные фары', kw: ['противотуман', 'птф'] },
+    { name: 'Фары', kw: ['фара', 'фары'] },
+    { name: 'Фонари', kw: ['фонар', 'стоп-сигнал', 'стоп сигнал'] },
+    { name: 'Поворотники', kw: ['поворотник', 'указатель поворота'] },
+    { name: 'Плафоны и подсветка', kw: ['плафон', 'подсветк'] },
+  ],
+  'Тормозная система': [
+    { name: 'Блоки ABS', kw: ['abs', 'абс'] },
+    { name: 'Суппорты', kw: ['суппорт'] },
+    { name: 'Тормозные диски', kw: ['диск'] },
+    { name: 'Вакуумные усилители', kw: ['вакуум', 'усилитель тормозов'] },
+    { name: 'Стояночный тормоз', kw: ['стояночн', 'ручник'] },
+    { name: 'Тормозные цилиндры', kw: ['цилиндр'] },
+    { name: 'Тросы', kw: ['трос'] },
+    { name: 'Колодки', kw: ['колодк'] },
+    { name: 'Барабаны', kw: ['барабан'] },
+  ],
+  'Рулевое управление': [
+    { name: 'Рулевые рейки', kw: ['рейка', 'рейки'] },
+    { name: 'Рулевые колонки', kw: ['колонка', 'колонки'] },
+    { name: 'Рули', kw: ['руль'] },
+    { name: 'ГУР и ЭУР', kw: [' гур', ' эур', 'эгур', 'гидроусилител', 'электроусилител'] },
+    { name: 'Тяги и наконечники', kw: ['тяга', 'тяги', 'наконечник'] },
+    { name: 'Карданчики рулевые', kw: ['кардан'] },
+  ],
+  'Салон': [
+    { name: 'Сиденья', kw: ['сиден', 'кресл'] },
+    { name: 'Обшивки', kw: ['обшивк'] },
+    { name: 'Центральная консоль', kw: ['консоль'] },
+    { name: 'Торпедо', kw: ['торпед', 'панель салона'] },
+    { name: 'Ремни безопасности', kw: ['ремень', 'ремни'] },
+    { name: 'Подушки безопасности', kw: ['подушка безопасности', 'airbag', 'аирбаг'] },
+    { name: 'Педали', kw: ['педаль'] },
+    { name: 'Козырьки', kw: ['козыр'] },
+    { name: 'Ковры', kw: ['ковер', 'ковёр', 'коврик'] },
+    { name: 'Отопитель', kw: ['отопител', 'печк'] },
+    { name: 'Ручки', kw: ['ручка', 'ручки'] },
+    { name: 'Полки', kw: ['полка'] },
+    { name: 'Уплотнители', kw: ['уплотнител'] },
+    { name: 'Кулисы КПП', kw: ['кулиса'] },
+  ],
+  'Подвеска': [
+    { name: 'Амортизаторы и стойки', kw: ['амортизатор', 'стойк'] },
+    { name: 'Рычаги', kw: ['рычаг'] },
+    { name: 'Пружины', kw: ['пружин'] },
+    { name: 'Поворотные кулаки', kw: ['кулак'] },
+    { name: 'Ступицы', kw: ['ступиц'] },
+    { name: 'Стабилизаторы', kw: ['стабилизатор'] },
+    { name: 'Подрамники', kw: ['подрамник'] },
+    { name: 'Балки', kw: ['балка'] },
+    { name: 'Сайлентблоки и шаровые', kw: ['сайлент', 'шаров'] },
+  ],
+  'Система охлаждения': [
+    { name: 'Кондиционер', kw: ['кондиционер', 'компрессор'] },
+    { name: 'Радиаторы', kw: ['радиатор'] },
+    { name: 'Расширительные бачки', kw: ['бачок'] },
+    { name: 'Вентиляторы', kw: ['вентилятор', 'крыльчат'] },
+    { name: 'Термостаты', kw: ['термостат'] },
+    { name: 'Помпы', kw: ['помпа', 'насос'] },
+    { name: 'Отопитель', kw: ['отопител', 'печк'] },
+  ],
+  'Топливная и выхлопная системы': [
+    { name: 'Бензобаки', kw: ['бензобак', 'топливный бак', 'бак '] },
+    { name: 'Дроссельные заслонки', kw: ['дроссель'] },
+    { name: 'Выхлопная система', kw: ['глушител', 'выхлоп', 'резонатор', 'катализатор', 'коллектор'] },
+    { name: 'Топливные насосы', kw: ['насос'] },
+    { name: 'Форсунки и рампы', kw: ['форсунк', 'рампа', 'рейка топливная', 'топливная рейка'] },
+    { name: 'Абсорберы', kw: ['абсорбер', 'адсорбер'] },
+    { name: 'Трубки и магистрали', kw: ['трубк', 'магистрал'] },
+    { name: 'Горловины', kw: ['горловин'] },
+    { name: 'Фильтры', kw: ['фильтр'] },
+  ],
+};
+
+function deriveSubcategory(category, title) {
+  const rules = SUBCATEGORY_RULES[category];
+  if (!rules) return '';
+  const t = ' ' + String(title).toLowerCase() + ' ';
+  for (const rule of rules) {
+    if (rule.kw.some(k => t.includes(k))) return rule.name;
+  }
+  return OTHER_SUBCATEGORY;
+}
+
 async function fetchAndParseXML() {
   console.log('Загрузка XML...');
   const response = await fetch(XML_URL);
@@ -171,6 +297,15 @@ async function fetchAndParseXML() {
     // SparePartType → category (основной фильтр)
     const category = ad.SparePartType ? String(ad.SparePartType) : '';
 
+    // Подкатегория: родной тег фида, иначе — по ключевым словам из названия
+    let subcategory = '';
+    for (const nativeTag of NATIVE_SUBCATEGORY_TAGS) {
+      if (ad[nativeTag]) { subcategory = String(ad[nativeTag]); break; }
+    }
+    if (!subcategory) {
+      subcategory = deriveSubcategory(category, ad.Title || '');
+    }
+
     // Цена: 0 и 0.00 → «Цена по запросу»
     let price = (ad.Price !== undefined && ad.Price !== null) ? String(ad.Price) : '';
     if (price === '0' || price === '0.0' || price === '0.00') price = '';
@@ -188,6 +323,7 @@ async function fetchAndParseXML() {
       carModel,
       generation,
       category,
+      subcategory,
       installationLocation: '',
       address: '',
       phone: '',
@@ -212,7 +348,7 @@ app.get('/api/products', async (req, res) => {
     }
 
     let results = cachedProducts;
-    const { search, brand, category, carModel, generation, priceMin, priceMax, page, limit } = req.query;
+    const { search, brand, category, subcategory, carModel, generation, priceMin, priceMax, page, limit } = req.query;
 
     if (search) {
       const s = search.toLowerCase();
@@ -226,6 +362,7 @@ app.get('/api/products', async (req, res) => {
     }
     if (brand) results = results.filter(p => p.brand === brand);
     if (category) results = results.filter(p => p.category === category);
+    if (subcategory) results = results.filter(p => p.subcategory === subcategory);
     if (carModel) results = results.filter(p => p.carModel === carModel);
     if (generation) results = results.filter(p => p.generation === generation);
 
@@ -255,8 +392,23 @@ app.get('/api/categories', async (req, res) => {
       lastFetch = now;
     }
     const seen = new Set();
-    cachedProducts.forEach(p => { if (p.category) seen.add(p.category); });
-    res.json({ categories: [...seen].sort() });
+    const subMap = {};
+    cachedProducts.forEach(p => {
+      if (!p.category) return;
+      seen.add(p.category);
+      if (p.subcategory) {
+        (subMap[p.category] = subMap[p.category] || new Set()).add(p.subcategory);
+      }
+    });
+    // «Прочее» всегда в конце списка; категории, где кроме «Прочего» ничего нет, — без подкатегорий
+    const subcategories = {};
+    for (const [cat, subs] of Object.entries(subMap)) {
+      const sorted = [...subs].filter(s => s !== OTHER_SUBCATEGORY).sort();
+      if (sorted.length === 0) continue;
+      if (subs.has(OTHER_SUBCATEGORY)) sorted.push(OTHER_SUBCATEGORY);
+      subcategories[cat] = sorted;
+    }
+    res.json({ categories: [...seen].sort(), subcategories });
   } catch (error) {
     res.status(500).json({ error: error.message });
   }

@@ -40,6 +40,7 @@ function CatalogPage() {
   const [loadingProgress, setLoadingProgress] = useState('Загрузка...')
   const [brands, setBrands] = useState([])
   const [categories, setCategories] = useState([])
+  const [subcategoriesMap, setSubcategoriesMap] = useState({})
   const [totalResults, setTotalResults] = useState(0)
   const [totalPages, setTotalPages] = useState(0)
   const [currentPage, setCurrentPage] = useState(1)
@@ -51,6 +52,7 @@ function CatalogPage() {
     search: '',
     brand: '',
     category: '',
+    subcategory: '',
     carModel: '',
     generation: '',
   })
@@ -97,6 +99,7 @@ function CatalogPage() {
         if (debouncedSearch) params.set('search', debouncedSearch)
         if (filters.brand) params.set('brand', filters.brand)
         if (filters.category) params.set('category', filters.category)
+        if (filters.subcategory) params.set('subcategory', filters.subcategory)
         if (filters.carModel) params.set('carModel', filters.carModel)
         if (filters.generation) params.set('generation', filters.generation)
         params.set('page', currentPage)
@@ -135,7 +138,7 @@ function CatalogPage() {
         abortControllerRef.current.abort()
       }
     }
-  }, [debouncedSearch, filters.brand, filters.category, filters.carModel, filters.generation, currentPage])
+  }, [debouncedSearch, filters.brand, filters.category, filters.subcategory, filters.carModel, filters.generation, currentPage])
 
   // Загрузка списка брендов
   useEffect(() => {
@@ -175,6 +178,7 @@ function CatalogPage() {
         if (!res.ok) throw new Error('Ошибка')
         const data = await res.json()
         setCategories(data.categories || [])
+        setSubcategoriesMap(data.subcategories || {})
       } catch (error) {
         console.error('Ошибка загрузки категорий:', error)
       }
@@ -244,7 +248,7 @@ function CatalogPage() {
   // Сброс страницы при изменении фильтров
   useEffect(() => {
     setCurrentPage(1)
-  }, [filters.brand, filters.category, filters.carModel, filters.generation, debouncedSearch])
+  }, [filters.brand, filters.category, filters.subcategory, filters.carModel, filters.generation, debouncedSearch])
 
   const handleFilterChange = useCallback((key, value) => {
     setFilters(prev => ({ ...prev, [key]: value }))
@@ -255,6 +259,7 @@ function CatalogPage() {
       search: '',
       brand: '',
       category: '',
+      subcategory: '',
       carModel: '',
       generation: '',
     })
@@ -315,11 +320,27 @@ function CatalogPage() {
                     <label>Категория</label>
                     <select
                       value={filters.category}
-                      onChange={(e) => handleFilterChange('category', e.target.value)}
+                      onChange={(e) => {
+                        handleFilterChange('category', e.target.value)
+                        handleFilterChange('subcategory', '')
+                      }}
                     >
                       <option value="">Все категории</option>
                       {categories.map((cat, index) => (
                         <option key={`cat-${cat}-${index}`} value={cat}>{cat}</option>
+                      ))}
+                    </select>
+                  </div>
+                  <div className={styles.compactFilterGroup}>
+                    <label>Подкатегория</label>
+                    <select
+                      value={filters.subcategory}
+                      onChange={(e) => handleFilterChange('subcategory', e.target.value)}
+                      disabled={!filters.category || !(subcategoriesMap[filters.category] || []).length}
+                    >
+                      <option value="">Все подкатегории</option>
+                      {(subcategoriesMap[filters.category] || []).map((sub, index) => (
+                        <option key={`sub-${sub}-${index}`} value={sub}>{sub}</option>
                       ))}
                     </select>
                   </div>
@@ -384,6 +405,7 @@ function CatalogPage() {
                 filters={filters}
                 brands={brands}
                 categories={categories}
+                subcategories={subcategoriesMap[filters.category] || []}
                 models={models}
                 generations={generations}
                 totalResults={totalResults}

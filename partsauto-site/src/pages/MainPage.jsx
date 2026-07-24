@@ -10,6 +10,24 @@ import { IconMax, IconAvito, IconVK, IconTelegram, IconDrom } from '../component
 import SEO from '../components/SEO'
 import StructuredData from '../components/StructuredData'
 
+const allKeywords = [
+  "автозапчасти", "выкуп авто", "разборка", "Реж", "Екатеринбург", "б/у запчасти",
+  "запчасти бу", "купить запчасти",
+  "купить двигатель", "купить МКПП", "купить Акпп", "купить фару", "купить бампер",
+  "купить рулевую рейку", "купить тормозной суппорт", "купить дверь", "купить стекло",
+  "купить кузов", "купить капот", "купить крыло", "купить порог", "купить крышу", "купить стойку",
+  "купить запчасти Daewoo Nexia", "купить запчасти Daewoo Matiz",
+  "купить запчасти Chevrolet Aveo", "купить запчасти Chevrolet Lanos", "купить запчасти Chevrolet Lacetti",
+  "купить запчасти Kia Rio", "купить запчасти Kia Spectra",
+  "купить запчасти Renault Duster", "купить запчасти Renault Logan", "купить запчасти Renault Megan",
+  "купить запчасти Skoda Octavia", "купить запчасти Volkswagen Polo",
+  "купить запчасти Toyota Corolla",
+  "купить запчасти Hyundai Accent", "купить запчасти Hyundai Solaris",
+  "купить запчасти Nissan Almera Classic",
+  "купить запчасти Mazda 3", "купить запчасти Mazda 6",
+  "купить запчасти Citroen"
+];
+
 function MainPage() {
   const { theme } = useTheme()
   const [imageIndex, setImageIndex] = useState(0)
@@ -77,7 +95,7 @@ function MainPage() {
       <SEO
         title="Главная"
         description="Автозапчасти б/у. Выкуп авто в любом состоянии. Деньги сразу. Работаем в Екатеринбурге и Реже. Более 200 000 запчастей в наличии."
-        keywords="автозапчасти, выкуп авто, разборка, Реж, Екатеринбург, б/у запчасти"
+        keywords={allKeywords.join(", ")}
       />
       <StructuredData data={organizationSchema} />
       <div className={styles.jumbotron} style={{ cursor: 'pointer', backgroundImage }}>

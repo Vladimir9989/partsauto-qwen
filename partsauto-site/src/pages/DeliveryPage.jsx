@@ -1,13 +1,31 @@
 import SEO from '../components/SEO'
 import styles from './DeliveryPage.module.css'
 
+const allKeywords = [
+  "автозапчасти", "выкуп авто", "разборка", "Реж", "Екатеринбург", "б/у запчасти",
+  "запчасти бу", "купить запчасти",
+  "купить двигатель", "купить МКПП", "купить Акпп", "купить фару", "купить бампер",
+  "купить рулевую рейку", "купить тормозной суппорт", "купить дверь", "купить стекло",
+  "купить кузов", "купить капот", "купить крыло", "купить порог", "купить крышу", "купить стойку",
+  "купить запчасти Daewoo Nexia", "купить запчасти Daewoo Matiz",
+  "купить запчасти Chevrolet Aveo", "купить запчасти Chevrolet Lanos", "купить запчасти Chevrolet Lacetti",
+  "купить запчасти Kia Rio", "купить запчасти Kia Spectra",
+  "купить запчасти Renault Duster", "купить запчасти Renault Logan", "купить запчасти Renault Megan",
+  "купить запчасти Skoda Octavia", "купить запчасти Volkswagen Polo",
+  "купить запчасти Toyota Corolla",
+  "купить запчасти Hyundai Accent", "купить запчасти Hyundai Solaris",
+  "купить запчасти Nissan Almera Classic",
+  "купить запчасти Mazda 3", "купить запчасти Mazda 6",
+  "купить запчасти Citroen"
+];
+
 function DeliveryPage() {
   return (
     <>
       <SEO
         title="Оплата и доставка"
         description="Способы оплаты и доставки автозапчастей. Доставка по Екатеринбургу и всей России через ТК. Самовывоз в Реже и Екатеринбурге."
-        keywords="доставка автозапчастей, оплата, самовывоз, доставка по России"
+        keywords={allKeywords.join(", ")}
       />
 
       <div className={styles.deliveryPage}>

@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react'
 import { useParams, Link } from 'react-router-dom'
 import { Helmet } from 'react-helmet-async'
 import SEO from '../components/SEO'
+import NewsQuiz from '../components/NewsQuiz'
 import styles from './NewsDetailPage.module.css'
 
 const allKeywords = [
@@ -104,10 +105,12 @@ function NewsDetailPage() {
             <h1 className={styles.newsTitle}>{news.title}</h1>
             <time className={styles.newsDate}>{news.date}</time>
             
-            <div 
+            <div
               className={styles.newsContent}
               dangerouslySetInnerHTML={{ __html: news.content }}
             />
+
+            {news.quiz && <NewsQuiz questions={news.quiz} />}
           </article>
         </div>
       </div>

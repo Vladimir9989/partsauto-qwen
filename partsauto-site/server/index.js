@@ -929,6 +929,49 @@ app.post('/api/send-order-email', (req, res) => {
   })();
 });
 
+// ===== SITEMAP.XML (динамический, включает актуальные новости) =====
+const SITE_URL = 'https://razbor-vykup.ru';
+
+app.get('/sitemap.xml', (req, res) => {
+  const today = new Date().toISOString().split('T')[0];
+
+  const staticPages = [
+    { loc: '/', changefreq: 'daily', priority: '1.0' },
+    { loc: '/catalog', changefreq: 'daily', priority: '0.9' },
+    { loc: '/car-buyback', changefreq: 'monthly', priority: '0.8' },
+    { loc: '/delivery', changefreq: 'monthly', priority: '0.7' },
+    { loc: '/warranty', changefreq: 'monthly', priority: '0.7' },
+    { loc: '/news', changefreq: 'weekly', priority: '0.6' },
+  ];
+
+  const news = getNewsList();
+  const newsPages = news.map((item) => ({
+    loc: item.link || `/news/${item.id}`,
+    lastmod: (item.updatedAt || item.createdAt || '').split('T')[0] || today,
+    changefreq: 'monthly',
+    priority: '0.5',
+  }));
+
+  const urls = [
+    ...staticPages.map((p) => ({ ...p, lastmod: today })),
+    ...newsPages,
+  ];
+
+  const body = urls
+    .map(
+      (u) => `  <url>
+    <loc>${SITE_URL}${u.loc}</loc>
+    <lastmod>${u.lastmod}</lastmod>
+    <changefreq>${u.changefreq}</changefreq>
+    <priority>${u.priority}</priority>
+  </url>`
+    )
+    .join('\n');
+
+  res.header('Content-Type', 'application/xml');
+  res.send(`<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n${body}\n</urlset>\n`);
+});
+
 // ===== СТАТИКА И FALLBACK (В КОНЦЕ!) =====
 app.use(express.static(path.join(__dirname, '../dist')));
 
